@@ -28,8 +28,8 @@ export function WorkspaceTab({ onFullView }: { onFullView: () => void }) {
           </svg>
         </div>
         <div className="flex flex-col items-center gap-1 text-center text-[11px] text-t4">
-          <svg className="h-4 w-4 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>
-          <span>Salesforce{"\n"}Pipeline view</span>
+          <svg className="h-4 w-4 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
+          <span>LinkedIn{"\n"}Founder profile</span>
         </div>
       </div>
 
@@ -37,15 +37,15 @@ export function WorkspaceTab({ onFullView }: { onFullView: () => void }) {
       <div className="flex items-center gap-2 rounded-lg border border-b1 bg-bg3 px-3 py-2">
         <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-g shadow-[0_0_4px_var(--gg)]" />
         <div className="flex-1">
-          <div className="text-[11.5px] font-medium text-t1">Check Salesforce pipeline</div>
-          <div className="text-[10px] text-t3">Using screen now - 1:42 elapsed</div>
+          <div className="text-[11.5px] font-medium text-t1">Research inbound founder</div>
+          <div className="text-[10px] text-t3">Using screen now - 2:18 elapsed</div>
         </div>
       </div>
 
       {/* Queue */}
       <div className="flex items-center gap-1.5 rounded-md bg-as px-3 py-1.5 text-[10.5px] text-t3">
         <div className="h-1 w-1 shrink-0 rounded-full bg-am" />
-        Up next: Update CRM contacts from CSV
+        Up next: Draft LP follow-up emails
       </div>
 
       {/* Status row */}

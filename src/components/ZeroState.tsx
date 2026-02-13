@@ -26,7 +26,7 @@ export function ZeroState({ onStartTask }: ZeroStateProps) {
           </div>
           <div>
             <div className="text-sm leading-[1.65] text-t1">
-              Good morning, Peter.
+              Good morning, Katie.
             </div>
             <div className="mt-0.5 text-sm leading-[1.65] text-t2">
               Here&apos;s what I can get started on for you.

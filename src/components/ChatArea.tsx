@@ -75,7 +75,7 @@ export function ChatArea({
           <CompetitorScanResult
             onEditSchedule={() =>
               openSchedule(
-                "Daily competitor scan",
+                "Daily deal sourcing digest",
                 "Every day at 7:00am",
                 "Tomorrow 7:00am"
               )
@@ -95,11 +95,11 @@ export function ChatArea({
           <>
             <AgentMessage>
               <div className="text-sm leading-[1.6] text-t2">
-                On it, pulling your Acme Corp briefing now.
+                On it, pulling your Sequoia Scouts LP prep now.
               </div>
               <RunningTaskDetail
                 steps={runningTaskSteps}
-                subtasks={["Researching Acme Corp..."]}
+                subtasks={["Researching Sequoia Scouts..."]}
                 onViewActivityLog={onViewActivityLog}
               />
             </AgentMessage>
@@ -115,8 +115,8 @@ export function ChatArea({
 
         {/* ── User adds a follow-up request ── */}
         <UserMessage>
-          Also check if there&apos;s anything new on our Salesforce pipeline
-          from yesterday&apos;s calls.
+          Also check which LPs are overdue for a touchpoint. I want to
+          make sure I&apos;m staying on top of the P1 relationships.
         </UserMessage>
 
         {/* ── Simular picks up the second task in parallel ── */}
@@ -124,11 +124,11 @@ export function ChatArea({
           <>
             <AgentMessage>
               <div className="text-sm leading-[1.6] text-t2">
-                On it, I&apos;ll check Salesforce while the briefing runs.
+                On it, I&apos;ll check your LP touchpoints while the briefing runs.
               </div>
               <RunningTaskDetail
                 steps={[]}
-                subtasks={["Checking Salesforce pipeline..."]}
+                subtasks={["Checking Salesforce LP records..."]}
               />
             </AgentMessage>
 
@@ -144,7 +144,7 @@ export function ChatArea({
         {/* ── Briefing result ── */}
         <AgentMessage>
           <div className="text-sm leading-[1.6] text-t2">
-            Here&apos;s your Acme briefing.
+            Here&apos;s your Sequoia Scouts LP prep.
           </div>
           <ResultCard
             highlighted={view === "result-detail"}
@@ -157,9 +157,9 @@ export function ChatArea({
           <SalesforceResult
             onEditSchedule={() =>
               openSchedule(
-                "Check Salesforce pipeline",
+                "LP touchpoint tracker",
                 undefined,
-                "Tomorrow 7:00am"
+                "Next Monday 8:00am"
               )
             }
           />

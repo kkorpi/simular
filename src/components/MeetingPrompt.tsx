@@ -2,9 +2,9 @@ export function MeetingPrompt() {
   return (
     <div>
       <div className="text-sm leading-[1.65] text-t2">
-        You also have a meeting with{" "}
-        <strong className="font-semibold text-t1">Acme Corp at 2pm</strong>.
-        Want me to pull a briefing?
+        You have an{" "}
+        <strong className="font-semibold text-t1">LP meeting with Sequoia Scouts on Thursday</strong>.
+        Want me to pull your prep briefing now?
       </div>
 
       {/* Action buttons */}

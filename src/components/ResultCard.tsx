@@ -16,18 +16,18 @@ export function ResultCard({
           <svg className="h-4 w-4 text-t1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /><polyline points="10 9 9 9 8 9" /></svg>
         </div>
         <div className="min-w-0 flex-1">
-          <div className="text-[13px] font-semibold text-t1">Acme Corp - Meeting Briefing</div>
-          <div className="text-[11px] text-t3">8 sources - just now</div>
+          <div className="text-[13px] font-semibold text-t1">Sequoia Scouts - LP Meeting Prep</div>
+          <div className="text-[11px] text-t3">5 sources - just now</div>
         </div>
       </div>
       <div className="px-3.5 py-3 text-[13px] leading-[1.6] text-t2">
-        <strong className="font-semibold text-t1">Acme Corp</strong> (Series B, $42M raised) builds
-        supply chain optimization for mid-market retailers.
+        <strong className="font-semibold text-t1">Sequoia Scouts</strong> ($2.5B AUM). P1 LP since Fund II,
+        last touchpoint 45 days ago.
         {!highlighted && (
           <>
             {" "}
-            CEO <strong className="font-semibold text-t1">Sarah Chen</strong> previously led ops at
-            Shopify.
+            Key contact: <strong className="font-semibold text-t1">Ravi Gupta</strong>, Managing Director.
+            Considering Fund IV commitment.
           </>
         )}
       </div>
@@ -41,7 +41,7 @@ export function ResultCard({
             onClick={onOpenDetail}
             className="rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-all hover:brightness-110"
           >
-            Open full briefing
+            Open full prep
           </button>
         )}
         <button className="rounded-md border border-b1 bg-transparent px-2.5 py-1 text-xs font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">

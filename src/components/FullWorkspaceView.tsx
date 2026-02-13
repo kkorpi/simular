@@ -68,14 +68,14 @@ export function FullWorkspaceView({
             LIVE
           </div>
           <div className="flex flex-col items-center text-center text-[13px] text-t4">
-            <svg className="mb-2 h-5 w-5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>
-            Salesforce - Pipeline View
+            <svg className="mb-2 h-5 w-5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
+            LinkedIn - Founder Profile
             <br />
             <br />
             <span className="text-[11px] text-t4">
-              Your coworker is scrolling through Q1 pipeline data,
+              Your coworker is reviewing the inbound founder&apos;s LinkedIn,
               <br />
-              extracting updates from yesterday&apos;s calls.
+              pulling background, experience, and mutual connections.
             </span>
           </div>
         </div>

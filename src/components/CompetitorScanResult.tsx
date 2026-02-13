@@ -7,8 +7,8 @@ export function CompetitorScanResult({
     <div>
       <div className="text-sm leading-[1.65] text-t2">
         Your{" "}
-        <strong className="font-semibold text-t1">daily competitor scan</strong>{" "}
-        finished. Two new companies raised funding overnight.
+        <strong className="font-semibold text-t1">deal sourcing digest</strong>{" "}
+        is ready. Three new deals worth reviewing this morning.
       </div>
 
       {/* Compact result card */}
@@ -19,10 +19,10 @@ export function CompetitorScanResult({
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-[13px] font-semibold text-t1">
-              Competitor Intel - Feb 13
+              Deal Sourcing Digest - Feb 13
             </div>
             <div className="text-[11px] text-t3">
-              2 new funded competitors · ran at 7:02am
+              3 new deals flagged · ran at 7:04am
             </div>
           </div>
           <button className="rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-all hover:brightness-110">
@@ -36,15 +36,22 @@ export function CompetitorScanResult({
             <div className="flex items-start gap-2 text-[12px] leading-[1.5] text-t2">
               <div className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-t4" />
               <span>
-                <strong className="font-medium text-t1">Vanta</strong> raised
-                $40M Series C led by Sequoia, AI compliance automation
+                <strong className="font-medium text-t1">Abridge</strong> raised
+                $150M Series C led by Lightspeed, clinical AI documentation
               </span>
             </div>
             <div className="flex items-start gap-2 text-[12px] leading-[1.5] text-t2">
               <div className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-t4" />
               <span>
-                <strong className="font-medium text-t1">Drata</strong> acquired
-                ComplianceBot for SOC2 evidence collection
+                <strong className="font-medium text-t1">NovaTech AI</strong>{" "}
+                (YC W25) $4.2M seed, vertical AI for supply chain compliance
+              </span>
+            </div>
+            <div className="flex items-start gap-2 text-[12px] leading-[1.5] text-t2">
+              <div className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-t4" />
+              <span>
+                <strong className="font-medium text-t1">ClearStack</strong>{" "}
+                $3.1M seed, AI procurement, second-time founder (prev. exit to Coupa)
               </span>
             </div>
           </div>

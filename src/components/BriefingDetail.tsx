@@ -28,9 +28,9 @@ export function BriefingDetail({ onBack }: { onBack: () => void }) {
           Back
         </button>
         <div className="flex-1 text-[15px] font-semibold text-t1">
-          Acme Corp - Meeting Briefing
+          Sequoia Scouts - LP Meeting Prep
         </div>
-        <div className="font-mono text-[11px] text-t3">8 sources - 9:14am</div>
+        <div className="font-mono text-[11px] text-t3">5 sources - 9:30am</div>
       </div>
 
       {/* Body */}
@@ -38,7 +38,7 @@ export function BriefingDetail({ onBack }: { onBack: () => void }) {
         {/* Company overview */}
         <div className="mb-5">
           <div className="mb-2.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-t4">
-            Company overview
+            LP overview
           </div>
           <div className="grid grid-cols-[auto_1fr] gap-x-3.5 gap-y-1.5 text-[13px]">
             {Object.entries(briefingOverview).map(([key, val]) => (

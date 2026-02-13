@@ -6,7 +6,7 @@ export function SalesforceResult({
   return (
     <div>
       <div className="text-sm leading-[1.6] text-t2">
-        Here&apos;s your Salesforce pipeline update from yesterday&apos;s calls.
+        Here&apos;s your LP touchpoint report. A few relationships need attention.
       </div>
 
       {/* Result card */}
@@ -17,10 +17,10 @@ export function SalesforceResult({
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-[13px] font-semibold text-t1">
-              Pipeline Update - Feb 13
+              LP Touchpoint Report - Feb 13
             </div>
             <div className="text-[11px] text-t3">
-              3 deal updates · 1 needs attention
+              4 LPs overdue · 5 actions suggested
             </div>
           </div>
           <button className="rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-all hover:brightness-110">
@@ -32,24 +32,24 @@ export function SalesforceResult({
         <div className="border-t border-b1 px-3.5 py-2.5">
           <div className="flex flex-col gap-1.5">
             <div className="flex items-start gap-2 text-[12px] leading-[1.5] text-t2">
-              <div className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-g" />
+              <div className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-am" />
               <span>
-                <strong className="font-medium text-t1">Acme Corp</strong>{" "}
-                moved to Negotiation - $180K, close date Mar 15
-              </span>
-            </div>
-            <div className="flex items-start gap-2 text-[12px] leading-[1.5] text-t2">
-              <div className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-g" />
-              <span>
-                <strong className="font-medium text-t1">BetaCo</strong>{" "}
-                demo scheduled for next Tuesday
+                <strong className="font-medium text-t1">Wellington</strong>{" "}
+                72 days since last touchpoint. Suggest: share portfolio update deck.
               </span>
             </div>
             <div className="flex items-start gap-2 text-[12px] leading-[1.5] text-t2">
               <div className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-am" />
               <span>
-                <strong className="font-medium text-t1">Gamma Inc</strong>{" "}
-                stale - no activity in 32 days, was $42K
+                <strong className="font-medium text-t1">GIC Singapore</strong>{" "}
+                68 days overdue. Suggest: invite to AI in Healthcare webinar.
+              </span>
+            </div>
+            <div className="flex items-start gap-2 text-[12px] leading-[1.5] text-t2">
+              <div className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-g" />
+              <span>
+                <strong className="font-medium text-t1">12 other P1 LPs</strong>{" "}
+                are within your 60-day touchpoint cadence
               </span>
             </div>
           </div>
@@ -61,16 +61,16 @@ export function SalesforceResult({
         <svg className="h-4 w-4 shrink-0 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 014-4h14" /><polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 01-4 4H3" /></svg>
         <div className="flex-1 text-[13px] leading-[1.5] text-t2">
           <strong className="font-medium text-t1">
-            Want me to do this every morning?
+            Want me to run this every Monday?
           </strong>{" "}
-          I&apos;ll check the pipeline and flag changes.
+          I&apos;ll track LP touchpoints and suggest outreach to keep you on cadence.
         </div>
         <div className="flex gap-1.5">
           <button
             onClick={onEditSchedule}
             className="rounded-md border border-transparent bg-gs px-2.5 py-1 text-[11.5px] font-medium text-gt"
           >
-            Yes, daily
+            Yes, weekly
           </button>
           <button className="rounded-md border border-b1 bg-transparent px-2.5 py-1 text-[11.5px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
             No thanks
