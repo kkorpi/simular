@@ -1,26 +1,248 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ===== Dark Theme (default) ===== */
+[data-theme="dark"] {
+  --logo-bg: #FEFEFE;
+  --logo-fg: #000000;
+  --bg: #0a0a0b;
+  --bg2: #101012;
+  --bg3: #161618;
+  --bg3h: #1c1c1f;
+  --bgi: #1a1a1d;
+  --bgm: #111413;
+  --bgmb: #1e2b22;
+  --b1: #1c1c1f;
+  --b2: #28282c;
+  --bf: #3a3a40;
+  --t1: #e8e8eb;
+  --t2: #88888f;
+  --t3: #58585f;
+  --t4: #3a3a40;
+  --as: rgba(200, 200, 204, 0.07);
+  --ab: #e8e8eb;
+  --abt: #0a0a0b;
+  --g: #3dd68c;
+  --gs: rgba(61, 214, 140, 0.08);
+  --gg: rgba(61, 214, 140, 0.2);
+  --gt: #3dd68c;
+  --am: #e8a830;
+  --ams: rgba(232, 168, 48, 0.08);
+  --bl: #5b9bf0;
+  --bls: rgba(91, 155, 240, 0.07);
+  --blt: #5b9bf0;
+  --lb: #e8e8eb;
+  --lt: #0a0a0b;
+  --sc: 0 1px 3px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--b1);
+  --mg: radial-gradient(ellipse at 30% 0%, rgba(61, 214, 140, 0.06) 0%, transparent 50%);
+  --st: #88888f;
+  --sb: #1c1c1f;
+  --thumb-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
 
+/* ===== Light Theme ===== */
+[data-theme="light"] {
+  --logo-bg: #000000;
+  --logo-fg: #FEFEFE;
+  --bg: #f8f8f9;
+  --bg2: #f0f0f2;
+  --bg3: #fff;
+  --bg3h: #f5f5f7;
+  --bgi: #fff;
+  --bgm: #f6fbf8;
+  --bgmb: #c8e0d0;
+  --b1: #e6e6e9;
+  --b2: #d4d4d8;
+  --bf: #b0b0b8;
+  --t1: #18181b;
+  --t2: #6b6b73;
+  --t3: #9b9ba3;
+  --t4: #c0c0c6;
+  --as: rgba(82, 82, 91, 0.05);
+  --ab: #18181b;
+  --abt: #fff;
+  --g: #1d9960;
+  --gs: rgba(29, 153, 96, 0.06);
+  --gg: rgba(29, 153, 96, 0.15);
+  --gt: #18804f;
+  --am: #a06e10;
+  --ams: rgba(160, 110, 16, 0.06);
+  --bl: #3575d4;
+  --bls: rgba(53, 117, 212, 0.05);
+  --blt: #2d6abf;
+  --lb: #18181b;
+  --lt: #fff;
+  --sc: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--b1);
+  --mg: radial-gradient(ellipse at 30% 0%, rgba(29, 153, 96, 0.06) 0%, transparent 50%);
+  --st: #18181b;
+  --sb: #d4d4d8;
+  --thumb-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Tailwind Theme Tokens ===== */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-bg: var(--bg);
+  --color-bg2: var(--bg2);
+  --color-bg3: var(--bg3);
+  --color-bg3h: var(--bg3h);
+  --color-bgi: var(--bgi);
+  --color-bgm: var(--bgm);
+  --color-bgmb: var(--bgmb);
+  --color-b1: var(--b1);
+  --color-b2: var(--b2);
+  --color-bf: var(--bf);
+  --color-t1: var(--t1);
+  --color-t2: var(--t2);
+  --color-t3: var(--t3);
+  --color-t4: var(--t4);
+  --color-as: var(--as);
+  --color-ab: var(--ab);
+  --color-abt: var(--abt);
+  --color-g: var(--g);
+  --color-gs: var(--gs);
+  --color-gg: var(--gg);
+  --color-gt: var(--gt);
+  --color-am: var(--am);
+  --color-ams: var(--ams);
+  --color-bl: var(--bl);
+  --color-bls: var(--bls);
+  --color-blt: var(--blt);
+  --color-lb: var(--lb);
+  --color-lt: var(--lt);
+  --color-st: var(--st);
+  --color-sb: var(--sb);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ===== Base Styles ===== */
+body {
+  background: var(--bg);
+  color: var(--t1);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* ===== Animations ===== */
+@keyframes pulse-dot {
+  0%, 100% { box-shadow: 0 0 5px var(--gg); }
+  50% { box-shadow: 0 0 12px var(--gg); }
+}
+
+@keyframes working-dots {
+  0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+  40% { opacity: 0.7; transform: scale(1); }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 3s ease-in-out infinite;
+}
+
+.animate-working-dot {
+  animation: working-dots 1.4s ease-in-out infinite;
+}
+
+.animate-working-dot-2 {
+  animation: working-dots 1.4s ease-in-out infinite 0.15s;
+}
+
+.animate-working-dot-3 {
+  animation: working-dots 1.4s ease-in-out infinite 0.3s;
+}
+
+/* ===== Running Task Ping ===== */
+@keyframes running-ping {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(3.5); opacity: 0; }
+}
+
+.animate-running-glow {
+  position: relative;
+}
+
+.animate-running-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  border: 1.5px solid var(--g);
+  animation: running-ping 2s ease-out infinite;
+}
+
+/* ===== Hover Thumbnail ===== */
+@keyframes hover-thumb-enter {
+  from { opacity: 0; transform: translateX(6px) scale(0.97); }
+  to { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+.animate-hover-thumb-enter {
+  animation: hover-thumb-enter 0.15s ease-out forwards;
+}
+
+/* ===== Shimmer Bar ===== */
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.shimmer-bar {
+  background: var(--gg);
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--g) 50%,
+    transparent 100%
+  );
+  animation: shimmer-sweep 1.8s ease-in-out infinite;
+}
+
+/* ===== Collapsible Section ===== */
+.collapsible {
+  display: grid;
+  transition: grid-template-rows 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+.collapsible[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.collapsible[data-open="false"] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.collapsible > div {
+  overflow: hidden;
+}
+
+/* ===== Step Log Animation ===== */
+@keyframes step-log-enter {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    max-height: 600px;
+    transform: translateY(0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.animate-step-log-enter {
+  animation: step-log-enter 0.25s ease-out forwards;
 }
+
+/* ===== Scrollbar ===== */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--b1); border-radius: 100px; }
+::-webkit-scrollbar-thumb:hover { background: var(--b2); }
