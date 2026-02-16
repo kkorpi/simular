@@ -179,7 +179,7 @@ export function FullWorkspaceView({
       {/* Screen area */}
       <div ref={containerRef} className="relative flex flex-1 items-center justify-center overflow-hidden bg-bg3">
         {/* LIVE badge */}
-        <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-black/65 px-2 py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
+        <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-bg2/90 px-2 py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
           <div className="h-1 w-1 rounded-full bg-g" />
           LIVE
         </div>
@@ -202,7 +202,7 @@ export function FullWorkspaceView({
           ref={panelRef}
           onMouseDown={handleMouseDown}
           style={panelStyle()}
-          className={`absolute w-[300px] rounded-xl bg-black/70 backdrop-blur-md select-none ${
+          className={`absolute w-[300px] rounded-xl bg-bg2/90 backdrop-blur-md shadow-lg select-none ${
             dragging ? "cursor-grabbing" : "cursor-grab"
           } ${
             stepsVisible

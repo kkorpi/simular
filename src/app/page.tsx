@@ -81,7 +81,7 @@ export default function Home() {
           onClick={() => setWorkspaceOpen(true)}
           className="relative flex aspect-video cursor-pointer items-center justify-center bg-bg3 transition-all hover:brightness-110"
         >
-          <div className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-full bg-black/65 px-[7px] py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
+          <div className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-full bg-bg2/90 px-[7px] py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
             <div className="h-1 w-1 rounded-full bg-g" />
             LIVE
           </div>

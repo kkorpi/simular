@@ -90,11 +90,11 @@ export function RightPanel({
           onClick={onOpenWorkspace}
           className="relative flex aspect-video cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-b1 bg-bg3 transition-all hover:border-b2"
         >
-          <div className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-full bg-black/65 px-[7px] py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
+          <div className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-full bg-bg2/90 px-[7px] py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
             <div className="h-1 w-1 rounded-full bg-g" />
             LIVE
           </div>
-          <div className="absolute bottom-1.5 right-1.5 flex items-center justify-center rounded-md bg-black/50 p-0.5 backdrop-blur-sm">
+          <div className="absolute bottom-1.5 right-1.5 flex items-center justify-center rounded-md bg-bg2/80 p-0.5 backdrop-blur-sm">
             <svg className="h-4 w-4 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 3 21 3 21 9" />
               <polyline points="9 21 3 21 3 15" />
