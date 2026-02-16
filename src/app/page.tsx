@@ -6,17 +6,41 @@ import { ChatArea } from "@/components/ChatArea";
 import { RightPanel } from "@/components/RightPanel";
 import { FullWorkspaceView } from "@/components/FullWorkspaceView";
 import { ZeroState } from "@/components/ZeroState";
-import { SettingsOverlay } from "@/components/SettingsOverlay";
+import { SettingsOverlay, type SettingsSection } from "@/components/SettingsOverlay";
 import type { ViewState } from "@/data/mockData";
 
 export default function Home() {
   const [activeView, setActiveView] = useState<ViewState>("zero-state");
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsSection, setSettingsSection] = useState<SettingsSection | undefined>(undefined);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [panelCollapsed, setPanelCollapsed] = useState(false);
 
   const handleStartTask = () => {
     setActiveView("task-hover");
+  };
+
+  const handleSlashCommand = (command: string) => {
+    switch (command) {
+      case "skills":
+        setSettingsSection("skills");
+        setSettingsOpen(true);
+        break;
+      case "integrations":
+        setSettingsSection("workspace");
+        setSettingsOpen(true);
+        break;
+      case "settings":
+        setSettingsSection("appearance");
+        setSettingsOpen(true);
+        break;
+      case "history":
+        // Could navigate to completed tasks view
+        break;
+      case "schedule":
+        // Could open schedule modal
+        break;
+    }
   };
 
   const showPip = panelCollapsed && activeView !== "zero-state";
@@ -30,13 +54,14 @@ export default function Home() {
       />
       <div className="flex flex-1 overflow-hidden">
         {activeView === "zero-state" ? (
-          <ZeroState onStartTask={handleStartTask} />
+          <ZeroState onStartTask={handleStartTask} onSlashCommand={handleSlashCommand} />
         ) : (
           <>
             <ChatArea
               view={activeView}
               onOpenDetail={() => setActiveView("result-detail")}
               onViewActivityLog={() => setWorkspaceOpen(true)}
+              onSlashCommand={handleSlashCommand}
             />
             <RightPanel
               view={activeView}
@@ -98,7 +123,8 @@ export default function Home() {
       />
       <SettingsOverlay
         open={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
+        onClose={() => { setSettingsOpen(false); setSettingsSection(undefined); }}
+        initialSection={settingsSection}
       />
     </div>
   );

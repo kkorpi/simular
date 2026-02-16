@@ -50,6 +50,8 @@ export interface Task {
   thumbSite?: string;
   thumbStatus?: string;
   detail?: TaskDetail;
+  integrations?: string[];
+  skills?: string[];
 }
 
 export interface Person {
@@ -75,6 +77,8 @@ export const activeTasks: Task[] = [
     thumbLabel: "Active - using screen now",
     thumbSite: "linkedin.com/in/daniel-park",
     thumbStatus: "LinkedIn\nFounder profile",
+    integrations: ["LinkedIn", "X", "Salesforce"],
+    skills: ["Research"],
     detail: {
       description: "Reviewing inbound deal from Daniel Park. Checking LinkedIn, X, and company website to build a founder profile and map to existing Salesforce records.",
       duration: "2:18 elapsed",
@@ -97,6 +101,8 @@ export const activeTasks: Task[] = [
     thumbLabel: "Queued - will start next",
     thumbSite: "waiting for current task",
     thumbStatus: "Waiting\nfor screen",
+    integrations: ["Gmail", "Granola"],
+    skills: ["Writing"],
     detail: {
       description: "After today's LP meetings, pull Granola notes, draft personalized thank-you emails including attendee emails and colleague CCs.",
       queuePosition: 1,
@@ -111,6 +117,8 @@ export const recurringTasks: Task[] = [
     status: "recurring",
     subtitle: "Every day - 7am",
     time: "7:00a",
+    integrations: ["Crunchbase", "X", "TechCrunch"],
+    skills: ["Research"],
     thumbEmoji: "\uD83D\uDD0D",
     thumbLabel: "Last run - today 7:04am",
     thumbSite: "crunchbase.com/search",
@@ -144,6 +152,8 @@ export const recurringTasks: Task[] = [
     status: "recurring",
     subtitle: "48 hrs before LP meeting",
     time: "auto",
+    integrations: ["Salesforce", "Google Docs", "Calendar"],
+    skills: ["Research", "Writing"],
     thumbEmoji: "\uD83D\uDCCB",
     thumbLabel: "Last run - Sequoia Scouts briefing",
     thumbSite: "salesforce.com/lp-profile",
@@ -175,6 +185,8 @@ export const recurringTasks: Task[] = [
     status: "recurring",
     subtitle: "Every Monday - 8am",
     time: "8:00a",
+    integrations: ["Salesforce", "Calendar", "Gmail"],
+    skills: ["Data Analysis"],
     thumbEmoji: "\uD83D\uDCCA",
     thumbLabel: "Last run - Monday 8:02am",
     thumbSite: "salesforce.com/lp-tracker",
@@ -210,6 +222,8 @@ export const completedTasks: Task[] = [
     status: "completed",
     subtitle: "Completed",
     time: "9:30a",
+    integrations: ["Salesforce", "Google Docs"],
+    skills: ["Research", "Writing"],
     thumbEmoji: "\uD83D\uDCCB",
     thumbLabel: "Completed - final state",
     thumbSite: "salesforce.com/sequoia-scouts",
@@ -240,6 +254,8 @@ export const completedTasks: Task[] = [
     status: "completed",
     subtitle: "Completed",
     time: "8:45a",
+    integrations: ["Granola", "Salesforce", "Gmail"],
+    skills: ["Writing"],
     thumbEmoji: "\uD83D\uDCDD",
     thumbLabel: "Completed - final state",
     thumbSite: "salesforce.com/notes",
@@ -271,6 +287,8 @@ export const completedTasks: Task[] = [
     status: "completed",
     subtitle: "Completed",
     time: "Yesterday",
+    integrations: ["LinkedIn", "X", "Crunchbase", "Salesforce"],
+    skills: ["Research"],
     thumbEmoji: "\uD83D\uDD0D",
     thumbLabel: "Completed - final state",
     thumbSite: "linkedin.com/company/abridge",
@@ -303,6 +321,8 @@ export const completedTasks: Task[] = [
     status: "completed",
     subtitle: "Completed",
     time: "Yesterday",
+    integrations: ["Granola", "Gmail"],
+    skills: ["Writing"],
     thumbEmoji: "\uD83D\uDCE7",
     thumbLabel: "Completed - final state",
     thumbSite: "gmail.com/drafts",
@@ -334,6 +354,8 @@ export const completedTasks: Task[] = [
     status: "completed",
     subtitle: "Completed",
     time: "Yesterday",
+    integrations: ["Gmail", "Calendar"],
+    skills: ["Data Analysis"],
     thumbEmoji: "\uD83D\uDCE7",
     thumbLabel: "Completed - final state",
     thumbSite: "gmail.com/school",

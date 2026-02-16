@@ -47,10 +47,12 @@ export function ChatArea({
   view,
   onOpenDetail,
   onViewActivityLog,
+  onSlashCommand,
 }: {
   view: ViewState;
   onOpenDetail: () => void;
   onViewActivityLog?: () => void;
+  onSlashCommand?: (command: string) => void;
 }) {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [scheduleTask, setScheduleTask] = useState({
@@ -99,6 +101,9 @@ export function ChatArea({
               <div className="text-sm leading-[1.6] text-t2">
                 On it, pulling your Sequoia Scouts LP prep now.
               </div>
+              <div className="mt-1 mb-0.5 text-[10.5px] text-t4">
+                Using <span className="text-t3">Salesforce · Google Docs · Calendar</span>
+              </div>
               <RunningTaskDetail
                 steps={runningTaskSteps}
                 subtasks={["Researching Sequoia Scouts..."]}
@@ -127,6 +132,9 @@ export function ChatArea({
             <AgentMessage>
               <div className="text-sm leading-[1.6] text-t2">
                 On it, I&apos;ll check your LP touchpoints while the briefing runs.
+              </div>
+              <div className="mt-1 mb-0.5 text-[10.5px] text-t4">
+                Using <span className="text-t3">Salesforce · Calendar · Gmail</span>
               </div>
               <RunningTaskDetail
                 steps={[]}
@@ -194,7 +202,7 @@ export function ChatArea({
 
       {/* New task input */}
       <div className="absolute bottom-0 left-0 right-0 z-10 mx-auto w-full max-w-[800px] px-6 pb-4 pt-8 bg-gradient-to-t from-bg from-60% to-transparent">
-        <TaskInput />
+        <TaskInput onSlashCommand={onSlashCommand} />
       </div>
 
       <ScheduleModal

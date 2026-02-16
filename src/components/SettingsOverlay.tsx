@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTheme } from "./ThemeProvider";
 
 interface SettingsOverlayProps {
   open: boolean;
   onClose: () => void;
+  initialSection?: SettingsSection;
 }
 
 type SettingsSection =
@@ -25,8 +26,15 @@ const sections: { id: SettingsSection; label: string }[] = [
   { id: "credits", label: "Credits" },
 ];
 
-export function SettingsOverlay({ open, onClose }: SettingsOverlayProps) {
-  const [active, setActive] = useState<SettingsSection>("appearance");
+export { type SettingsSection };
+
+export function SettingsOverlay({ open, onClose, initialSection }: SettingsOverlayProps) {
+  const [active, setActive] = useState<SettingsSection>(initialSection || "appearance");
+
+  // Sync when initialSection changes (e.g., from slash command)
+  useEffect(() => {
+    if (initialSection && open) setActive(initialSection);
+  }, [initialSection, open]);
 
   if (!open) return null;
 
@@ -77,7 +85,7 @@ export function SettingsOverlay({ open, onClose }: SettingsOverlayProps) {
             {active === "appearance" && <AppearanceSettings />}
             {active === "workspace" && <WorkspaceSettings />}
             {active === "commands" && <PlaceholderSection label="Commands" />}
-            {active === "skills" && <PlaceholderSection label="Skills" />}
+            {active === "skills" && <SkillsSettings />}
             {active === "subscription" && <PlaceholderSection label="Subscription" />}
             {active === "credits" && <PlaceholderSection label="Credits" />}
           </div>
@@ -168,14 +176,49 @@ function WorkspaceSettings() {
           <IntegrationRow
             name="Gmail"
             description="Read, draft, and send emails"
+            connected
           />
           <IntegrationRow
             name="Calendar"
             description="View and manage events"
+            connected
+          />
+          <IntegrationRow
+            name="Google Docs"
+            description="Create and edit documents"
+            connected
           />
           <IntegrationRow
             name="Sheets"
             description="Read and write spreadsheets"
+            connected
+          />
+          <IntegrationRow
+            name="LinkedIn"
+            description="Browse profiles and company pages"
+            connected
+          />
+          <IntegrationRow
+            name="Salesforce"
+            description="Access CRM records and deal pipeline"
+            connected
+          />
+          <IntegrationRow
+            name="Crunchbase"
+            description="Search funding rounds and company data"
+          />
+          <IntegrationRow
+            name="Granola"
+            description="Pull meeting notes and transcripts"
+            connected
+          />
+          <IntegrationRow
+            name="Slack"
+            description="Send and read messages"
+          />
+          <IntegrationRow
+            name="Notion"
+            description="Read and write workspace pages"
           />
         </div>
       </div>
@@ -206,20 +249,26 @@ function SettingRow({
 function IntegrationRow({
   name,
   description,
+  connected,
 }: {
   name: string;
   description: string;
+  connected?: boolean;
 }) {
   return (
     <div className="flex items-center gap-3">
-      <div className="h-2 w-2 rounded-full bg-t4" />
+      <div className={`h-2 w-2 rounded-full ${connected ? "bg-g" : "bg-t4"}`} />
       <div className="flex-1">
         <span className="text-[13px] font-medium text-t1">{name}</span>
         <span className="ml-2 text-[12px] text-t3">{description}</span>
       </div>
-      <button className="rounded-lg border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3 hover:text-t1">
-        Connect
-      </button>
+      {connected ? (
+        <span className="px-3 py-1.5 text-[12px] font-medium text-t3">Connected</span>
+      ) : (
+        <button className="rounded-lg border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3 hover:text-t1">
+          Connect
+        </button>
+      )}
     </div>
   );
 }
@@ -239,6 +288,55 @@ function HintIcon() {
       <line x1="12" y1="16" x2="12" y2="12" />
       <line x1="12" y1="8" x2="12.01" y2="8" />
     </svg>
+  );
+}
+
+/* ── Skills ── */
+function SkillsSettings() {
+  const skills = [
+    { name: "Research", description: "Web browsing, data gathering, and source cross-referencing", enabled: true },
+    { name: "Writing", description: "Emails, documents, reports, and summaries", enabled: true },
+    { name: "Data Analysis", description: "Spreadsheets, comparisons, and trend analysis", enabled: true },
+    { name: "Scheduling", description: "Calendar management, reminders, and recurring tasks", enabled: true },
+    { name: "Code", description: "Read, write, and debug code across languages", enabled: false },
+    { name: "Image Analysis", description: "Analyze screenshots, charts, and visual content", enabled: false },
+  ];
+
+  const [enabledSkills, setEnabledSkills] = useState<Record<string, boolean>>(
+    Object.fromEntries(skills.map((s) => [s.name, s.enabled]))
+  );
+
+  return (
+    <div>
+      <div className="text-[14px] font-semibold text-t1">Agent Skills</div>
+      <div className="mt-1 text-[12.5px] text-t3">
+        Capabilities your agent can use when completing tasks.
+      </div>
+      <div className="mt-4 flex flex-col gap-3">
+        {skills.map((skill) => (
+          <div key={skill.name} className="flex items-center gap-3">
+            <div className="flex-1">
+              <div className="text-[13px] font-medium text-t1">{skill.name}</div>
+              <div className="mt-0.5 text-[12px] text-t3">{skill.description}</div>
+            </div>
+            <button
+              onClick={() =>
+                setEnabledSkills((prev) => ({ ...prev, [skill.name]: !prev[skill.name] }))
+              }
+              className={`relative h-[24px] w-[44px] shrink-0 rounded-full transition-all ${
+                enabledSkills[skill.name] ? "bg-t1" : "bg-b2"
+              }`}
+            >
+              <div
+                className={`absolute top-[2px] h-[20px] w-[20px] rounded-full bg-bg transition-all ${
+                  enabledSkills[skill.name] ? "left-[22px]" : "left-[2px]"
+                }`}
+              />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

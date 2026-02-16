@@ -255,6 +255,22 @@ export function TaskDetail({
           </div>
         )}
 
+        {/* Integrations & Skills */}
+        {(task.integrations?.length || task.skills?.length) && (
+          <div className="mb-4 flex flex-wrap gap-1.5">
+            {task.integrations?.map((name) => (
+              <span key={name} className="rounded-full bg-bg3 px-2.5 py-0.5 text-[11px] font-medium text-t2">
+                {name}
+              </span>
+            ))}
+            {task.skills?.map((name) => (
+              <span key={name} className="rounded-full border border-b1 px-2.5 py-0.5 text-[11px] font-medium text-t3">
+                {name}
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* Schedule (recurring) */}
         {d?.schedule && (
           <div className="mb-4">

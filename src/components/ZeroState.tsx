@@ -6,6 +6,7 @@ import { starterTasks, type StarterTask } from "@/data/mockData";
 
 interface ZeroStateProps {
   onStartTask: (task: StarterTask) => void;
+  onSlashCommand?: (command: string) => void;
 }
 
 const trustBadgeStyles: Record<string, string> = {
@@ -13,7 +14,7 @@ const trustBadgeStyles: Record<string, string> = {
   "needs-auth": "text-blt",
 };
 
-export function ZeroState({ onStartTask }: ZeroStateProps) {
+export function ZeroState({ onStartTask, onSlashCommand }: ZeroStateProps) {
   const noLogin = starterTasks.filter((t) => t.trustLevel === "low");
   const requiresLogin = starterTasks.filter((t) => t.trustLevel === "needs-auth");
 
@@ -70,7 +71,7 @@ export function ZeroState({ onStartTask }: ZeroStateProps) {
         {/* Describe your own task */}
         <div className="mt-8 w-full max-w-[520px] mx-auto">
           <div className="mb-2 text-center text-[13px] text-t4">or describe your own</div>
-          <TaskInput />
+          <TaskInput onSlashCommand={onSlashCommand} />
         </div>
       </div>
     </div>
