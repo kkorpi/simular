@@ -428,6 +428,21 @@ export const runningTaskSteps: RunningStep[] = [
   { timestamp: "0:40", label: "Checking company website and product...", done: false },
 ];
 
+// ===== Workspace Steps (simplified progress) =====
+
+export interface WorkspaceStep {
+  label: string;
+  status: "done" | "active" | "pending";
+}
+
+export const workspaceSteps: WorkspaceStep[] = [
+  { label: "Opened founder's LinkedIn profile", status: "done" },
+  { label: "Pulled background, experience, and notable followers", status: "done" },
+  { label: "Cross-referenced X profile for recent posts", status: "done" },
+  { label: "Checking company website and product", status: "active" },
+  { label: "Mapping to Salesforce deal record", status: "pending" },
+];
+
 // ===== Zero State Starter Tasks =====
 
 export type TrustLevel = "low" | "medium" | "needs-auth";
