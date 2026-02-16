@@ -39,6 +39,16 @@ export function FullWorkspaceView({
   onClose: () => void;
 }) {
   const [stepsVisible, setStepsVisible] = useState(true);
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!open) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [open, onClose]);
   const [corner, setCorner] = useState<Corner>("bottom-left");
   const [dragging, setDragging] = useState(false);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
