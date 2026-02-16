@@ -158,6 +158,7 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
           {filteredCommands.map((cmd, i) => (
             <button
               key={cmd.command}
+              onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSlashSelect(cmd.command)}
               onMouseEnter={() => setSlashIndex(i)}
               className={`flex w-full items-center gap-3 px-3 py-2 text-left transition-colors ${

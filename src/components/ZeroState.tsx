@@ -2,11 +2,14 @@
 
 import { SimularLogo } from "./SimularLogo";
 import { TaskInput } from "./TaskInput";
+import { NewTaskCard } from "./NewTaskCard";
 import { starterTasks, type StarterTask } from "@/data/mockData";
 
 interface ZeroStateProps {
   onStartTask: (task: StarterTask) => void;
   onSlashCommand?: (command: string) => void;
+  showNewTaskCard?: boolean;
+  onCloseNewTask?: () => void;
 }
 
 const trustBadgeStyles: Record<string, string> = {
@@ -14,7 +17,7 @@ const trustBadgeStyles: Record<string, string> = {
   "needs-auth": "text-blt",
 };
 
-export function ZeroState({ onStartTask, onSlashCommand }: ZeroStateProps) {
+export function ZeroState({ onStartTask, onSlashCommand, showNewTaskCard, onCloseNewTask }: ZeroStateProps) {
   const noLogin = starterTasks.filter((t) => t.trustLevel === "low");
   const requiresLogin = starterTasks.filter((t) => t.trustLevel === "needs-auth");
 
@@ -71,6 +74,12 @@ export function ZeroState({ onStartTask, onSlashCommand }: ZeroStateProps) {
         {/* Describe your own task */}
         <div className="mt-8 w-full max-w-[520px] mx-auto">
           <div className="mb-2 text-center text-[13px] text-t4">or describe your own</div>
+          {showNewTaskCard && (
+            <NewTaskCard
+              onClose={() => onCloseNewTask?.()}
+              onCreate={() => onCloseNewTask?.()}
+            />
+          )}
           <TaskInput onSlashCommand={onSlashCommand} />
         </div>
       </div>

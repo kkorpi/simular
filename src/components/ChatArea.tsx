@@ -10,6 +10,7 @@ import { ResultCard } from "./ResultCard";
 import { SalesforceResult } from "./SalesforceResult";
 import { TaskInput } from "./TaskInput";
 import { ScheduleModal } from "./ScheduleModal";
+import { NewTaskCard } from "./NewTaskCard";
 
 import { runningTaskSteps } from "@/data/mockData";
 import type { ViewState } from "@/data/mockData";
@@ -48,11 +49,15 @@ export function ChatArea({
   onOpenDetail,
   onViewActivityLog,
   onSlashCommand,
+  showNewTaskCard,
+  onCloseNewTask,
 }: {
   view: ViewState;
   onOpenDetail: () => void;
   onViewActivityLog?: () => void;
   onSlashCommand?: (command: string) => void;
+  showNewTaskCard?: boolean;
+  onCloseNewTask?: () => void;
 }) {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [scheduleTask, setScheduleTask] = useState({
@@ -202,6 +207,12 @@ export function ChatArea({
 
       {/* New task input */}
       <div className="absolute bottom-0 left-0 right-0 z-10 mx-auto w-full max-w-[800px] px-6 pb-4 pt-8 bg-gradient-to-t from-bg from-60% to-transparent">
+        {showNewTaskCard && (
+          <NewTaskCard
+            onClose={() => onCloseNewTask?.()}
+            onCreate={() => onCloseNewTask?.()}
+          />
+        )}
         <TaskInput onSlashCommand={onSlashCommand} />
       </div>
 

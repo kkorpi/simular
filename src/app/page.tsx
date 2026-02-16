@@ -15,6 +15,7 @@ export default function Home() {
   const [settingsSection, setSettingsSection] = useState<SettingsSection | undefined>(undefined);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [panelCollapsed, setPanelCollapsed] = useState(false);
+  const [showNewTaskCard, setShowNewTaskCard] = useState(false);
 
   const handleStartTask = () => {
     setActiveView("task-hover");
@@ -38,7 +39,7 @@ export default function Home() {
         // Could navigate to completed tasks view
         break;
       case "schedule":
-        // Could open schedule modal
+        setShowNewTaskCard(true);
         break;
     }
   };
@@ -54,7 +55,12 @@ export default function Home() {
       />
       <div className="flex flex-1 overflow-hidden">
         {activeView === "zero-state" ? (
-          <ZeroState onStartTask={handleStartTask} onSlashCommand={handleSlashCommand} />
+          <ZeroState
+            onStartTask={handleStartTask}
+            onSlashCommand={handleSlashCommand}
+            showNewTaskCard={showNewTaskCard}
+            onCloseNewTask={() => setShowNewTaskCard(false)}
+          />
         ) : (
           <>
             <ChatArea
@@ -62,6 +68,8 @@ export default function Home() {
               onOpenDetail={() => setActiveView("result-detail")}
               onViewActivityLog={() => setWorkspaceOpen(true)}
               onSlashCommand={handleSlashCommand}
+              showNewTaskCard={showNewTaskCard}
+              onCloseNewTask={() => setShowNewTaskCard(false)}
             />
             <RightPanel
               view={activeView}
