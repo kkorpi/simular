@@ -1,6 +1,7 @@
 "use client";
 
 import { SimularLogo } from "./SimularLogo";
+import { TaskInput } from "./TaskInput";
 import { starterTasks, type StarterTask } from "@/data/mockData";
 
 interface ZeroStateProps {
@@ -67,14 +68,9 @@ export function ZeroState({ onStartTask }: ZeroStateProps) {
         )}
 
         {/* Describe your own task */}
-        <div className="mt-10 flex items-center justify-center gap-3">
-          <span className="text-[13px] text-t4">or</span>
-          <button className="flex items-center gap-2 rounded-[10px] border border-b1 bg-transparent px-4 py-2.5 text-[13px] text-t3 transition-all hover:border-b2 hover:bg-bg3 hover:text-t2">
-            Describe your own task
-            <span className="rounded bg-bg3 px-1.5 py-0.5 font-mono text-[10.5px] text-t4">
-              /
-            </span>
-          </button>
+        <div className="mt-8 w-full max-w-[520px] mx-auto">
+          <div className="mb-2 text-center text-[13px] text-t4">or describe your own</div>
+          <TaskInput />
         </div>
       </div>
     </div>

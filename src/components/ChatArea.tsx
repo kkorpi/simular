@@ -8,6 +8,7 @@ import { MeetingPrompt } from "./MeetingPrompt";
 import { RunningTaskDetail } from "./RunningTaskDetail";
 import { ResultCard } from "./ResultCard";
 import { SalesforceResult } from "./SalesforceResult";
+import { TaskInput } from "./TaskInput";
 import { ScheduleModal } from "./ScheduleModal";
 
 import { runningTaskSteps } from "@/data/mockData";
@@ -64,8 +65,9 @@ export function ChatArea({
   };
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col">
-      <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-8 py-5">
+    <div className="relative flex min-w-0 flex-1 flex-col">
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-auto flex max-w-[800px] flex-col gap-4 px-6 pt-5 pb-28">
         {/* ── Morning group: greeting + scan result + meeting offer ── */}
         <AgentMessage>
           <MorningBriefing />
@@ -187,17 +189,12 @@ export function ChatArea({
             </button>
           </div>
         </AgentContinuation>
+        </div>
       </div>
 
       {/* New task input */}
-      <div className="shrink-0 px-8 pb-4">
-        <button className="flex w-full cursor-pointer items-center gap-2 rounded-[10px] border border-b1 bg-transparent px-4 py-2.5 text-[13px] font-medium text-t3 transition-all hover:border-b2 hover:bg-bg3 hover:text-t2">
-          <span className="text-base font-normal leading-none">+</span>
-          New task
-          <span className="ml-auto rounded bg-bg3 px-1.5 py-0.5 font-mono text-[10.5px] text-t4">
-            {"\u2318"}K
-          </span>
-        </button>
+      <div className="absolute bottom-0 left-0 right-0 z-10 mx-auto w-full max-w-[800px] px-6 pb-4 pt-8 bg-gradient-to-t from-bg from-60% to-transparent">
+        <TaskInput />
       </div>
 
       <ScheduleModal

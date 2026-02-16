@@ -32,9 +32,8 @@ export function FullWorkspaceView({
             className="flex items-center justify-center rounded-lg p-1 text-t3 transition-all hover:bg-bg3 hover:text-t1"
             title="Collapse workspace"
           >
-            {/* Collapse / shrink icon — 32x32 */}
             <svg
-              className="h-8 w-8"
+              className="h-6 w-6"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -49,7 +48,7 @@ export function FullWorkspaceView({
             </svg>
           </button>
           <div className="flex items-center gap-1.5 text-xs font-medium text-t2">
-            <div className="h-1.5 w-1.5 rounded-full bg-g shadow-[0_0_4px_var(--gg)]" />
+            <div className="h-1.5 w-1.5 rounded-full bg-g animate-running-glow" />
             Workspace online
           </div>
           <div className="ml-auto text-xs text-t3">

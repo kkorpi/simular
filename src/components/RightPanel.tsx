@@ -22,7 +22,7 @@ export function RightPanel({
   onToggleCollapse: () => void;
 }) {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [panelWidth, setPanelWidth] = useState(420);
+  const [panelWidth, setPanelWidth] = useState(470);
   const [isDragging, setIsDragging] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
 
@@ -76,8 +76,10 @@ export function RightPanel({
           className="flex items-center justify-center rounded-md p-1 text-t4 transition-colors hover:bg-bg3 hover:text-t2"
           title="Collapse panel"
         >
-          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="9 18 15 12 9 6" />
+          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <rect width="18" height="18" x="3" y="3" rx="2" />
+            <path d="M15 3v18" />
+            <path d="m8 9 3 3-3 3" />
           </svg>
         </button>
       </div>
@@ -104,14 +106,6 @@ export function RightPanel({
             <svg className="h-4 w-4 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
             <span>LinkedIn{"\n"}Founder profile</span>
           </div>
-        </div>
-        {/* Current task info */}
-        <div className="mt-2 flex items-center gap-2">
-          <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-g shadow-[0_0_4px_var(--gg)]" />
-          <div className="flex-1 min-w-0">
-            <div className="truncate text-[11.5px] font-medium text-t1">Research inbound founder</div>
-          </div>
-          <span className="shrink-0 font-mono text-[10px] text-t3">2:18</span>
         </div>
       </div>
 
