@@ -13,10 +13,13 @@ export default function Home() {
   const [activeView, setActiveView] = useState<ViewState>("zero-state");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
+  const [panelCollapsed, setPanelCollapsed] = useState(false);
 
   const handleStartTask = () => {
     setActiveView("task-hover");
   };
+
+  const showPip = panelCollapsed && activeView !== "zero-state";
 
   return (
     <div className="flex h-screen flex-col">
@@ -39,10 +42,51 @@ export default function Home() {
               view={activeView}
               onViewChange={setActiveView}
               onOpenWorkspace={() => setWorkspaceOpen(true)}
+              collapsed={panelCollapsed}
+              onToggleCollapse={() => setPanelCollapsed((c) => !c)}
             />
           </>
         )}
       </div>
+
+      {/* Floating PiP workspace when sidebar is collapsed */}
+      {showPip && (
+        <div className="fixed bottom-4 right-4 z-40 w-[280px] overflow-hidden rounded-xl border border-b1 bg-bg2 shadow-2xl">
+          <div
+            onClick={() => setWorkspaceOpen(true)}
+            className="relative flex aspect-video cursor-pointer items-center justify-center bg-bg3 transition-all hover:brightness-110"
+          >
+            <div className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-full bg-black/65 px-[7px] py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
+              <div className="h-1 w-1 rounded-full bg-g" />
+              LIVE
+            </div>
+            <div className="flex flex-col items-center gap-1 text-center text-[11px] text-t4">
+              <svg className="h-4 w-4 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
+              <span>LinkedIn{"\n"}Founder profile</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 px-3 py-2">
+            <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-g shadow-[0_0_4px_var(--gg)]" />
+            <div className="flex-1 min-w-0">
+              <div className="truncate text-[11px] font-medium text-t1">Research inbound founder</div>
+              <div className="text-[10px] text-t3">2:18 elapsed</div>
+            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setPanelCollapsed(false);
+              }}
+              className="flex items-center justify-center rounded-md p-1 text-t4 transition-colors hover:bg-bg3 hover:text-t2"
+              title="Expand panel"
+            >
+              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       <FullWorkspaceView
         open={workspaceOpen}
         onClose={() => setWorkspaceOpen(false)}
