@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 
 export interface NewTaskData {
   name: string;
+  instructions: string;
   frequency: string;
   time: string;
   maxDuration: string;
@@ -32,6 +33,7 @@ const allIntegrations = [
 
 export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
   const [name, setName] = useState("");
+  const [instructions, setInstructions] = useState("");
   const [frequency, setFrequency] = useState("Daily");
   const [time, setTime] = useState("7:00 AM");
   const [maxDuration, setMaxDuration] = useState("30 min");
@@ -73,6 +75,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
     if (!name.trim()) return;
     onCreate({
       name: name.trim(),
+      instructions: instructions.trim(),
       frequency,
       time,
       maxDuration,
@@ -147,6 +150,20 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Daily deal sourcing digest"
             className="w-full rounded-lg border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 placeholder:text-t4 outline-none transition-colors focus:border-b2"
+          />
+        </div>
+
+        {/* Instructions */}
+        <div className="mb-4">
+          <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-t4">
+            Instructions
+          </div>
+          <textarea
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            placeholder="e.g. Scan Crunchbase for Series A rounds in healthcare AI. Cross-reference with existing portfolio. Flag overlaps."
+            rows={3}
+            className="w-full resize-y rounded-lg border border-b1 bg-bg3 px-3 py-2 text-[13px] leading-[1.5] text-t1 placeholder:text-t4 outline-none transition-colors focus:border-b2"
           />
         </div>
 
