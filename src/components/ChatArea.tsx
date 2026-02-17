@@ -70,7 +70,7 @@ export function ChatArea({
   return (
     <div className="relative flex min-w-0 flex-1 flex-col">
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto flex max-w-[800px] flex-col gap-8 px-6 pt-5 pb-28">
+        <div className="mx-auto flex max-w-[800px] flex-col gap-8 px-8 pt-5 pb-28">
         {/* ── Morning group: greeting + scan result + meeting offer ── */}
         <AgentMessage>
           <MorningBriefing />
