@@ -438,6 +438,7 @@ export interface RunningStep {
   site?: string;
   trustSignal?: string;
   done: boolean;
+  userAction?: boolean;
 }
 
 export const runningTaskSteps: RunningStep[] = [
@@ -463,6 +464,95 @@ export const workspaceSteps: WorkspaceStep[] = [
   { label: "Cross-referenced X profile for recent posts", status: "done" },
   { label: "Checking company website and product", status: "active" },
   { label: "Mapping to Salesforce deal record", status: "pending" },
+];
+
+export const linkedinLoginSteps: RunningStep[] = [
+  { timestamp: "0:01", label: "Opened Chrome", done: true },
+  { timestamp: "0:03", label: "Navigated to linkedin.com/login", site: "linkedin.com", trustSignal: "Secure connection", done: true },
+  { timestamp: "0:09", label: "Signed in to LinkedIn", done: true, userAction: true },
+  { timestamp: "0:12", label: "Pulling profile viewer list...", done: false },
+];
+
+export const loginSteps: WorkspaceStep[] = [
+  { label: "Received task: check LinkedIn profile viewers", status: "done" },
+  { label: "LinkedIn access required", status: "done" },
+  { label: "Waiting for sign in", status: "active" },
+  { label: "Pull profile viewer list", status: "pending" },
+  { label: "Research viewer backgrounds", status: "pending" },
+];
+
+export const loginSuccessSteps: WorkspaceStep[] = [
+  { label: "Received task: check LinkedIn profile viewers", status: "done" },
+  { label: "LinkedIn access required", status: "done" },
+  { label: "Signed in to LinkedIn", status: "done" },
+  { label: "Pulling profile viewer list", status: "active" },
+  { label: "Research viewer backgrounds", status: "pending" },
+];
+
+// ===== LinkedIn Profile Disambiguation =====
+
+export interface LinkedInProfile {
+  id: string;
+  name: string;
+  title: string;
+  company: string;
+  location: string;
+  initials: string;
+  mutualConnections: number;
+  avatarUrl: string;
+}
+
+export const disambiguationProfiles: LinkedInProfile[] = [
+  {
+    id: "dp-1",
+    name: "Daniel Park",
+    title: "Co-founder & CEO",
+    company: "Luma AI",
+    location: "San Francisco, CA",
+    initials: "DP",
+    mutualConnections: 34,
+    avatarUrl: "https://i.pravatar.cc/80?img=11",
+  },
+  {
+    id: "dp-2",
+    name: "Daniel Park",
+    title: "Partner",
+    company: "Sequoia Capital",
+    location: "Menlo Park, CA",
+    initials: "DP",
+    mutualConnections: 12,
+    avatarUrl: "https://i.pravatar.cc/80?img=33",
+  },
+  {
+    id: "dp-3",
+    name: "Danny Park",
+    title: "Staff Engineer",
+    company: "Stripe",
+    location: "San Francisco, CA",
+    initials: "DP",
+    mutualConnections: 8,
+    avatarUrl: "https://i.pravatar.cc/80?img=53",
+  },
+];
+
+export const linkedinDisambiguatedSteps: RunningStep[] = [
+  { timestamp: "0:01", label: "Opened Chrome", done: true },
+  { timestamp: "0:03", label: "Navigated to linkedin.com/login", site: "linkedin.com", trustSignal: "Secure connection", done: true },
+  { timestamp: "0:09", label: "Signed in to LinkedIn", done: true, userAction: true },
+  { timestamp: "0:14", label: "Found 3 matching profiles for Daniel Park", done: true },
+  { timestamp: "0:16", label: "User selected Daniel Park, CEO at Luma AI", done: true, userAction: true },
+  { timestamp: "0:18", label: "Pulling profile viewer list...", done: false },
+];
+
+// ===== Teach Mode Steps =====
+
+export const teachSteps: WorkspaceStep[] = [
+  { label: "Open Chrome", status: "done" },
+  { label: "Navigate to gmail.com", status: "done" },
+  { label: "Sign in to Gmail", status: "active" },
+  { label: "Compose a new email", status: "pending" },
+  { label: "Fill in recipients, subject, and body", status: "pending" },
+  { label: "Send the email", status: "pending" },
 ];
 
 // ===== Zero State Starter Tasks =====

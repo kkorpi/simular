@@ -67,6 +67,17 @@ const slashCommands: SlashCommand[] = [
       </svg>
     ),
   },
+  {
+    command: "teach",
+    label: "Teach",
+    description: "Show your coworker how to do a task",
+    icon: (
+      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" />
+        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+      </svg>
+    ),
+  },
 ];
 
 export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: string) => void }) {
@@ -74,11 +85,15 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
   const [model, setModel] = useState("Claude 4.6 Opus");
   const [modelOpen, setModelOpen] = useState(false);
   const [slashOpen, setSlashOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [slashFilter, setSlashFilter] = useState("");
   const [slashIndex, setSlashIndex] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const modelRef = useRef<HTMLDivElement>(null);
   const slashRef = useRef<HTMLDivElement>(null);
+  const actionsRef = useRef<HTMLButtonElement>(null);
+
+  const showMenu = slashOpen || menuOpen;
 
   const models = ["Claude 4.6 Opus", "Claude 4.5 Sonnet", "GPT-4o", "Gemini 2.5 Pro"];
 
@@ -107,6 +122,20 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
+  // Close menu on outside click (ignore clicks on the Actions button itself)
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (actionsRef.current?.contains(target)) return;
+      if (slashRef.current && !slashRef.current.contains(target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [menuOpen]);
+
   // Detect slash command input
   useEffect(() => {
     if (value.startsWith("/")) {
@@ -123,11 +152,18 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
   const handleSlashSelect = (command: string) => {
     setValue("");
     setSlashOpen(false);
+    setMenuOpen(false);
     onSlashCommand?.(command);
   };
 
+  const handleSend = () => {
+    if (!value.trim() || showMenu) return;
+    // Prototype: just clear the input
+    setValue("");
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (slashOpen && filteredCommands.length > 0) {
+    if (showMenu && filteredCommands.length > 0) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
         setSlashIndex((i) => Math.min(i + 1, filteredCommands.length - 1));
@@ -139,21 +175,25 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
         handleSlashSelect(filteredCommands[slashIndex].command);
       } else if (e.key === "Escape") {
         setSlashOpen(false);
-        setValue("");
+        setMenuOpen(false);
+        if (slashOpen) setValue("");
       }
+    } else if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
   return (
     <div className="relative flex flex-col rounded-xl border border-b1 bg-bg3 transition-colors focus-within:border-b2">
       {/* Slash command menu */}
-      {slashOpen && filteredCommands.length > 0 && (
+      {showMenu && filteredCommands.length > 0 && (
         <div
           ref={slashRef}
           className="absolute bottom-full left-0 right-0 mb-1.5 overflow-hidden rounded-xl border border-b1 bg-bg2 shadow-lg"
         >
           <div className="px-3 pt-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wide text-t4">
-            Commands
+            Quick actions
           </div>
           {filteredCommands.map((cmd, i) => (
             <button
@@ -183,9 +223,11 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
               )}
             </button>
           ))}
-          <div className="border-t border-b1 px-3 py-1.5 text-[10px] text-t4">
-            Type <span className="font-medium text-t3">/</span> to see commands
-          </div>
+          {slashOpen && (
+            <div className="border-t border-b1 px-3 py-1.5 text-[10px] text-t4">
+              Type <span className="font-medium text-t3">/</span> for quick actions
+            </div>
+          )}
         </div>
       )}
 
@@ -213,16 +255,22 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
           </svg>
         </button>
 
-        {/* Slash command hint */}
+        {/* Quick actions trigger */}
         <button
+          ref={actionsRef}
+          onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
-            setValue("/");
-            textareaRef.current?.focus();
+            setMenuOpen((o) => !o);
+            setSlashIndex(0);
+            setSlashFilter("");
           }}
-          className="flex items-center justify-center rounded-md px-1.5 py-1 text-[11px] font-mono text-t4 transition-colors hover:bg-bg3h hover:text-t2"
-          title="Slash commands"
+          className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] text-t4 transition-colors hover:bg-bg3h hover:text-t2"
+          title="Quick actions"
         >
-          /
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+          </svg>
+          Actions
         </button>
 
         {/* Model selector */}
@@ -269,12 +317,13 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
 
         {/* Send button */}
         <button
+          onClick={handleSend}
           className={`flex items-center justify-center rounded-full p-1.5 transition-all ${
-            value.trim() && !slashOpen
+            value.trim() && !showMenu
               ? "bg-ab text-abt hover:brightness-110"
               : "text-t4 cursor-default"
           }`}
-          disabled={!value.trim() || slashOpen}
+          disabled={!value.trim() || showMenu}
           title="Send"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { workspaceSteps } from "@/data/mockData";
+import { workspaceSteps, loginSteps, loginSuccessSteps, teachSteps } from "@/data/mockData";
 
 type Corner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
@@ -34,11 +34,19 @@ function nearestCorner(x: number, y: number, container: DOMRect, panel: DOMRect)
 export function FullWorkspaceView({
   open,
   onClose,
+  onLoginSuccess,
+  mode,
+  service,
 }: {
   open: boolean;
   onClose: () => void;
+  onLoginSuccess?: () => void;
+  mode?: "default" | "login" | "teach";
+  service?: string;
 }) {
   const [stepsVisible, setStepsVisible] = useState(true);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+  const [countdown, setCountdown] = useState(5);
 
   // Close on Escape key
   useEffect(() => {
@@ -49,7 +57,39 @@ export function FullWorkspaceView({
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [open, onClose]);
-  const [corner, setCorner] = useState<Corner>("bottom-left");
+
+  // Reset login success state when workspace closes
+  useEffect(() => {
+    if (!open) {
+      setLoginSuccess(false);
+      setCountdown(5);
+    }
+  }, [open]);
+
+  // Countdown timer after login success
+  useEffect(() => {
+    if (!loginSuccess) return;
+    if (countdown <= 0) {
+      onLoginSuccess?.();
+      onClose();
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [loginSuccess, countdown, onClose, onLoginSuccess]);
+
+  const handleLoginSubmit = () => {
+    setLoginSuccess(true);
+    setCountdown(5);
+  };
+
+  const [corner, setCorner] = useState<Corner>("top-left");
+
+  const activeSteps = mode === "teach"
+    ? teachSteps
+    : mode === "login"
+      ? (loginSuccess ? loginSuccessSteps : loginSteps)
+      : workspaceSteps;
   const [dragging, setDragging] = useState(false);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
 
@@ -151,17 +191,51 @@ export function FullWorkspaceView({
           </svg>
         </button>
         <div className="flex items-center gap-1.5 text-xs font-medium text-t2">
-          <div className="h-1.5 w-1.5 rounded-full bg-g animate-running-glow" />
-          Workspace online
+          {mode === "teach" ? (
+            <>
+              <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-running-glow" />
+              <span className="text-violet-500">Learning mode</span>
+            </>
+          ) : (
+            <>
+              <div className="h-1.5 w-1.5 rounded-full bg-g animate-running-glow" />
+              Workspace online
+            </>
+          )}
         </div>
 
         <div className="ml-auto flex items-center gap-3">
           <div className="text-xs text-t3">
-            Working on:{" "}
-            <strong className="font-semibold text-t1">
-              Research inbound founder
-            </strong>{" "}
-            (2:18)
+            {mode === "teach" ? (
+              <>
+                Recording:{" "}
+                <strong className="font-semibold text-t1">
+                  Send an email in Gmail
+                </strong>
+              </>
+            ) : mode === "login" && loginSuccess ? (
+              <>
+                <strong className="font-semibold text-g">
+                  {service} connected
+                </strong>
+                {" "}— resuming task
+              </>
+            ) : mode === "login" ? (
+              <>
+                Waiting for{" "}
+                <strong className="font-semibold text-t1">
+                  {service} sign in
+                </strong>
+              </>
+            ) : (
+              <>
+                Working on:{" "}
+                <strong className="font-semibold text-t1">
+                  Research inbound founder
+                </strong>{" "}
+                (2:18)
+              </>
+            )}
           </div>
           {/* Steps toggle */}
           <button
@@ -186,26 +260,193 @@ export function FullWorkspaceView({
         </div>
       </div>
 
+      {/* Login coaching banner */}
+      {mode === "login" && service && (
+        <div className={`flex shrink-0 items-center gap-3 border-b border-b1 px-5 py-3 transition-colors ${
+          loginSuccess ? "bg-g/[0.06]" : "bg-bg2"
+        }`}>
+          {/* Status icon */}
+          {loginSuccess ? (
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-g/20">
+              <svg className="h-4 w-4 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+          ) : (
+            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
+              {/* Cursor/pointer icon */}
+              <svg className="h-4 w-4 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 2l14.5 11.5-5.5 1.5 3.5 6.5-2.5 1.5-3.5-6.5-4 4z" />
+              </svg>
+              {/* Subtle pulse ring */}
+              <div className="absolute inset-0 rounded-lg border border-amber-500/40 animate-[ping_2s_ease-out_infinite] opacity-50" />
+            </div>
+          )}
+          <div className="flex-1">
+            {loginSuccess ? (
+              <>
+                <div className="text-[13px] font-medium text-t1">
+                  Connected to {service}. Resuming your task...
+                </div>
+                <div className="text-[11px] text-t3">
+                  Closing in {countdown}s
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-[13px] font-medium text-t1">
+                  Sign in to {service} so I can continue
+                </div>
+                <div className="text-[11px] text-t3">
+                  Just sign in like you normally would. I&apos;ll take it from here.
+                </div>
+              </>
+            )}
+          </div>
+          {loginSuccess && (
+            <button
+              onClick={() => {
+                setLoginSuccess(false);
+                setCountdown(5);
+              }}
+              className="rounded-lg border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3"
+            >
+              Keep open
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Teach mode coaching banner */}
+      {mode === "teach" && (
+        <div className="flex shrink-0 items-center gap-3 border-b border-violet-500/20 bg-violet-500/[0.04] px-5 py-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-500/15">
+            <svg className="h-4 w-4 text-violet-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" />
+              <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <div className="text-[13px] font-medium text-t1">
+              Your coworker is watching and learning
+            </div>
+            <div className="text-[11px] text-t3">
+              Perform the task as you normally would. Each step will be recorded so Simular can repeat it later.
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 rounded-full bg-violet-500/15 px-2.5 py-1 text-[11px] font-medium text-violet-500">
+            <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse" />
+            Recording
+          </div>
+        </div>
+      )}
+
       {/* Screen area */}
       <div ref={containerRef} className="relative flex flex-1 items-center justify-center overflow-hidden bg-bg3">
-        {/* LIVE badge */}
-        <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-bg2/90 px-2 py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
-          <div className="h-1 w-1 rounded-full bg-g" />
-          LIVE
+        {/* LIVE / RECORDING badge */}
+        <div className={`absolute top-3 right-3 flex items-center gap-1 rounded-full bg-bg2/90 px-2 py-0.5 text-[9px] font-semibold backdrop-blur-sm ${
+          mode === "teach" ? "text-violet-500" : "text-g"
+        }`}>
+          <div className={`h-1 w-1 rounded-full ${mode === "teach" ? "bg-violet-500 animate-pulse" : "bg-g"}`} />
+          {mode === "teach" ? "REC" : "LIVE"}
         </div>
 
         {/* Placeholder content */}
-        <div className="flex flex-col items-center text-center text-[13px] text-t4">
-          <svg className="mb-2 h-6 w-6 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
-          LinkedIn - Founder Profile
-          <br />
-          <br />
-          <span className="text-[11px] text-t4">
-            Your coworker is reviewing the inbound founder&apos;s LinkedIn,
+        {mode === "teach" ? (
+          <div className="flex flex-col items-center text-center">
+            {/* Simulated Gmail sign-in page */}
+            <div className="w-[360px] rounded-lg border border-b1 bg-bg2 p-8 shadow-xl">
+              <svg className="mx-auto mb-4 h-8 w-auto" viewBox="0 0 24 24" fill="none">
+                <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2z" stroke="#EA4335" strokeWidth="1.5" />
+                <path d="M22 6l-10 7L2 6" stroke="#EA4335" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <div className="mb-6 text-[15px] font-medium text-t1">Sign in to Gmail</div>
+              <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
+                <div>
+                  <label className="mb-1 block text-left text-[12px] text-t3">Email</label>
+                  <input
+                    type="email"
+                    className="h-9 w-full rounded border border-b1 bg-bg3 px-3 text-[13px] text-t1 outline-none transition-colors focus:border-[#EA4335]"
+                    placeholder="name@gmail.com"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-left text-[12px] text-t3">Password</label>
+                  <input
+                    type="password"
+                    className="h-9 w-full rounded border border-b1 bg-bg3 px-3 text-[13px] text-t1 outline-none transition-colors focus:border-[#EA4335]"
+                    placeholder="••••••••"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="h-9 w-full rounded-full bg-[#1A73E8] text-[14px] font-semibold text-white transition-all hover:brightness-110"
+                >
+                  Sign in
+                </button>
+              </form>
+              <div className="mt-4 text-center text-[11px] text-t4">
+                accounts.google.com
+              </div>
+            </div>
+          </div>
+        ) : mode === "login" && service === "LinkedIn" ? (
+          <div className="flex flex-col items-center text-center">
+            {/* Simulated LinkedIn login page */}
+            <div className="w-[360px] rounded-lg border border-b1 bg-bg2 p-8 shadow-xl">
+              <svg className="mx-auto mb-6 h-8 w-auto text-[#0A66C2]" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+              </svg>
+              <form
+                className="space-y-3"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleLoginSubmit();
+                }}
+              >
+                <div>
+                  <label className="mb-1 block text-left text-[12px] text-t3">Email</label>
+                  <input
+                    type="email"
+                    className="h-9 w-full rounded border border-b1 bg-bg3 px-3 text-[13px] text-t1 outline-none transition-colors focus:border-[#0A66C2]"
+                    placeholder="name@example.com"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-left text-[12px] text-t3">Password</label>
+                  <input
+                    type="password"
+                    className="h-9 w-full rounded border border-b1 bg-bg3 px-3 text-[13px] text-t1 outline-none transition-colors focus:border-[#0A66C2]"
+                    placeholder="••••••••"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="h-9 w-full rounded-full bg-[#0A66C2] text-[14px] font-semibold text-white transition-all hover:brightness-110"
+                >
+                  Sign in
+                </button>
+              </form>
+              <div className="mt-4 text-center text-[11px] text-t4">
+                linkedin.com
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center text-center text-[13px] text-t4">
+            <svg className="mb-2 h-6 w-6 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
+            LinkedIn - Founder Profile
             <br />
-            pulling background, experience, and mutual connections.
-          </span>
-        </div>
+            <br />
+            <span className="text-[11px] text-t4">
+              Your coworker is reviewing the inbound founder&apos;s LinkedIn,
+              <br />
+              pulling background, experience, and mutual connections.
+            </span>
+          </div>
+        )}
 
         {/* Floating steps overlay — draggable, snaps to corners */}
         <div
@@ -221,7 +462,7 @@ export function FullWorkspaceView({
           }`}
         >
           <div className="flex items-center gap-2 px-3.5 pt-3 pb-1">
-            <span className="text-[10px] font-semibold tracking-wide text-t3 uppercase">Steps</span>
+            <span className="text-[10px] font-semibold tracking-wide text-t3 uppercase">{mode === "teach" ? "Steps recorded" : "Steps"}</span>
             {/* Drag hint */}
             <svg className="h-3 w-3 text-t4/50" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="9" cy="5" r="1.5" />
@@ -233,7 +474,7 @@ export function FullWorkspaceView({
             </svg>
           </div>
           <div className="flex flex-col gap-0.5 px-3.5 pb-3">
-            {workspaceSteps.map((step, i) => (
+            {activeSteps.map((step, i) => (
               <div
                 key={i}
                 className={`flex items-center gap-2.5 rounded-md px-1.5 py-1.5 ${
@@ -241,12 +482,12 @@ export function FullWorkspaceView({
                 }`}
               >
                 {step.status === "done" ? (
-                  <svg className="h-3.5 w-3.5 shrink-0 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <svg className={`h-3.5 w-3.5 shrink-0 ${mode === "teach" ? "text-violet-500" : "text-g"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="20 6 9 17 4 12" />
                   </svg>
                 ) : step.status === "active" ? (
                   <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
-                    <div className="h-[7px] w-[7px] rounded-full bg-g shadow-[0_0_6px_var(--gg)] animate-pulse-dot" />
+                    <div className={`h-[7px] w-[7px] rounded-full animate-pulse-dot ${mode === "teach" ? "bg-violet-500 shadow-[0_0_6px_rgb(139,92,246)]" : "bg-g shadow-[0_0_6px_var(--gg)]"}`} />
                   </div>
                 ) : (
                   <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">

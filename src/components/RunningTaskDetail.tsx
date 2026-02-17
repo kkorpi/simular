@@ -11,6 +11,8 @@ interface RunningTaskDetailProps {
   /** Integrations used by this task (e.g. ["Salesforce", "Google Docs"]) */
   integrations?: string[];
   onViewActivityLog?: () => void;
+  /** Start with details expanded */
+  initialExpanded?: boolean;
 }
 
 function parseTimestamp(ts: string): number {
@@ -23,8 +25,9 @@ export function RunningTaskDetail({
   subtasks,
   integrations,
   onViewActivityLog,
+  initialExpanded = false,
 }: RunningTaskDetailProps) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(initialExpanded);
 
   const completedCount = steps.filter((s) => s.done).length;
   const lastTimestamp = steps[steps.length - 1]?.timestamp || "0:00";
@@ -102,6 +105,11 @@ export function RunningTaskDetail({
                     ) : (
                       <span className={step.done ? "" : "text-t3"}>
                         {step.label}
+                      </span>
+                    )}
+                    {step.userAction && (
+                      <span className="ml-1.5 inline-flex items-center rounded border border-b1 bg-bg3 px-1 py-px text-[9px] font-medium text-t3">
+                        You
                       </span>
                     )}
                   </div>

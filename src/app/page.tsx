@@ -14,11 +14,20 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSection, setSettingsSection] = useState<SettingsSection | undefined>(undefined);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
+  const [workspaceMode, setWorkspaceMode] = useState<"default" | "login" | "teach">("default");
+  const [workspaceService, setWorkspaceService] = useState<string>("");
   const [panelCollapsed, setPanelCollapsed] = useState(false);
   const [showNewTaskCard, setShowNewTaskCard] = useState(false);
+  const [linkedinConnected, setLinkedinConnected] = useState(false);
 
   const handleStartTask = () => {
     setActiveView("task-hover");
+  };
+
+  const handleOpenWorkspaceForLogin = (service: string) => {
+    setWorkspaceMode("login");
+    setWorkspaceService(service);
+    setWorkspaceOpen(true);
   };
 
   const handleSlashCommand = (command: string) => {
@@ -40,6 +49,10 @@ export default function Home() {
         break;
       case "schedule":
         setShowNewTaskCard(true);
+        break;
+      case "teach":
+        setWorkspaceMode("teach");
+        setWorkspaceOpen(true);
         break;
     }
   };
@@ -66,10 +79,12 @@ export default function Home() {
             <ChatArea
               view={activeView}
               onOpenDetail={() => setActiveView("result-detail")}
-              onViewActivityLog={() => setWorkspaceOpen(true)}
+              onViewActivityLog={() => { setWorkspaceMode("default"); setWorkspaceOpen(true); }}
+              onOpenWorkspaceForLogin={handleOpenWorkspaceForLogin}
               onSlashCommand={handleSlashCommand}
               showNewTaskCard={showNewTaskCard}
               onCloseNewTask={() => setShowNewTaskCard(false)}
+              linkedinConnected={linkedinConnected}
             />
             <RightPanel
               view={activeView}
@@ -135,7 +150,10 @@ export default function Home() {
 
       <FullWorkspaceView
         open={workspaceOpen}
-        onClose={() => setWorkspaceOpen(false)}
+        onClose={() => { setWorkspaceOpen(false); setWorkspaceMode("default"); }}
+        onLoginSuccess={() => setLinkedinConnected(true)}
+        mode={workspaceMode}
+        service={workspaceService}
       />
       <SettingsOverlay
         open={settingsOpen}
