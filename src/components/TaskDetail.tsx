@@ -8,7 +8,7 @@ function StatusBadge({ status }: { status: Task["status"] }) {
     running: "bg-gs text-gt",
     queued: "bg-ams text-am",
     recurring: "bg-ams text-am",
-    completed: "bg-as text-t3",
+    completed: "bg-bg3h text-t3",
   };
   const labels = {
     running: "Running",

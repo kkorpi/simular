@@ -35,7 +35,7 @@ export function TaskSection({
         <span className="text-[10.5px] font-semibold uppercase tracking-[0.06em] text-t4">
           {label}
         </span>
-        <span className="rounded-full bg-as px-1.5 py-px font-mono text-[10px] font-medium text-t4">
+        <span className="rounded-full bg-bg3h px-1.5 py-px font-mono text-[10px] font-medium text-t4">
           {count}
         </span>
       </button>

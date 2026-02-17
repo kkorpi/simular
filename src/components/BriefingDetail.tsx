@@ -61,7 +61,7 @@ export function BriefingDetail({ onBack }: { onBack: () => void }) {
                 key={p.initials}
                 className="flex items-center gap-2.5 rounded-lg border border-b1 bg-bg3 px-2.5 py-2"
               >
-                <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-as text-[11px] font-semibold text-t2">
+                <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-bg3h text-[11px] font-semibold text-t2">
                   {p.initials}
                 </div>
                 <div className="flex-1">

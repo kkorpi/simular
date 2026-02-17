@@ -34,7 +34,7 @@ function AgentContinuation({ children }: { children: React.ReactNode }) {
 
 function UserMessage({ children }: { children: React.ReactNode }) {
   return (
-    <div className="ml-auto max-w-[480px] rounded-[14px_14px_4px_14px] border border-as2 bg-as px-4 py-2.5 text-sm text-t1">
+    <div className="ml-auto max-w-[480px] rounded-[14px_14px_4px_14px] bg-as px-4 py-2.5 text-sm text-white">
       {children}
     </div>
   );
