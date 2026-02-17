@@ -115,8 +115,8 @@ function ArtifactCard({
               onClick={() => setExpanded(!expanded)}
               className="flex w-full items-center justify-center gap-1 border-t border-b1 bg-bg3 py-1.5 text-[11px] font-medium text-t3 transition-all hover:text-t2"
             >
-              <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points={expanded ? "18 15 12 9 6 15" : "6 9 12 15 18 9"} />
+              <svg className={`h-3 w-3 transition-transform ${expanded ? "" : "-rotate-90"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="6 9 12 15 18 9" />
               </svg>
               {expanded ? "Show less" : "Show more"}
             </button>
@@ -360,8 +360,8 @@ export function TaskDetail({
                   onClick={() => setShowFullResult(!showFullResult)}
                   className="flex items-center gap-1.5 text-[12px] font-medium text-blt transition-all hover:underline"
                 >
-                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points={showFullResult ? "18 15 12 9 6 15" : "6 9 12 15 18 9"} />
+                  <svg className={`h-3 w-3 transition-transform ${showFullResult ? "" : "-rotate-90"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
                   </svg>
                   {showFullResult ? "Show less" : "Show full result"}
                 </button>

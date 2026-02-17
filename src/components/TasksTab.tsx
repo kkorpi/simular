@@ -35,7 +35,7 @@ export function TasksTab({ onSelectTask }: { onSelectTask: (task: Task) => void 
           ))}
         </TaskSection>
 
-        <TaskSection label="Completed today" count={completedTasks.length}>
+        <TaskSection label="Completed today" count={completedTasks.length} defaultOpen={false}>
           {completedTasks.map((t) => (
             <TaskItem key={t.id} task={t} onClick={() => onSelectTask(t)} />
           ))}
