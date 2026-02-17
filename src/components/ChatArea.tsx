@@ -197,9 +197,106 @@ export function ChatArea({
                 Get the Simular mobile app to track progress, get alerts, and review results from your phone.
               </div>
             </div>
-            <button className="shrink-0 rounded-lg bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
-              Get app
-            </button>
+            <div className="flex shrink-0 items-center gap-2.5">
+              {/* QR code */}
+              <div className="flex h-[52px] w-[52px] items-center justify-center rounded-lg border border-b1 bg-bg p-1">
+                <svg viewBox="0 0 21 21" className="h-full w-full" shapeRendering="crispEdges">
+                  {/* QR code pattern */}
+                  <rect width="21" height="21" fill="white" />
+                  {/* Top-left finder */}
+                  <rect x="0" y="0" width="7" height="7" fill="#111" />
+                  <rect x="1" y="1" width="5" height="5" fill="white" />
+                  <rect x="2" y="2" width="3" height="3" fill="#111" />
+                  {/* Top-right finder */}
+                  <rect x="14" y="0" width="7" height="7" fill="#111" />
+                  <rect x="15" y="1" width="5" height="5" fill="white" />
+                  <rect x="16" y="2" width="3" height="3" fill="#111" />
+                  {/* Bottom-left finder */}
+                  <rect x="0" y="14" width="7" height="7" fill="#111" />
+                  <rect x="1" y="15" width="5" height="5" fill="white" />
+                  <rect x="2" y="16" width="3" height="3" fill="#111" />
+                  {/* Timing patterns */}
+                  <rect x="8" y="0" width="1" height="1" fill="#111" />
+                  <rect x="10" y="0" width="1" height="1" fill="#111" />
+                  <rect x="12" y="0" width="1" height="1" fill="#111" />
+                  <rect x="0" y="8" width="1" height="1" fill="#111" />
+                  <rect x="0" y="10" width="1" height="1" fill="#111" />
+                  <rect x="0" y="12" width="1" height="1" fill="#111" />
+                  {/* Data modules */}
+                  <rect x="8" y="2" width="1" height="1" fill="#111" />
+                  <rect x="9" y="3" width="1" height="1" fill="#111" />
+                  <rect x="10" y="2" width="1" height="1" fill="#111" />
+                  <rect x="11" y="4" width="1" height="1" fill="#111" />
+                  <rect x="12" y="3" width="1" height="1" fill="#111" />
+                  <rect x="8" y="5" width="1" height="1" fill="#111" />
+                  <rect x="10" y="5" width="1" height="1" fill="#111" />
+                  <rect x="12" y="5" width="1" height="1" fill="#111" />
+                  <rect x="8" y="8" width="1" height="1" fill="#111" />
+                  <rect x="9" y="9" width="1" height="1" fill="#111" />
+                  <rect x="10" y="8" width="1" height="1" fill="#111" />
+                  <rect x="11" y="9" width="1" height="1" fill="#111" />
+                  <rect x="12" y="8" width="1" height="1" fill="#111" />
+                  <rect x="8" y="10" width="1" height="1" fill="#111" />
+                  <rect x="10" y="10" width="1" height="1" fill="#111" />
+                  <rect x="12" y="10" width="1" height="1" fill="#111" />
+                  <rect x="8" y="12" width="1" height="1" fill="#111" />
+                  <rect x="9" y="11" width="1" height="1" fill="#111" />
+                  <rect x="11" y="11" width="1" height="1" fill="#111" />
+                  <rect x="12" y="12" width="1" height="1" fill="#111" />
+                  <rect x="14" y="8" width="1" height="1" fill="#111" />
+                  <rect x="15" y="9" width="1" height="1" fill="#111" />
+                  <rect x="16" y="8" width="1" height="1" fill="#111" />
+                  <rect x="17" y="9" width="1" height="1" fill="#111" />
+                  <rect x="18" y="8" width="1" height="1" fill="#111" />
+                  <rect x="14" y="10" width="1" height="1" fill="#111" />
+                  <rect x="16" y="10" width="1" height="1" fill="#111" />
+                  <rect x="18" y="10" width="1" height="1" fill="#111" />
+                  <rect x="20" y="10" width="1" height="1" fill="#111" />
+                  <rect x="14" y="12" width="1" height="1" fill="#111" />
+                  <rect x="15" y="11" width="1" height="1" fill="#111" />
+                  <rect x="17" y="11" width="1" height="1" fill="#111" />
+                  <rect x="19" y="12" width="1" height="1" fill="#111" />
+                  <rect x="20" y="11" width="1" height="1" fill="#111" />
+                  <rect x="8" y="14" width="1" height="1" fill="#111" />
+                  <rect x="9" y="15" width="1" height="1" fill="#111" />
+                  <rect x="10" y="14" width="1" height="1" fill="#111" />
+                  <rect x="11" y="15" width="1" height="1" fill="#111" />
+                  <rect x="8" y="16" width="1" height="1" fill="#111" />
+                  <rect x="10" y="16" width="1" height="1" fill="#111" />
+                  <rect x="12" y="16" width="1" height="1" fill="#111" />
+                  <rect x="9" y="17" width="1" height="1" fill="#111" />
+                  <rect x="11" y="17" width="1" height="1" fill="#111" />
+                  <rect x="8" y="18" width="1" height="1" fill="#111" />
+                  <rect x="10" y="18" width="1" height="1" fill="#111" />
+                  <rect x="14" y="14" width="1" height="1" fill="#111" />
+                  <rect x="16" y="14" width="1" height="1" fill="#111" />
+                  <rect x="18" y="14" width="1" height="1" fill="#111" />
+                  <rect x="20" y="14" width="1" height="1" fill="#111" />
+                  <rect x="15" y="15" width="1" height="1" fill="#111" />
+                  <rect x="17" y="15" width="1" height="1" fill="#111" />
+                  <rect x="19" y="15" width="1" height="1" fill="#111" />
+                  <rect x="14" y="16" width="1" height="1" fill="#111" />
+                  <rect x="16" y="16" width="1" height="1" fill="#111" />
+                  <rect x="18" y="16" width="1" height="1" fill="#111" />
+                  <rect x="20" y="16" width="1" height="1" fill="#111" />
+                  <rect x="15" y="17" width="1" height="1" fill="#111" />
+                  <rect x="19" y="17" width="1" height="1" fill="#111" />
+                  <rect x="14" y="18" width="1" height="1" fill="#111" />
+                  <rect x="16" y="18" width="1" height="1" fill="#111" />
+                  <rect x="20" y="18" width="1" height="1" fill="#111" />
+                  <rect x="15" y="19" width="1" height="1" fill="#111" />
+                  <rect x="17" y="19" width="1" height="1" fill="#111" />
+                  <rect x="19" y="19" width="1" height="1" fill="#111" />
+                  <rect x="14" y="20" width="1" height="1" fill="#111" />
+                  <rect x="16" y="20" width="1" height="1" fill="#111" />
+                  <rect x="18" y="20" width="1" height="1" fill="#111" />
+                  <rect x="20" y="20" width="1" height="1" fill="#111" />
+                </svg>
+              </div>
+              <button className="shrink-0 rounded-lg bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
+                Get app
+              </button>
+            </div>
           </div>
         </AgentContinuation>
         </div>
