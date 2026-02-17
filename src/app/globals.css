@@ -18,7 +18,8 @@
   --t2: #88888f;
   --t3: #58585f;
   --t4: #3a3a40;
-  --as: rgba(200, 200, 204, 0.07);
+  --as: rgba(96, 165, 250, 0.08);
+  --as2: rgba(96, 165, 250, 0.18);
   --ab: #e8e8eb;
   --abt: #0a0a0b;
   --g: #3dd68c;
@@ -57,7 +58,8 @@
   --t2: #6b6b73;
   --t3: #9b9ba3;
   --t4: #c0c0c6;
-  --as: rgba(82, 82, 91, 0.05);
+  --as: rgba(37, 99, 235, 0.05);
+  --as2: rgba(37, 99, 235, 0.12);
   --ab: #18181b;
   --abt: #fff;
   --g: #1d9960;
@@ -95,6 +97,7 @@
   --color-t3: var(--t3);
   --color-t4: var(--t4);
   --color-as: var(--as);
+  --color-as2: var(--as2);
   --color-ab: var(--ab);
   --color-abt: var(--abt);
   --color-g: var(--g);

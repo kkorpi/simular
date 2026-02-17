@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { SimularLogo } from "./SimularLogo";
 import { MorningBriefing } from "./MorningBriefing";
 import { CompetitorScanResult } from "./CompetitorScanResult";
 import { MeetingPrompt } from "./MeetingPrompt";
@@ -15,22 +14,19 @@ import { NewTaskCard } from "./NewTaskCard";
 import { runningTaskSteps } from "@/data/mockData";
 import type { ViewState } from "@/data/mockData";
 
-/** Agent message with avatar — use for the first message in a group */
+/** Agent message block */
 function AgentMessage({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex max-w-[620px] gap-2.5">
-      <div className="mt-0.5 shrink-0">
-        <SimularLogo size={24} />
-      </div>
-      <div className="min-w-0 flex-1">{children}</div>
+    <div className="max-w-[620px]">
+      <div className="min-w-0">{children}</div>
     </div>
   );
 }
 
-/** Continuation message — no avatar, just indented to align with text above */
+/** Continuation message — same layout, used for follow-up blocks */
 function AgentContinuation({ children }: { children: React.ReactNode }) {
   return (
-    <div className="max-w-[620px] pl-[34px]">
+    <div className="max-w-[620px]">
       <div className="min-w-0">{children}</div>
     </div>
   );
@@ -38,7 +34,7 @@ function AgentContinuation({ children }: { children: React.ReactNode }) {
 
 function UserMessage({ children }: { children: React.ReactNode }) {
   return (
-    <div className="ml-auto max-w-[480px] rounded-[14px_14px_4px_14px] border border-b1 bg-as px-4 py-2.5 text-sm text-t1">
+    <div className="ml-auto max-w-[480px] rounded-[14px_14px_4px_14px] border border-as2 bg-as px-4 py-2.5 text-sm text-t1">
       {children}
     </div>
   );
@@ -74,7 +70,7 @@ export function ChatArea({
   return (
     <div className="relative flex min-w-0 flex-1 flex-col">
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-auto flex max-w-[800px] flex-col gap-4 px-6 pt-5 pb-28">
+        <div className="mx-auto flex max-w-[800px] flex-col gap-8 px-6 pt-5 pb-28">
         {/* ── Morning group: greeting + scan result + meeting offer ── */}
         <AgentMessage>
           <MorningBriefing />
@@ -182,7 +178,7 @@ export function ChatArea({
 
         {/* ── Mobile app promo ── */}
         <AgentContinuation>
-          <div className="mt-1 flex max-w-[520px] items-center gap-3 rounded-xl border border-b1 bg-bg3 p-3.5">
+          <div className="mt-1 flex max-w-[520px] items-center gap-3 rounded-xl border border-b1 bg-bg3 p-4.5">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-bg3h">
               <svg className="h-[18px] w-[18px] text-t1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
