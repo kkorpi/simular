@@ -66,7 +66,7 @@ export function RightPanel({
       <ResizeHandle onResize={handleResize} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
 
       {/* Panel header: working status + collapse toggle */}
-      <div className="flex shrink-0 items-center border-b border-b1 px-3 py-2.5">
+      <div className="flex shrink-0 items-center px-3 py-2.5">
         <div className="flex flex-1 items-center justify-center gap-2">
           <div className="h-[7px] w-[7px] rounded-full bg-g shadow-[0_0_6px_var(--gg)] animate-pulse-dot" />
           <span className="font-mono text-[11.5px] text-t3">Working &middot; 3.2 hrs</span>
@@ -85,7 +85,7 @@ export function RightPanel({
       </div>
 
       {/* Live workspace preview */}
-      <div className="shrink-0 border-b border-b1 p-3">
+      <div className="shrink-0 p-3">
         <div
           onClick={onOpenWorkspace}
           className="relative flex aspect-video cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-b1 bg-bg3 transition-all hover:border-b2"

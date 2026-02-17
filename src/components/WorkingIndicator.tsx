@@ -1,10 +1,13 @@
+"use client";
+
 export function WorkingIndicator({ label }: { label: string }) {
   return (
-    <div className="flex flex-col gap-1.5">
-      <span className="text-[12px] text-t3">{label}</span>
-      <div className="h-[3px] w-[220px] overflow-hidden rounded-full bg-b1">
-        <div className="shimmer-bar h-full w-full rounded-full" />
-      </div>
+    <div className="flex items-center">
+      <div className="mr-2 h-[7px] w-[7px] shrink-0 rounded-full bg-g animate-pulse-dot" />
+      <span className="shimmer-text text-[13px] font-medium text-t3">
+        {label}
+      </span>
+      <span className="blink-cursor text-[13px] font-medium text-g ml-0.5">_</span>
     </div>
   );
 }

@@ -102,12 +102,10 @@ export function ChatArea({
               <div className="text-sm leading-[1.6] text-t2">
                 On it, pulling your Sequoia Scouts LP prep now.
               </div>
-              <div className="mt-1 mb-0.5 text-[10.5px] text-t4">
-                Using <span className="text-t3">Salesforce · Google Docs · Calendar</span>
-              </div>
               <RunningTaskDetail
                 steps={runningTaskSteps}
-                subtasks={["Researching Sequoia Scouts..."]}
+                subtasks={["Researching Sequoia Scouts"]}
+                integrations={["Salesforce", "Google Docs", "Calendar"]}
                 onViewActivityLog={onViewActivityLog}
               />
             </AgentMessage>
@@ -134,12 +132,10 @@ export function ChatArea({
               <div className="text-sm leading-[1.6] text-t2">
                 On it, I&apos;ll check your LP touchpoints while the briefing runs.
               </div>
-              <div className="mt-1 mb-0.5 text-[10.5px] text-t4">
-                Using <span className="text-t3">Salesforce · Calendar · Gmail</span>
-              </div>
               <RunningTaskDetail
                 steps={[]}
-                subtasks={["Checking Salesforce LP records..."]}
+                subtasks={["Checking Salesforce LP records"]}
+                integrations={["Salesforce", "Calendar", "Gmail"]}
               />
             </AgentMessage>
 
