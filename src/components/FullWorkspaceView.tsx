@@ -172,7 +172,7 @@ export function FullWorkspaceView({
       <div className="flex shrink-0 items-center gap-3 border-b border-b1 px-5 py-2.5">
         <button
           onClick={onClose}
-          className="flex items-center justify-center rounded-lg p-1 text-t3 transition-all hover:bg-bg3 hover:text-t1"
+          className="flex items-center justify-center rounded-md p-1 text-t3 transition-all hover:bg-bg3 hover:text-t1"
           title="Close workspace"
         >
           <svg
@@ -218,7 +218,7 @@ export function FullWorkspaceView({
                 <strong className="font-semibold text-g">
                   {service} connected
                 </strong>
-                {" "}— resuming task
+                {" "}· resuming task
               </>
             ) : mode === "login" ? (
               <>
@@ -267,19 +267,19 @@ export function FullWorkspaceView({
         }`}>
           {/* Status icon */}
           {loginSuccess ? (
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-g/20">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-g/20">
               <svg className="h-4 w-4 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             </div>
           ) : (
-            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
+            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-amber-500/15">
               {/* Cursor/pointer icon */}
               <svg className="h-4 w-4 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M4 2l14.5 11.5-5.5 1.5 3.5 6.5-2.5 1.5-3.5-6.5-4 4z" />
               </svg>
               {/* Subtle pulse ring */}
-              <div className="absolute inset-0 rounded-lg border border-amber-500/40 animate-[ping_2s_ease-out_infinite] opacity-50" />
+              <div className="absolute inset-0 rounded-md border border-amber-500/40 animate-[ping_2s_ease-out_infinite] opacity-50" />
             </div>
           )}
           <div className="flex-1">
@@ -309,7 +309,7 @@ export function FullWorkspaceView({
                 setLoginSuccess(false);
                 setCountdown(5);
               }}
-              className="rounded-lg border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3"
+              className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3"
             >
               Keep open
             </button>
@@ -320,7 +320,7 @@ export function FullWorkspaceView({
       {/* Teach mode coaching banner */}
       {mode === "teach" && (
         <div className="flex shrink-0 items-center gap-3 border-b border-violet-500/20 bg-violet-500/[0.04] px-5 py-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-500/15">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-violet-500/15">
             <svg className="h-4 w-4 text-violet-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" />
               <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
@@ -453,7 +453,7 @@ export function FullWorkspaceView({
           ref={panelRef}
           onMouseDown={handleMouseDown}
           style={panelStyle()}
-          className={`absolute w-[300px] rounded-xl bg-bg2/90 backdrop-blur-md shadow-lg select-none ${
+          className={`absolute w-[300px] rounded-lg bg-bg2/90 backdrop-blur-md shadow-lg select-none ${
             dragging ? "cursor-grabbing" : "cursor-grab"
           } ${
             stepsVisible

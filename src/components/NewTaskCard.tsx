@@ -185,13 +185,13 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
 
   return (
     <div
-      className="mb-3 overflow-hidden rounded-xl border border-b1 bg-bg2 shadow-lg"
+      className="mb-3 overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-lg"
       onKeyDown={handleKeyDown}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-bg3 text-t2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-bg3 text-t2">
             <svg
               className="h-3.5 w-3.5"
               viewBox="0 0 24 24"
@@ -243,7 +243,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Daily deal sourcing digest"
-            className="w-full rounded-lg border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 placeholder:text-t4 outline-none transition-colors focus:border-b2"
+            className="w-full rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 placeholder:text-t4 outline-none transition-colors focus:border-b2"
           />
         </div>
 
@@ -257,7 +257,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
             onChange={(e) => setInstructions(e.target.value)}
             placeholder="e.g. Scan Crunchbase for Series A rounds in healthcare AI. Cross-reference with existing portfolio. Flag overlaps."
             rows={3}
-            className="w-full resize-y rounded-lg border border-b1 bg-bg3 px-3 py-2 text-[13px] leading-[1.5] text-t1 placeholder:text-t4 outline-none transition-colors focus:border-b2"
+            className="w-full resize-y rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] leading-[1.5] text-t1 placeholder:text-t4 outline-none transition-colors focus:border-b2"
           />
         </div>
 
@@ -271,7 +271,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
               <select
                 value={frequency}
                 onChange={(e) => setFrequency(e.target.value)}
-                className="rounded-lg border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none"
+                className="rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none"
               >
                 {frequencyOptions.map((f) => (
                   <option key={f} value={f}>
@@ -283,7 +283,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
                 type="text"
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="w-[88px] rounded-lg border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none transition-colors focus:border-b2"
+                className="w-[88px] rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none transition-colors focus:border-b2"
               />
             </div>
           </div>
@@ -294,7 +294,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
             <select
               value={maxDuration}
               onChange={(e) => setMaxDuration(e.target.value)}
-              className="rounded-lg border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none"
+              className="rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none"
             >
               {durationOptions.map((d) => (
                 <option key={d} value={d}>
@@ -341,7 +341,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
               </button>
 
               {integrationDropdownOpen && (
-                <div className="absolute bottom-full left-0 mb-1 w-[180px] rounded-lg border border-b1 bg-bg2 py-1 shadow-lg z-10">
+                <div className="absolute bottom-full left-0 mb-1 w-[180px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg z-10">
                   {!addingNewIntegration ? (
                     <>
                       {availableIntegrations.map((integ) => (
@@ -428,7 +428,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
               </button>
 
               {skillsDropdownOpen && (
-                <div className="absolute bottom-full left-0 mb-1 w-[180px] rounded-lg border border-b1 bg-bg2 py-1 shadow-lg z-10">
+                <div className="absolute bottom-full left-0 mb-1 w-[180px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg z-10">
                   {!addingNewSkill ? (
                     <>
                       {availableSkills.map((skill) => (
@@ -480,7 +480,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
         </div>
 
         {/* Preview */}
-        <div className="mb-4 rounded-lg bg-bg3 px-3.5 py-2.5">
+        <div className="mb-4 rounded-md bg-bg3 px-3.5 py-2.5">
           <div className="flex items-center gap-2 text-[12px] text-t3">
             <svg
               className="h-3 w-3 shrink-0 text-t4"
@@ -513,14 +513,14 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
         <div className="flex items-center justify-end gap-2">
           <button
             onClick={onClose}
-            className="rounded-lg border border-b1 bg-transparent px-4 py-2 text-[13px] font-medium text-t2 transition-all hover:bg-bg3 hover:text-t1"
+            className="rounded-md border border-b1 bg-transparent px-4 py-2 text-[13px] font-medium text-t2 transition-all hover:bg-bg3 hover:text-t1"
           >
             Cancel
           </button>
           <button
             onClick={handleCreate}
             disabled={!name.trim()}
-            className={`rounded-lg px-4 py-2 text-[13px] font-medium transition-all ${
+            className={`rounded-md px-4 py-2 text-[13px] font-medium transition-all ${
               name.trim()
                 ? "bg-ab text-abt hover:brightness-110"
                 : "bg-bg3 text-t4 cursor-default"

@@ -1,0 +1,326 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { SimularLogo } from "./SimularLogo";
+
+/**
+ * Setup steps shown during workspace provisioning.
+ * Framed as a coworker getting set up. Never mention VMs or containers.
+ */
+const setupSteps = [
+  { label: "Setting up your workspace", tip: "Your coworker gets their own private machine. A real computer in the cloud, just for you." },
+  { label: "Installing Chrome and apps", tip: "Simular uses the same apps you do. Real browser, real clicks, real work." },
+  { label: "Configuring a secure environment", tip: "Your credentials never leave your workspace. Everything is encrypted and isolated." },
+  { label: "Preparing your coworker", tip: "Once set up, your coworker works around the clock, even while you sleep." },
+];
+
+/** Onboarding questions shown alongside setup progress */
+const onboardingQuestions = [
+  {
+    question: "What best describes your role?",
+    options: [
+      { id: "vc", label: "VC / Investor" },
+      { id: "sales", label: "Sales" },
+      { id: "marketing", label: "Marketing" },
+      { id: "ops", label: "Operations" },
+      { id: "founder", label: "Founder" },
+      { id: "other", label: "Other" },
+    ],
+  },
+  {
+    question: "Which apps do you use most?",
+    multi: true,
+    options: [
+      { id: "gmail", label: "Gmail" },
+      { id: "linkedin", label: "LinkedIn" },
+      { id: "salesforce", label: "Salesforce" },
+      { id: "slack", label: "Slack" },
+      { id: "hubspot", label: "HubSpot" },
+      { id: "notion", label: "Notion" },
+    ],
+  },
+  {
+    question: "What would you love to hand off?",
+    options: [
+      { id: "research", label: "Research" },
+      { id: "email", label: "Email triage" },
+      { id: "crm", label: "CRM updates" },
+      { id: "meeting-prep", label: "Meeting prep" },
+      { id: "monitoring", label: "Monitoring" },
+      { id: "reporting", label: "Reporting" },
+    ],
+  },
+];
+
+export interface OnboardingProfile {
+  role?: string;
+  apps?: string[];
+  handoff?: string;
+}
+
+export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingProfile) => void }) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [progress, setProgress] = useState(0);
+  const [stepsFinished, setStepsFinished] = useState(false);
+  const [done, setDone] = useState(false);
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [showQuestion, setShowQuestion] = useState(true);
+
+  // Profile answers
+  const [role, setRole] = useState<string | undefined>();
+  const [apps, setApps] = useState<string[]>([]);
+  const [handoff, setHandoff] = useState<string | undefined>();
+
+  const allQuestionsAnswered = questionIndex >= onboardingQuestions.length;
+
+  // Show completion only when BOTH steps finished AND questions answered
+  useEffect(() => {
+    if (stepsFinished && allQuestionsAnswered && !done) {
+      const timer = setTimeout(() => setDone(true), 400);
+      return () => clearTimeout(timer);
+    }
+  }, [stepsFinished, allQuestionsAnswered, done]);
+
+  // Advance through steps with varying durations
+  useEffect(() => {
+    if (stepsFinished || currentStep >= setupSteps.length) return;
+
+    const durations = [3000, 2400, 3000, 2400];
+    const duration = durations[currentStep] || 2400;
+
+    const startProgress = (currentStep / setupSteps.length) * 100;
+    const endProgress = ((currentStep + 1) / setupSteps.length) * 100;
+    const interval = 50;
+    const increment = ((endProgress - startProgress) / duration) * interval;
+
+    const progressTimer = setInterval(() => {
+      setProgress((p) => {
+        const next = p + increment;
+        return next >= endProgress ? endProgress : next;
+      });
+    }, interval);
+
+    const stepTimer = setTimeout(() => {
+      clearInterval(progressTimer);
+      setProgress(endProgress);
+
+      if (currentStep === setupSteps.length - 1) {
+        setStepsFinished(true);
+      } else {
+        setCurrentStep((s) => s + 1);
+      }
+    }, duration);
+
+    return () => {
+      clearTimeout(stepTimer);
+      clearInterval(progressTimer);
+    };
+  }, [currentStep, stepsFinished]);
+
+  const advanceQuestion = useCallback(() => {
+    setShowQuestion(false);
+    setTimeout(() => {
+      setQuestionIndex((i) => i + 1);
+      setShowQuestion(true);
+    }, 300);
+  }, []);
+
+  const handleSelectRole = (id: string) => {
+    setRole(id);
+    advanceQuestion();
+  };
+
+  const handleToggleApp = (id: string) => {
+    setApps((prev) =>
+      prev.includes(id) ? prev.filter((a) => a !== id) : [...prev, id]
+    );
+  };
+
+  const handleSelectHandoff = (id: string) => {
+    setHandoff(id);
+    advanceQuestion();
+  };
+
+  const handleContinue = useCallback(() => {
+    onReady({ role, apps: apps.length > 0 ? apps : undefined, handoff });
+  }, [onReady, role, apps, handoff]);
+
+  const currentQ = onboardingQuestions[questionIndex];
+
+  return (
+    <div className="flex h-screen flex-col items-center justify-center bg-bg px-8">
+      <div className="w-full max-w-[540px]">
+        {/* Logo */}
+        <div className="mb-10 flex justify-center">
+          <SimularLogo size={40} />
+        </div>
+
+        {/* Trial badge */}
+        <div className="mb-8 flex justify-center">
+          <div className="flex items-center gap-2 rounded-full border border-as/25 bg-as/[0.06] px-4 py-2">
+            <svg className="h-4 w-4 text-blt" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <span className="text-[13px] font-medium text-blt">
+              7-day free trial started
+            </span>
+            <span className="text-[12px] text-blt/60">
+              · no credit card required
+            </span>
+          </div>
+        </div>
+
+        {done ? (
+          /* ── Completion state ── */
+          <div className="animate-fade-in text-center">
+            {/* Checkmark circle */}
+            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-as/10">
+              <svg className="h-8 w-8 text-blt" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+
+            <h2 className="text-[22px] font-semibold text-t1">
+              Your workspace is ready{role ? `, Katie` : ""}
+            </h2>
+            <p className="mt-2 text-[15px] leading-[1.6] text-t3">
+              Let&apos;s meet your new coworker.
+            </p>
+
+            <button
+              onClick={handleContinue}
+              className="mt-8 inline-flex h-11 items-center gap-2.5 rounded-md bg-as px-8 text-[14px] font-medium text-white transition-all hover:bg-as2"
+            >
+              Get started
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12" />
+                <polyline points="12 5 19 12 12 19" />
+              </svg>
+            </button>
+          </div>
+        ) : (
+          /* ── Progress + questions state ── */
+          <>
+            {/* Current step label */}
+            <div className="mb-6 text-center">
+              <h2 className="text-[18px] font-semibold text-t1">
+                {stepsFinished ? "Almost there" : setupSteps[currentStep]?.label}
+              </h2>
+            </div>
+
+            {/* Progress bar */}
+            <div className="mb-6 h-1 overflow-hidden rounded-full bg-bg3">
+              <div
+                className="h-full rounded-full bg-as transition-all duration-100 ease-linear"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+
+            {/* Step indicators */}
+            <div className="mb-8 flex justify-center gap-2">
+              {setupSteps.map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-1.5 w-1.5 rounded-full transition-all duration-300 ${
+                    stepsFinished || i < currentStep
+                      ? "bg-as"
+                      : i === currentStep
+                        ? "bg-blt animate-pulse"
+                        : "bg-bg3"
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Question area */}
+            {!allQuestionsAnswered && currentQ ? (
+              <div
+                key={questionIndex}
+                className={`rounded-lg border border-b1 bg-bg2 px-5 py-5 transition-all duration-300 ${
+                  showQuestion ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
+                }`}
+              >
+                <p className="mb-4 text-[14px] font-medium text-t1">
+                  {currentQ.question}
+                </p>
+
+                <div className="flex flex-wrap gap-2">
+                  {currentQ.options.map((opt) => {
+                    // Multi-select (apps question)
+                    if (questionIndex === 1) {
+                      const selected = apps.includes(opt.id);
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => handleToggleApp(opt.id)}
+                          className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-all ${
+                            selected
+                              ? "border-as/50 bg-as/10 text-blt"
+                              : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h"
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    }
+                    // Single-select (role, handoff)
+                    const isSelected =
+                      questionIndex === 0 ? role === opt.id : handoff === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        onClick={() =>
+                          questionIndex === 0
+                            ? handleSelectRole(opt.id)
+                            : handleSelectHandoff(opt.id)
+                        }
+                        className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-all ${
+                          isSelected
+                            ? "border-as/50 bg-as/10 text-blt"
+                            : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Continue button for multi-select */}
+                {questionIndex === 1 && (
+                  <button
+                    onClick={advanceQuestion}
+                    className={`mt-4 text-[13px] font-medium transition-colors ${
+                      apps.length > 0 ? "text-blt hover:text-as2" : "text-t4"
+                    }`}
+                  >
+                    {apps.length > 0 ? "Continue →" : "Skip →"}
+                  </button>
+                )}
+              </div>
+            ) : (
+              /* Educational tip when questions are done */
+              <div className="rounded-lg border border-b1 bg-bg2 px-5 py-4">
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-as/10">
+                    <svg className="h-3.5 w-3.5 text-blt" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="16" x2="12" y2="12" />
+                      <line x1="12" y1="8" x2="12.01" y2="8" />
+                    </svg>
+                  </div>
+                  <p
+                    key={currentStep}
+                    className="text-[13px] leading-[1.7] text-t3 animate-fade-in"
+                  >
+                    {setupSteps[currentStep]?.tip}
+                  </p>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}

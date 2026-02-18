@@ -50,7 +50,7 @@ function ArtifactCard({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="overflow-hidden rounded-lg border border-b1">
+    <div className="overflow-hidden rounded-md border border-b1">
       {/* Header row */}
       <div className="flex items-center gap-2.5 bg-bg3 px-3 py-2.5">
         <span className="text-base">{artifact.icon}</span>
@@ -204,7 +204,7 @@ export function TaskDetail({
         {/* Screen preview — only for running/queued tasks */}
         {task.thumbEmoji && (task.status === "running" || task.status === "queued") && (
           <div
-            className={`mb-4 overflow-hidden rounded-lg border border-b1 ${onOpenWorkspace ? "cursor-pointer transition-all hover:border-b2" : ""}`}
+            className={`mb-4 overflow-hidden rounded-md border border-b1 ${onOpenWorkspace ? "cursor-pointer transition-all hover:border-b2" : ""}`}
             onClick={onOpenWorkspace}
           >
             <div className="relative flex aspect-video items-center justify-center bg-bg">
@@ -344,7 +344,7 @@ export function TaskDetail({
 
             {/* Summary text */}
             {d?.result && (
-              <div className="mb-2.5 rounded-lg border border-b1 bg-bg3 p-3 text-[13px] leading-[1.6] text-t2">
+              <div className="mb-2.5 rounded-md border border-b1 bg-bg3 p-3 text-[13px] leading-[1.6] text-t2">
                 {showFullResult && d.fullResult ? (
                   <div className="whitespace-pre-line">{d.fullResult}</div>
                 ) : (
@@ -432,36 +432,36 @@ export function TaskDetail({
       <div className="flex shrink-0 flex-wrap gap-2 border-t border-b1 px-4 py-3">
         {task.status === "running" && (
           <>
-            <button className="rounded-lg border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
               Pause
             </button>
-            <button className="rounded-lg border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
               Cancel
             </button>
           </>
         )}
         {task.status === "queued" && (
           <>
-            <button className="rounded-lg bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
+            <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
               Run now
             </button>
-            <button className="rounded-lg border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
               Remove from queue
             </button>
           </>
         )}
         {task.status === "recurring" && (
           <>
-            <button className="rounded-lg bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
+            <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
               Run now
             </button>
             <button
               onClick={onEditSchedule}
-              className="rounded-lg border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+              className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
             >
               Edit schedule
             </button>
-            <button className="rounded-lg border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
               Disable
             </button>
           </>
@@ -471,20 +471,20 @@ export function TaskDetail({
             {hasRichResult && onViewResult ? (
               <button
                 onClick={onViewResult}
-                className="rounded-lg bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110"
+                className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110"
               >
                 View full briefing
               </button>
             ) : d?.artifact?.url ? (
-              <button className="rounded-lg bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
+              <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
                 Open in {d.artifact.format === "code" ? "GitHub" : d.artifact.format === "spreadsheet" ? "Sheets" : d.artifact.format === "link" ? "browser" : "Docs"}
               </button>
             ) : (
-              <button className="rounded-lg bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
+              <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
                 View in chat
               </button>
             )}
-            <button className="rounded-lg border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
               Run again
             </button>
           </>

@@ -7,7 +7,7 @@ export function ResultCard({
 }) {
   return (
     <div
-      className={`mt-2 max-w-[520px] overflow-hidden rounded-xl border bg-bg3 ${
+      className={`mt-2 max-w-[520px] overflow-hidden rounded-lg border bg-bg3 ${
         highlighted ? "border-b2 shadow-[0_0_0_2px_var(--as)]" : "border-b1"
       }`}
     >

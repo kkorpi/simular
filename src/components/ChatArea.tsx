@@ -124,8 +124,8 @@ export function ChatArea({
 
         {/* ── Mobile app promo ── */}
         <AgentContinuation>
-          <div className="mt-1 flex max-w-[520px] items-center gap-3 rounded-xl border border-b1 bg-bg3 p-4.5">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-bg3h">
+          <div className="mt-1 flex max-w-[520px] items-center gap-3 rounded-lg border border-b1 bg-bg3 p-4.5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-bg3h">
               <svg className="h-[18px] w-[18px] text-t1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
                 <line x1="12" y1="18" x2="12.01" y2="18" />
@@ -139,7 +139,7 @@ export function ChatArea({
                 Get the Simular mobile app to track progress, get alerts, and review results from your phone.
               </div>
             </div>
-            <button className="shrink-0 rounded-lg bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
+            <button className="shrink-0 rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
               Get app
             </button>
           </div>

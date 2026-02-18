@@ -38,8 +38,8 @@ export function TopBar({
       {/* Right: avatar */}
       <div className="ml-auto">
         <img
-          src="/avatar-peter.jpg"
-          alt="Peter"
+          src="/avatar-katie.jpg"
+          alt="Katie"
           onClick={() => setMenuOpen(!menuOpen)}
           className="h-7 w-7 cursor-pointer rounded-full object-cover transition-all hover:ring-2 hover:ring-b2"
         />

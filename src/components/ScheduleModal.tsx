@@ -114,7 +114,7 @@ export function ScheduleModal({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-b1 px-5 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-bg3 text-t2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-md bg-bg3 text-t2">
               <RepeatIcon className="h-4 w-4" />
             </div>
             <div>
@@ -155,7 +155,7 @@ export function ScheduleModal({
                 <button
                   key={f.id}
                   onClick={() => setFrequency(f.id)}
-                  className={`rounded-lg border px-3.5 py-2 text-[13px] font-medium transition-all ${
+                  className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-all ${
                     frequency === f.id
                       ? "border-b2 bg-bg3 text-t1"
                       : "border-b1 text-t3 hover:border-b2 hover:text-t2"
@@ -301,7 +301,7 @@ export function ScheduleModal({
               Time
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex items-center rounded-lg border border-b1 bg-bg3">
+              <div className="flex items-center rounded-md border border-b1 bg-bg3">
                 <input
                   type="text"
                   value={time}
@@ -328,7 +328,7 @@ export function ScheduleModal({
           </div>
 
           {/* Preview */}
-          <div className="rounded-lg bg-bg3 px-3.5 py-3">
+          <div className="rounded-md bg-bg3 px-3.5 py-3">
             <div className="flex items-center gap-2 text-[13px] text-t2">
               <RepeatIcon className="h-3.5 w-3.5 shrink-0 text-t3" />
               {previewText(frequency, time, customDays, weeklyDay, monthDay)}
@@ -357,13 +357,13 @@ export function ScheduleModal({
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="rounded-lg border border-b1 bg-transparent px-4 py-2 text-[13px] font-medium text-t2 transition-all hover:bg-bg3 hover:text-t1"
+              className="rounded-md border border-b1 bg-transparent px-4 py-2 text-[13px] font-medium text-t2 transition-all hover:bg-bg3 hover:text-t1"
             >
               Cancel
             </button>
             <button
               onClick={onClose}
-              className="rounded-lg bg-ab px-4 py-2 text-[13px] font-medium text-abt transition-all hover:brightness-110"
+              className="rounded-md bg-ab px-4 py-2 text-[13px] font-medium text-abt transition-all hover:brightness-110"
             >
               Save
             </button>

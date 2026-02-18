@@ -59,7 +59,7 @@ export function BriefingDetail({ onBack }: { onBack: () => void }) {
             {briefingPeople.map((p) => (
               <div
                 key={p.initials}
-                className="flex items-center gap-2.5 rounded-lg border border-b1 bg-bg3 px-2.5 py-2"
+                className="flex items-center gap-2.5 rounded-md border border-b1 bg-bg3 px-2.5 py-2"
               >
                 <div className="flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full bg-bg3h text-[11px] font-semibold text-t2">
                   {p.initials}
@@ -117,13 +117,13 @@ export function BriefingDetail({ onBack }: { onBack: () => void }) {
 
       {/* Actions */}
       <div className="flex shrink-0 gap-2 border-t border-b1 px-5 py-4">
-        <button className="rounded-lg bg-ab px-4 py-[7px] text-[12.5px] font-medium text-abt transition-all hover:brightness-110">
+        <button className="rounded-md bg-ab px-4 py-[7px] text-[12.5px] font-medium text-abt transition-all hover:brightness-110">
           Copy to clipboard
         </button>
-        <button className="rounded-lg border border-b1 bg-transparent px-4 py-[7px] text-[12.5px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+        <button className="rounded-md border border-b1 bg-transparent px-4 py-[7px] text-[12.5px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
           Open in Google Docs
         </button>
-        <button className="rounded-lg border border-b1 bg-transparent px-4 py-[7px] text-[12.5px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+        <button className="rounded-md border border-b1 bg-transparent px-4 py-[7px] text-[12.5px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
           Share via email
         </button>
       </div>

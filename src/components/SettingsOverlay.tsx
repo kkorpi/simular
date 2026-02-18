@@ -107,7 +107,7 @@ function AppearanceSettings() {
           <button
             key={t}
             onClick={() => setPreference(t)}
-            className={`rounded-lg border px-4 py-2 text-[13px] font-medium capitalize transition-all ${
+            className={`rounded-md border px-4 py-2 text-[13px] font-medium capitalize transition-all ${
               preference === t
                 ? "border-b2 bg-bg3 text-t1"
                 : "border-b1 text-t3 hover:border-b2 hover:text-t2"
@@ -132,7 +132,7 @@ function WorkspaceSettings() {
         <div className="text-[14px] font-semibold text-t1">Agent settings</div>
         <div className="mt-4 flex flex-col gap-4">
           <SettingRow label="Thinking strength" hint>
-            <select className="rounded-lg border border-b1 bg-bg3 px-3 py-1.5 text-[13px] text-t1 outline-none">
+            <select className="rounded-md border border-b1 bg-bg3 px-3 py-1.5 text-[13px] text-t1 outline-none">
               <option>Low</option>
               <option>Medium</option>
               <option>High</option>
@@ -143,7 +143,7 @@ function WorkspaceSettings() {
             <input
               type="number"
               defaultValue={20}
-              className="w-[72px] rounded-lg border border-b1 bg-bg3 px-3 py-1.5 text-right text-[13px] text-t1 outline-none"
+              className="w-[72px] rounded-md border border-b1 bg-bg3 px-3 py-1.5 text-right text-[13px] text-t1 outline-none"
             />
           </SettingRow>
 
@@ -265,7 +265,7 @@ function IntegrationRow({
       {connected ? (
         <span className="px-3 py-1.5 text-[12px] font-medium text-t3">Connected</span>
       ) : (
-        <button className="rounded-lg border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3 hover:text-t1">
+        <button className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3 hover:text-t1">
           Connect
         </button>
       )}

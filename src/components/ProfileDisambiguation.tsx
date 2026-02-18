@@ -59,7 +59,7 @@ export function ProfileDisambiguation({
                   key={profile.id}
                   onClick={() => !selectedId && onSelect(profile)}
                   disabled={!!selectedId && !isSelected}
-                  className={`group flex w-[160px] flex-col items-center rounded-xl border px-3 py-4 text-center transition-all ${
+                  className={`group flex w-[160px] flex-col items-center rounded-lg border px-3 py-4 text-center transition-all ${
                     isSelected
                       ? "border-b2 bg-bg3 shadow-[0_0_0_2px_var(--as)]"
                       : selectedId

@@ -185,12 +185,12 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
   };
 
   return (
-    <div className="relative flex flex-col rounded-xl border border-b1 bg-bg3 transition-colors focus-within:border-b2">
+    <div className="relative flex flex-col rounded-lg border border-b1 bg-bg3 transition-colors focus-within:border-b2">
       {/* Slash command menu */}
       {showMenu && filteredCommands.length > 0 && (
         <div
           ref={slashRef}
-          className="absolute bottom-full left-0 right-0 mb-1.5 overflow-hidden rounded-xl border border-b1 bg-bg2 shadow-lg"
+          className="absolute bottom-full left-0 right-0 mb-1.5 overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-lg"
         >
           <div className="px-3 pt-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wide text-t4">
             Quick actions
@@ -205,7 +205,7 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
                 i === slashIndex ? "bg-bg3" : ""
               }`}
             >
-              <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${
+              <div className={`flex h-8 w-8 items-center justify-center rounded-md ${
                 i === slashIndex ? "bg-bg3h text-t1" : "bg-bg3 text-t3"
               }`}>
                 {cmd.icon}
@@ -287,7 +287,7 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
 
           {/* Dropdown */}
           {modelOpen && (
-            <div className="absolute bottom-full left-0 mb-1 w-[180px] rounded-lg border border-b1 bg-bg2 py-1 shadow-lg">
+            <div className="absolute bottom-full left-0 mb-1 w-[180px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
               {models.map((m) => (
                 <button
                   key={m}

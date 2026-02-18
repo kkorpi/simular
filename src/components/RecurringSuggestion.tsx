@@ -1,6 +1,6 @@
 export function RecurringSuggestion() {
   return (
-    <div className="mt-2 flex max-w-[520px] items-center gap-2.5 rounded-xl border border-b1 bg-bg3 p-3">
+    <div className="mt-2 flex max-w-[520px] items-center gap-2.5 rounded-lg border border-b1 bg-bg3 p-3">
       <svg className="h-4 w-4 shrink-0 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 014-4h14" /><polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 01-4 4H3" /></svg>
       <div className="flex-1 text-[13px] leading-[1.5] text-t2">
         <strong className="font-medium text-t1">

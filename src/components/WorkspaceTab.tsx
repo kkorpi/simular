@@ -34,7 +34,7 @@ export function WorkspaceTab({ onFullView }: { onFullView: () => void }) {
       </div>
 
       {/* Current task */}
-      <div className="flex items-center gap-2 rounded-lg border border-b1 bg-bg3 px-3 py-2">
+      <div className="flex items-center gap-2 rounded-md border border-b1 bg-bg3 px-3 py-2">
         <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-g shadow-[0_0_4px_var(--gg)]" />
         <div className="flex-1">
           <div className="text-[11.5px] font-medium text-t1">Research inbound founder</div>
@@ -64,7 +64,7 @@ export function WorkspaceTab({ onFullView }: { onFullView: () => void }) {
 
       {/* Trust info */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-start gap-2 rounded-lg bg-bg3 px-2.5 py-2 text-[11px] leading-[1.45] text-t3">
+        <div className="flex items-start gap-2 rounded-md bg-bg3 px-2.5 py-2 text-[11px] leading-[1.45] text-t3">
           <svg
             className="mt-0.5 h-[13px] w-[13px] shrink-0 text-g"
             viewBox="0 0 24 24"
@@ -79,7 +79,7 @@ export function WorkspaceTab({ onFullView }: { onFullView: () => void }) {
           </svg>
           <span>Your workspace is private. Only you can see it. All activity is logged.</span>
         </div>
-        <div className="flex items-start gap-2 rounded-lg bg-bg3 px-2.5 py-2 text-[11px] leading-[1.45] text-t3">
+        <div className="flex items-start gap-2 rounded-md bg-bg3 px-2.5 py-2 text-[11px] leading-[1.45] text-t3">
           <svg
             className="mt-0.5 h-[13px] w-[13px] shrink-0 text-g"
             viewBox="0 0 24 24"

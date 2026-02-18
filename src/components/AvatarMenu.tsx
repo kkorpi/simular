@@ -25,18 +25,18 @@ export function AvatarMenu({ open, onClose, onOpenSettings }: AvatarMenuProps) {
   return (
     <div
       ref={ref}
-      className="absolute right-5 top-[46px] z-50 w-[220px] overflow-hidden rounded-xl border border-b1 bg-bg2 shadow-[var(--sc)]"
+      className="absolute right-5 top-[46px] z-50 w-[220px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]"
     >
       {/* Profile */}
       <div className="flex items-center gap-3 px-4 py-3.5">
         <img
-          src="/avatar-peter.jpg"
-          alt="Peter"
+          src="/avatar-katie.jpg"
+          alt="Katie"
           className="h-9 w-9 rounded-full object-cover"
         />
         <div className="min-w-0 flex-1">
-          <div className="text-[13px] font-semibold text-t1">Peter Gao</div>
-          <div className="text-[11.5px] text-t3">peter@simular.ai</div>
+          <div className="text-[13px] font-semibold text-t1">Katie Chen</div>
+          <div className="text-[11.5px] text-t3">katie@simular.ai</div>
         </div>
       </div>
 

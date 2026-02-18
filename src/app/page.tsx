@@ -7,9 +7,14 @@ import { RightPanel } from "@/components/RightPanel";
 import { FullWorkspaceView } from "@/components/FullWorkspaceView";
 import { ZeroState } from "@/components/ZeroState";
 import { SettingsOverlay, type SettingsSection } from "@/components/SettingsOverlay";
+import { LoginScreen } from "@/components/LoginScreen";
+import { OnboardingScreen, type OnboardingProfile } from "@/components/OnboardingScreen";
 import type { ViewState } from "@/data/mockData";
 
 export default function Home() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isOnboarded, setIsOnboarded] = useState(false);
+  const [userProfile, setUserProfile] = useState<OnboardingProfile>({});
   const [activeView, setActiveView] = useState<ViewState>("zero-state");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSection, setSettingsSection] = useState<SettingsSection | undefined>(undefined);
@@ -59,6 +64,14 @@ export default function Home() {
 
   const showPip = panelCollapsed && activeView !== "zero-state";
 
+  if (!isLoggedIn) {
+    return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
+  }
+
+  if (!isOnboarded) {
+    return <OnboardingScreen onReady={(profile) => { setUserProfile(profile); setIsOnboarded(true); }} />;
+  }
+
   return (
     <div className="flex h-screen flex-col">
       <TopBar
@@ -70,9 +83,8 @@ export default function Home() {
         {activeView === "zero-state" ? (
           <ZeroState
             onStartTask={handleStartTask}
-            onSlashCommand={handleSlashCommand}
-            showNewTaskCard={showNewTaskCard}
-            onCloseNewTask={() => setShowNewTaskCard(false)}
+            onCreateOwn={() => setActiveView("task-hover")}
+            userRole={userProfile.role}
           />
         ) : (
           <>
@@ -99,7 +111,7 @@ export default function Home() {
 
       {/* Floating PiP workspace when sidebar is collapsed */}
       <div
-        className={`fixed top-[54px] right-4 z-40 w-[280px] overflow-hidden rounded-xl border border-b1 bg-bg2 shadow-2xl transition-all duration-300 ease-out ${
+        className={`fixed top-[54px] right-4 z-40 w-[280px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-2xl transition-all duration-300 ease-out ${
           showPip ? "translate-y-0 opacity-100" : "-translate-y-2 pointer-events-none opacity-0"
         }`}
       >
