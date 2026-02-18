@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { TopBar } from "@/components/TopBar";
 import { ChatArea } from "@/components/ChatArea";
 import { RightPanel } from "@/components/RightPanel";
@@ -10,6 +10,10 @@ import { SettingsOverlay, type SettingsSection } from "@/components/SettingsOver
 import { LoginScreen } from "@/components/LoginScreen";
 import { OnboardingScreen, type OnboardingProfile } from "@/components/OnboardingScreen";
 import type { ViewState } from "@/data/mockData";
+
+const PIP_MIN_WIDTH = 200;
+const PIP_MAX_WIDTH = 520;
+const PIP_DEFAULT_WIDTH = 320;
 
 export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -24,6 +28,11 @@ export default function Home() {
   const [panelCollapsed, setPanelCollapsed] = useState(false);
   const [showNewTaskCard, setShowNewTaskCard] = useState(false);
   const [linkedinConnected, setLinkedinConnected] = useState(false);
+  const [pipWidth, setPipWidth] = useState(PIP_DEFAULT_WIDTH);
+  const pipDragging = useRef(false);
+  const pipDragStartX = useRef(0);
+  const pipDragStartWidth = useRef(PIP_DEFAULT_WIDTH);
+
 
   const handleStartTask = () => {
     setActiveView("task-hover");
@@ -63,6 +72,37 @@ export default function Home() {
   };
 
   const showPip = panelCollapsed && activeView !== "zero-state";
+
+  const handlePipResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    pipDragging.current = true;
+    pipDragStartX.current = e.clientX;
+    pipDragStartWidth.current = pipWidth;
+    document.body.style.cursor = "nesw-resize";
+    document.body.style.userSelect = "none";
+  }, [pipWidth]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!pipDragging.current) return;
+      const deltaX = pipDragStartX.current - e.clientX;
+      const newWidth = Math.max(PIP_MIN_WIDTH, Math.min(PIP_MAX_WIDTH, pipDragStartWidth.current + deltaX));
+      setPipWidth(newWidth);
+    };
+    const handleMouseUp = () => {
+      if (!pipDragging.current) return;
+      pipDragging.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
 
   if (!isLoggedIn) {
     return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
@@ -111,9 +151,10 @@ export default function Home() {
 
       {/* Floating PiP workspace when sidebar is collapsed */}
       <div
-        className={`fixed top-[54px] right-4 z-40 w-[280px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-2xl transition-all duration-300 ease-out ${
+        className={`group fixed top-[54px] right-4 z-40 overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-2xl transition-[opacity,transform] duration-300 ease-out ${
           showPip ? "translate-y-0 opacity-100" : "-translate-y-2 pointer-events-none opacity-0"
         }`}
+        style={{ width: pipWidth }}
       >
         {/* Header: task info + expand */}
         <div className="flex items-center gap-2 px-3 py-2">
@@ -157,6 +198,15 @@ export default function Home() {
             <svg className="h-4 w-4 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
             <span>LinkedIn{"\n"}Founder profile</span>
           </div>
+        </div>
+        {/* Bottom-left corner resize handle */}
+        <div
+          onMouseDown={handlePipResizeStart}
+          className="absolute bottom-0 left-0 z-10 h-5 w-5 cursor-nesw-resize p-1"
+        >
+          <svg width="8" height="8" viewBox="0 0 8 8" className="text-t4 opacity-0 transition-opacity group-hover:opacity-100">
+            <path d="M0 0L8 8M0 4L4 8" stroke="currentColor" strokeWidth="1.2" />
+          </svg>
         </div>
       </div>
 

@@ -251,13 +251,6 @@ export function ChatArea({
           />
         </AgentMessage>
 
-        {/* Non-blocking divider */}
-        <div className="flex items-center gap-2 py-1">
-          <div className="h-px flex-1 bg-b1" />
-          <span className="text-[10px] text-t4">task running above</span>
-          <div className="h-px flex-1 bg-b1" />
-        </div>
-
         <AgentMessage>
           <div className="text-sm leading-[1.6] text-t2">
             {linkedinConnected
@@ -295,6 +288,13 @@ export function ChatArea({
             </div>
           </AgentMessage>
         )}
+
+        {/* Non-blocking divider — after all LinkedIn task sub-steps */}
+        <div className="flex items-center gap-2 py-1">
+          <div className="h-px flex-1 bg-b1" />
+          <span className="text-[10px] text-t4">task running above</span>
+          <div className="h-px flex-1 bg-b1" />
+        </div>
 
         </div>
       </div>

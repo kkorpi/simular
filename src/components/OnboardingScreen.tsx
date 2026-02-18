@@ -301,8 +301,8 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
             ) : (
               /* Educational tip when questions are done */
               <div className="rounded-lg border border-b1 bg-bg2 px-5 py-4">
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-as/10">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-as/10">
                     <svg className="h-3.5 w-3.5 text-blt" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10" />
                       <line x1="12" y1="16" x2="12" y2="12" />

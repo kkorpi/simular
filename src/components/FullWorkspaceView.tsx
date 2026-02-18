@@ -162,11 +162,16 @@ export function FullWorkspaceView({
 
   return (
     <div
-      className={`fixed inset-0 z-[60] flex flex-col bg-bg transition-all duration-300 ${
+      className={`fixed inset-0 z-[60] flex flex-col bg-bg transition-[clip-path,opacity] duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
         open
           ? "pointer-events-auto opacity-100"
           : "pointer-events-none opacity-0"
       }`}
+      style={{
+        clipPath: open
+          ? "inset(0 0 0 0 round 0px)"
+          : "inset(0 0 100% 100% round 12px)",
+      }}
     >
       {/* Bar */}
       <div className="flex shrink-0 items-center gap-3 border-b border-b1 px-5 py-2.5">
@@ -343,13 +348,13 @@ export function FullWorkspaceView({
 
       {/* Screen area */}
       <div ref={containerRef} className="relative flex flex-1 items-center justify-center overflow-hidden bg-bg3">
-        {/* LIVE / RECORDING badge */}
-        <div className={`absolute top-3 right-3 flex items-center gap-1 rounded-full bg-bg2/90 px-2 py-0.5 text-[9px] font-semibold backdrop-blur-sm ${
-          mode === "teach" ? "text-violet-500" : "text-g"
-        }`}>
-          <div className={`h-1 w-1 rounded-full ${mode === "teach" ? "bg-violet-500 animate-pulse" : "bg-g"}`} />
-          {mode === "teach" ? "REC" : "LIVE"}
-        </div>
+        {/* LIVE badge (teach mode uses the coaching banner instead) */}
+        {mode !== "teach" && (
+          <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-bg2/90 px-2 py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
+            <div className="h-1 w-1 rounded-full bg-g" />
+            LIVE
+          </div>
+        )}
 
         {/* Placeholder content */}
         {mode === "teach" ? (
