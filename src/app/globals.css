@@ -44,40 +44,40 @@
 [data-theme="light"] {
   --logo-bg: #000000;
   --logo-fg: #FEFEFE;
-  --bg: #f8f8f9;
-  --bg2: #f0f0f2;
-  --bg3: #fff;
-  --bg3h: #f5f5f7;
-  --bgi: #fff;
-  --bgm: #f6fbf8;
+  --bg: #fafafa;
+  --bg2: #f2f2f4;
+  --bg3: #e9e9ec;
+  --bg3h: #e0e0e4;
+  --bgi: #f5f5f7;
+  --bgm: #f0f7f3;
   --bgmb: #c8e0d0;
-  --b1: #e6e6e9;
-  --b2: #d4d4d8;
-  --bf: #b0b0b8;
-  --t1: #18181b;
-  --t2: #6b6b73;
-  --t3: #9b9ba3;
-  --t4: #c0c0c6;
-  --as: #346E96;
-  --as2: #3d7ba6;
-  --ab: #18181b;
+  --b1: #d8d8dc;
+  --b2: #c4c4ca;
+  --bf: #a0a0a8;
+  --t1: #1a1a1e;
+  --t2: #52525a;
+  --t3: #71717a;
+  --t4: #a0a0a8;
+  --as: #2c6084;
+  --as2: #346E96;
+  --ab: #1a1a1e;
   --abt: #fff;
-  --g: #1d9960;
-  --gs: rgba(29, 153, 96, 0.06);
-  --gg: rgba(29, 153, 96, 0.15);
-  --gt: #18804f;
-  --am: #a06e10;
-  --ams: rgba(160, 110, 16, 0.06);
-  --bl: #346E96;
-  --bls: rgba(52, 110, 150, 0.12);
-  --blt: #4a8db8;
-  --lb: #18181b;
+  --g: #18875a;
+  --gs: rgba(24, 135, 90, 0.08);
+  --gg: rgba(24, 135, 90, 0.18);
+  --gt: #15704a;
+  --am: #8a5e0c;
+  --ams: rgba(138, 94, 12, 0.08);
+  --bl: #2c6084;
+  --bls: rgba(44, 96, 132, 0.12);
+  --blt: #2c6084;
+  --lb: #1a1a1e;
   --lt: #fff;
-  --sc: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px var(--b1);
-  --mg: radial-gradient(ellipse at 30% 0%, rgba(29, 153, 96, 0.06) 0%, transparent 50%);
-  --st: #18181b;
-  --sb: #d4d4d8;
-  --thumb-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --sc: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--b1);
+  --mg: radial-gradient(ellipse at 30% 0%, rgba(24, 135, 90, 0.06) 0%, transparent 50%);
+  --st: #1a1a1e;
+  --sb: #c4c4ca;
+  --thumb-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
 /* ===== Tailwind Theme Tokens ===== */
@@ -221,6 +221,14 @@ body {
 
 .animate-fade-in {
   animation: fade-in 0.4s ease-out;
+}
+
+/* ===== Shake ===== */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-4px); }
 }
 
 /* ===== Collapsible Section ===== */

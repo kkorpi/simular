@@ -9,7 +9,7 @@ const ThemeContext = createContext<{
   theme: Theme;
   preference: ThemePreference;
   setPreference: (p: ThemePreference) => void;
-}>({ theme: "dark", preference: "dark", setPreference: () => {} });
+}>({ theme: "dark", preference: "system", setPreference: () => {} });
 
 function resolveTheme(preference: ThemePreference, systemDark: boolean): Theme {
   if (preference === "system") return systemDark ? "dark" : "light";
@@ -17,7 +17,7 @@ function resolveTheme(preference: ThemePreference, systemDark: boolean): Theme {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [preference, setPreferenceState] = useState<ThemePreference>("dark");
+  const [preference, setPreferenceState] = useState<ThemePreference>("system");
   const [systemDark, setSystemDark] = useState(true);
 
   const theme = resolveTheme(preference, systemDark);

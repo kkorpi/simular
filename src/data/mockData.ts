@@ -775,3 +775,9 @@ export const starterTasks: StarterTask[] = [
     category: "email",
   },
 ];
+
+// ===== Gated Trial =====
+
+export const VALID_INVITE_CODES = ["SIMULAR2026", "EARLY100", "LAUNCH", "BETA", "VIP"];
+export const SEATS_TOTAL = 1000;
+export const SEATS_REMAINING_INIT = 214;
