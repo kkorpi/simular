@@ -466,23 +466,14 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
     <div className="flex flex-col gap-6">
       {/* Cancelled banner */}
       {trialCancelled && trialDaysLeft > 0 && (
-        <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.04] px-4 py-3">
-          <div className="flex items-center gap-2">
-            <svg className="h-4 w-4 shrink-0 text-am" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            <div className="flex-1">
-              <div className="text-[13px] font-medium text-t1">Trial cancelled</div>
-              <div className="text-[12px] text-t3">
-                Your workspace stays active for {trialDaysLeft} more day{trialDaysLeft !== 1 ? "s" : ""}. After that, you&apos;ll lose access.
-              </div>
-            </div>
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.04] px-4 py-3.5">
+          <div className="text-[13px] font-medium text-am">Trial cancelled</div>
+          <div className="mt-1 text-[12px] text-t3">
+            Your workspace stays active for {trialDaysLeft} more day{trialDaysLeft !== 1 ? "s" : ""}. After that, you&apos;ll lose access.
           </div>
           <button
             onClick={onReactivateTrial}
-            className="mt-2.5 flex h-8 w-full items-center justify-center rounded-md border border-as/30 bg-as/10 text-[12px] font-medium text-blt transition-all hover:bg-as/20"
+            className="mt-3 flex h-8 w-full items-center justify-center rounded-md border border-amber-500/30 text-[12px] font-medium text-am transition-all hover:bg-amber-500/10"
           >
             Reactivate trial
           </button>
