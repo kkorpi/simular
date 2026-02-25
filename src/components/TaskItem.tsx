@@ -96,7 +96,7 @@ export function TaskItem({ task, onClick }: { task: Task; onClick?: () => void }
       <div className="min-w-0 flex-1">
         <div className="truncate text-xs font-medium text-t1">{task.name}</div>
         <div className="text-[10.5px] text-t3">{task.subtitle}</div>
-        {task.integrations && task.integrations.length > 0 && (
+        {task.status !== "recurring" && task.integrations && task.integrations.length > 0 && (
           <div className="mt-0.5 truncate text-[10px] text-t4">
             {task.integrations.join(" · ")}
           </div>

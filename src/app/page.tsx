@@ -370,6 +370,7 @@ export default function Home() {
         <OnboardingScreen
           onReady={(profile) => {
             setUserProfile(profile);
+            setActiveView("zero-state");
             setWorkspaceConnecting(true);
             setScreen("main-app");
             // Auto-clear connecting state after 3s

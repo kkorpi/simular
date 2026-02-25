@@ -208,6 +208,32 @@ body {
   animation: shimmer-text 3s ease-in-out infinite;
 }
 
+/* ===== Shimmer Bar (indeterminate progress) ===== */
+@keyframes shimmer-bar {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+.shimmer-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--shimmer-color, var(--as)) 50%,
+    transparent 100%
+  );
+  opacity: 0.5;
+  animation: shimmer-bar 1.8s ease-in-out infinite;
+}
+
 /* ===== Blinking Cursor ===== */
 @keyframes blink-cursor {
   0%, 100% { opacity: 1; }

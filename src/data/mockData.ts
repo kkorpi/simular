@@ -778,45 +778,54 @@ export const starterTasks: StarterTask[] = [
 
 // ===== First-Run Experience =====
 
-/** Maps starter task categories to a realistic progress sequence */
-export interface FirstRunStep {
-  label: string;
-  detail?: string;
+export interface FirstRunSequence {
+  intro: string;
+  subtask: string;
+  integrations: string[];
+  steps: RunningStep[];
+  resultTitle: string;
+  resultSummary: string;
 }
 
-export const firstRunSequences: Record<string, { intro: string; steps: FirstRunStep[]; resultTitle: string; resultSummary: string }> = {
+export const firstRunSequences: Record<string, FirstRunSequence> = {
   research: {
     intro: "On it — I'll research this now. Let me fire up a browser and start pulling sources.",
+    subtask: "Researching founder background",
+    integrations: ["LinkedIn", "Crunchbase", "X"],
     steps: [
-      { label: "Opening Chrome browser" },
-      { label: "Searching for recent news and background" },
-      { label: "Pulling LinkedIn profiles and company data" },
-      { label: "Cross-referencing with Crunchbase" },
-      { label: "Compiling findings into a summary" },
+      { timestamp: "0:01", label: "Opened Chrome", done: true },
+      { timestamp: "0:04", label: "Searching for recent news and background", done: true },
+      { timestamp: "0:12", label: "Navigated to linkedin.com for founder profile", site: "linkedin.com", trustSignal: "Secure connection", done: true },
+      { timestamp: "0:20", label: "Pulled company data from crunchbase.com", site: "crunchbase.com", trustSignal: "Secure connection", done: true },
+      { timestamp: "0:28", label: "Compiling findings into a summary...", done: false },
     ],
     resultTitle: "Research Summary",
     resultSummary: "I've compiled a comprehensive summary with background, key data points, and relevant sources. You can review the full document or open it in your workspace.",
   },
   crm: {
     intro: "Sure — I'll check the data and put together an update for you.",
+    subtask: "Checking CRM records",
+    integrations: ["Salesforce", "Calendar"],
     steps: [
-      { label: "Opening Chrome browser" },
-      { label: "Connecting to your CRM" },
-      { label: "Pulling recent activity and records" },
-      { label: "Analyzing patterns and gaps" },
-      { label: "Preparing actionable recommendations" },
+      { timestamp: "0:01", label: "Opened Chrome", done: true },
+      { timestamp: "0:03", label: "Navigated to salesforce.com", site: "salesforce.com", trustSignal: "Secure connection", done: true },
+      { timestamp: "0:10", label: "Pulling recent activity and records", done: true },
+      { timestamp: "0:18", label: "Analyzing patterns and gaps", done: true },
+      { timestamp: "0:25", label: "Preparing actionable recommendations...", done: false },
     ],
     resultTitle: "CRM Analysis",
     resultSummary: "I've reviewed your CRM records and identified actionable items. Here's a summary of what needs attention along with suggested next steps.",
   },
   email: {
     intro: "Got it — I'll pull the relevant notes and start drafting.",
+    subtask: "Drafting follow-up emails",
+    integrations: ["Gmail", "Granola", "Calendar"],
     steps: [
-      { label: "Opening Chrome browser" },
-      { label: "Pulling meeting notes and context" },
-      { label: "Extracting key discussion points" },
-      { label: "Drafting personalized emails" },
-      { label: "Saving drafts for your review" },
+      { timestamp: "0:01", label: "Opened Chrome", done: true },
+      { timestamp: "0:04", label: "Pulling meeting notes from Granola", done: true },
+      { timestamp: "0:12", label: "Extracting key discussion points", done: true },
+      { timestamp: "0:20", label: "Navigated to mail.google.com to draft emails", site: "mail.google.com", trustSignal: "Secure connection", done: true },
+      { timestamp: "0:28", label: "Saving drafts for your review...", done: false },
     ],
     resultTitle: "Email Drafts Ready",
     resultSummary: "I've drafted your emails based on the meeting notes and saved them for review. Each one includes personalized talking points and next steps.",

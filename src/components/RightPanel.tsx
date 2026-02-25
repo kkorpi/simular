@@ -21,13 +21,21 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean)
       id: "first-run-recurring",
       name: task.title,
       status: "recurring",
-      subtitle: "Runs automatically",
-      time: "",
+      subtitle: "Every weekday - 8am",
+      time: "8:00a",
+      integrations: seq.integrations,
+      thumbEmoji: "🔍",
+      thumbLabel: "Last run - just now",
+      thumbStatus: seq.subtask,
       detail: {
         description: task.description,
         schedule: "Every weekday at 8:00am",
+        lastRun: "Just now",
         nextRun: "Tomorrow 8:00am",
         result: seq.resultSummary,
+        runHistory: [
+          { date: "Just now", duration: "28s", summary: seq.resultSummary },
+        ],
       },
     };
   }
@@ -36,10 +44,11 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean)
     id: "first-run",
     name: task.title,
     status: done ? "completed" : "running",
-    subtitle: done ? "Just finished" : "Running now",
+    subtitle: done ? "Just now" : "Running now",
     time: "",
+    integrations: seq.integrations,
     thumbEmoji: "🔍",
-    thumbStatus: "Working on task",
+    thumbStatus: seq.subtask,
     detail: {
       description: task.description,
       duration: done ? "Just now" : "Running",
@@ -64,16 +73,18 @@ function FirstRunTaskList({
   onSelectTask: (task: Task) => void;
 }) {
   const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring);
+  const seq = firstRunSequences[firstRunTask.category] ?? firstRunSequences.research;
   const completedTask: Task = {
     id: "first-run-completed",
     name: firstRunTask.title,
     status: "completed",
     subtitle: "Just now",
     time: "",
+    integrations: seq.integrations,
     detail: {
       description: firstRunTask.description,
-      duration: "Just now",
-      result: (firstRunSequences[firstRunTask.category] ?? firstRunSequences.research).resultSummary,
+      duration: "28s",
+      result: seq.resultSummary,
     },
   };
 

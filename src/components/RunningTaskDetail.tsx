@@ -13,6 +13,8 @@ interface RunningTaskDetailProps {
   onViewActivityLog?: () => void;
   /** Start with details expanded */
   initialExpanded?: boolean;
+  /** Mark the task as complete (subtask shows as static text) */
+  done?: boolean;
 }
 
 function parseTimestamp(ts: string): number {
@@ -26,6 +28,7 @@ export function RunningTaskDetail({
   integrations,
   onViewActivityLog,
   initialExpanded = false,
+  done = false,
 }: RunningTaskDetailProps) {
   const [expanded, setExpanded] = useState(initialExpanded);
 
@@ -39,7 +42,7 @@ export function RunningTaskDetail({
       {/* Subtask indicators */}
       <div className="flex flex-col gap-3.5 px-3.5 pt-3 pb-2">
         {subtasks.map((label, i) => (
-          <WorkingIndicator key={i} label={label} />
+          <WorkingIndicator key={i} label={label} done={done} />
         ))}
       </div>
 

@@ -73,9 +73,6 @@ export function ProgressCard({
   const allDone = doneCount === total;
   const hasError = errorCount > 0;
 
-  // Derive progress from steps if not explicitly provided
-  const progressValue = progress ?? (total > 0 ? doneCount / total : 0);
-
   return (
     <CardShell accent={hasError ? "amber" : allDone ? "green" : accent}>
       {/* Header */}
@@ -103,20 +100,23 @@ export function ProgressCard({
             <div className="mt-0.5 text-[11px] text-t3">{subtitle}</div>
           )}
         </div>
-        <div className="rounded-full bg-bg3h px-2.5 py-0.5 text-[11px] font-medium text-t3">
-          {doneCount} of {total}
-        </div>
+        {allDone && (
+          <div className="rounded-full bg-bg3h px-2.5 py-0.5 text-[11px] font-medium text-t3">
+            Done
+          </div>
+        )}
       </div>
 
-      {/* Progress bar */}
-      <div className="h-1 w-full bg-b1">
-        <div
-          className={`h-full transition-all duration-500 ease-out ${
-            hasError ? "bg-am" : allDone ? "bg-g" : "bg-as"
-          }`}
-          style={{ width: `${Math.round(progressValue * 100)}%` }}
-        />
-      </div>
+      {/* Shimmer bar (indeterminate) / solid bar when done or error */}
+      <div
+        className={`h-1 w-full ${
+          allDone
+            ? "bg-g"
+            : hasError
+              ? "bg-am"
+              : "shimmer-bar bg-as/20"
+        }`}
+      />
 
       {/* Steps */}
       <div className="divide-y divide-b1">

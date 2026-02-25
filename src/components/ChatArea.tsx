@@ -8,14 +8,12 @@ import { TaskInput } from "./TaskInput";
 import { ScheduleModal } from "./ScheduleModal";
 import { NewTaskCard } from "./NewTaskCard";
 import { DraftCard } from "./cards/DraftCard";
-import { ProgressCard } from "./cards/ProgressCard";
 import { ResultCard as NewResultCard } from "./cards/ResultCard";
 import { PromptCard } from "./cards/PromptCard";
 import { ChoiceCard } from "./cards/ChoiceCard";
-import type { ProgressStepStatus } from "./cards/ProgressCard";
 
 import { runningTaskSteps, linkedinLoginSteps, linkedinDisambiguatedSteps, disambiguationProfiles, firstRunSequences, teachRecordedSteps } from "@/data/mockData";
-import type { ViewState, LinkedInProfile, StarterTask, TeachPhase } from "@/data/mockData";
+import type { ViewState, LinkedInProfile, StarterTask, TeachPhase, RunningStep } from "@/data/mockData";
 
 /** Agent message block */
 function AgentMessage({ children }: { children: React.ReactNode }) {
@@ -171,10 +169,11 @@ export function ChatArea({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // ── First-run animated progress ──
+  // firstRunStep: how many steps are visible (0 = none shown yet)
   const [firstRunStep, setFirstRunStep] = useState(0);
   const [firstRunDone, setFirstRunDone] = useState(false);
   const [firstRunShowResult, setFirstRunShowResult] = useState(false);
-  const firstRunTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const firstRunTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Teach flow state ──
   const [teachScheduleResolved, setTeachScheduleResolved] = useState(false);
@@ -183,34 +182,39 @@ export function ChatArea({
 
   const seq = firstRunTask ? (firstRunSequences[firstRunTask.category] ?? firstRunSequences.research) : null;
 
-  // Animate progress steps when firstRunTask is set
+  // Animate steps appearing one by one when firstRunTask is set
   useEffect(() => {
     if (!firstRunTask || !seq) return;
     setFirstRunStep(0);
     setFirstRunDone(false);
     setFirstRunShowResult(false);
 
-    // Start stepping after 1.5s initial delay
-    const startTimer = setTimeout(() => {
-      let step = 0;
-      firstRunTimerRef.current = setInterval(() => {
-        step++;
-        if (step >= seq.steps.length) {
-          if (firstRunTimerRef.current) clearInterval(firstRunTimerRef.current);
-          setFirstRunStep(seq.steps.length);
+    let step = 0;
+    const totalSteps = seq.steps.length;
+
+    const advance = () => {
+      step++;
+      setFirstRunStep(step);
+      if (step >= totalSteps) {
+        // All steps revealed — mark done after a pause
+        setTimeout(() => {
           setFirstRunDone(true);
           onFirstRunDone?.();
-          // Show result after a brief pause
           setTimeout(() => setFirstRunShowResult(true), 800);
-        } else {
-          setFirstRunStep(step);
-        }
-      }, 1200);
-    }, 1500);
+        }, 1200);
+      } else {
+        // Vary timing to feel organic: 1.5–3s per step
+        const delay = 1500 + Math.random() * 1500;
+        firstRunTimerRef.current = setTimeout(advance, delay);
+      }
+    };
+
+    // Start first step after 1.5s initial delay
+    const startTimer = setTimeout(advance, 1500);
 
     return () => {
       clearTimeout(startTimer);
-      if (firstRunTimerRef.current) clearInterval(firstRunTimerRef.current);
+      if (firstRunTimerRef.current) clearTimeout(firstRunTimerRef.current);
     };
   }, [firstRunTask, seq]);
 
@@ -328,18 +332,16 @@ export function ChatArea({
           <>
             <AgentMessage>
               <div className="text-sm leading-[1.6] text-t2">{seq.intro}</div>
-              <div className="mt-3">
-                <ProgressCard
-                  title={firstRunTask.title}
-                  subtitle="Working in browser"
-                  steps={seq.steps.map((s, i): { label: string; status: ProgressStepStatus; detail?: string } => ({
-                    label: s.label,
-                    status: i < firstRunStep ? "done" : i === firstRunStep && !firstRunDone ? "running" : firstRunDone ? "done" : "pending",
-                    detail: s.detail,
-                  }))}
-                  onCancel={() => onFirstRunComplete?.()}
-                />
-              </div>
+              <RunningTaskDetail
+                steps={seq.steps.slice(0, firstRunStep).map((s, i): RunningStep => ({
+                  ...s,
+                  done: firstRunDone ? true : i < firstRunStep - 1,
+                }))}
+                subtasks={[seq.subtask]}
+                integrations={seq.integrations}
+                onViewActivityLog={onViewActivityLog}
+                done={firstRunDone}
+              />
             </AgentMessage>
 
             {firstRunShowResult && (
