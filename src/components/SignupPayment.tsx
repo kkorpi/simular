@@ -77,20 +77,9 @@ export function SignupPayment({ onSubmit, onBack }: SignupPaymentProps) {
         </div>
 
         {/* Trust framing */}
-        <div className="mt-8 rounded-lg border border-b1 bg-bg2 px-5 py-4">
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-as/10">
-              <svg className="h-3.5 w-3.5 text-blt" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10" />
-                <line x1="12" y1="16" x2="12" y2="12" />
-                <line x1="12" y1="8" x2="12.01" y2="8" />
-              </svg>
-            </div>
-            <p className="text-[13px] leading-[1.7] text-t3">
-              We ask for a card to keep out bots and ensure real people get these limited spots. You won&apos;t be charged for 7 days. Cancel anytime.
-            </p>
-          </div>
-        </div>
+        <p className="mt-8 text-center text-[13px] leading-[1.7] text-t2">
+          We ask for a card to keep out bots and ensure real people get these limited spots. You won&apos;t be charged for 7 days. Cancel anytime.
+        </p>
 
         {/* Mock card form */}
         <div className="mt-6 overflow-hidden rounded-lg border border-b1 bg-bg3">

@@ -82,6 +82,10 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
   const [frequency, setFrequency] = useState("Daily");
   const [time, setTime] = useState("7:00 AM");
   const [maxDuration, setMaxDuration] = useState("30 min");
+  const [frequencyOpen, setFrequencyOpen] = useState(false);
+  const [durationOpen, setDurationOpen] = useState(false);
+  const frequencyRef = useRef<HTMLDivElement>(null);
+  const durationRef = useRef<HTMLDivElement>(null);
 
   // Integrations
   const [selectedIntegrations, setSelectedIntegrations] = useState<string[]>([]);
@@ -118,6 +122,12 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
         setSkillsDropdownOpen(false);
         setAddingNewSkill(false);
         setNewSkillValue("");
+      }
+      if (frequencyRef.current && !frequencyRef.current.contains(e.target as Node)) {
+        setFrequencyOpen(false);
+      }
+      if (durationRef.current && !durationRef.current.contains(e.target as Node)) {
+        setDurationOpen(false);
       }
     };
     document.addEventListener("mousedown", handler);
@@ -268,17 +278,38 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
               Schedule
             </div>
             <div className="flex gap-2">
-              <select
-                value={frequency}
-                onChange={(e) => setFrequency(e.target.value)}
-                className="rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none"
-              >
-                {frequencyOptions.map((f) => (
-                  <option key={f} value={f}>
-                    {f}
-                  </option>
-                ))}
-              </select>
+              <div className="relative" ref={frequencyRef}>
+                <button
+                  type="button"
+                  onClick={() => { setFrequencyOpen((o) => !o); setDurationOpen(false); }}
+                  className="flex items-center gap-1.5 rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none transition-colors hover:border-b2"
+                >
+                  {frequency}
+                  <svg className={`h-3 w-3 text-t4 transition-transform ${frequencyOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+                {frequencyOpen && (
+                  <div className="absolute left-0 top-[calc(100%+4px)] z-10 w-[140px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                    {frequencyOptions.map((f) => (
+                      <button
+                        key={f}
+                        type="button"
+                        onClick={() => { setFrequency(f); setFrequencyOpen(false); }}
+                        className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors hover:bg-bg3 ${f === frequency ? "text-t1" : "text-t3"}`}
+                      >
+                        {f === frequency && (
+                          <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        )}
+                        {f !== frequency && <span className="w-3" />}
+                        {f}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <input
                 type="text"
                 value={time}
@@ -291,17 +322,38 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
             <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.06em] text-t4">
               Max duration
             </div>
-            <select
-              value={maxDuration}
-              onChange={(e) => setMaxDuration(e.target.value)}
-              className="rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none"
-            >
-              {durationOptions.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </select>
+            <div className="relative" ref={durationRef}>
+              <button
+                type="button"
+                onClick={() => { setDurationOpen((o) => !o); setFrequencyOpen(false); }}
+                className="flex items-center gap-1.5 rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none transition-colors hover:border-b2"
+              >
+                {maxDuration}
+                <svg className={`h-3 w-3 text-t4 transition-transform ${durationOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              {durationOpen && (
+                <div className="absolute right-0 top-[calc(100%+4px)] z-10 w-[140px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                  {durationOptions.map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => { setMaxDuration(d); setDurationOpen(false); }}
+                      className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors hover:bg-bg3 ${d === maxDuration ? "text-t1" : "text-t3"}`}
+                    >
+                      {d === maxDuration && (
+                        <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                      {d !== maxDuration && <span className="w-3" />}
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 

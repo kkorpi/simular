@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { CardShell, type CardAccent } from "./CardShell";
 import { ResolvedInline } from "./ResolvedInline";
 
@@ -85,6 +85,22 @@ export function FormCard({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [resolved, setResolved] = useState(false);
   const [chipInput, setChipInput] = useState<Record<string, string>>({});
+  const [openSelect, setOpenSelect] = useState<string | null>(null);
+  const selectRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  // Close select dropdowns on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (openSelect) {
+        const ref = selectRefs.current[openSelect];
+        if (ref && !ref.contains(e.target as Node)) {
+          setOpenSelect(null);
+        }
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [openSelect]);
 
   const updateValue = (key: string, value: string | number | boolean | string[]) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -193,21 +209,39 @@ export function FormCard({
             )}
 
             {field.type === "select" && (
-              <div className="relative">
-                <select
-                  value={values[field.key] as string}
-                  onChange={(e) => updateValue(field.key, e.target.value)}
-                  className={`w-full appearance-none rounded-md border bg-bg3 px-3 py-1.5 pr-8 text-[12px] text-t1 outline-none transition-all focus:border-as ${
+              <div className="relative" ref={(el) => { selectRefs.current[field.key] = el; }}>
+                <button
+                  type="button"
+                  onClick={() => setOpenSelect(openSelect === field.key ? null : field.key)}
+                  className={`flex w-full items-center justify-between rounded-md border bg-bg3 px-3 py-1.5 text-left text-[12px] text-t1 outline-none transition-all hover:border-b2 ${
                     errors[field.key] ? "border-r" : "border-b1"
                   }`}
                 >
-                  {field.options.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-                <svg className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
+                  <span>{field.options.find((o) => o.value === values[field.key])?.label ?? values[field.key]}</span>
+                  <svg className={`h-3.5 w-3.5 shrink-0 text-t3 transition-transform ${openSelect === field.key ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="6 9 12 15 18 9" />
+                  </svg>
+                </button>
+                {openSelect === field.key && (
+                  <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                    {field.options.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => { updateValue(field.key, opt.value); setOpenSelect(null); }}
+                        className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors hover:bg-bg3 ${opt.value === values[field.key] ? "text-t1" : "text-t3"}`}
+                      >
+                        {opt.value === values[field.key] && (
+                          <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        )}
+                        {opt.value !== values[field.key] && <span className="w-3" />}
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

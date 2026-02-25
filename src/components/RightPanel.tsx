@@ -3,6 +3,8 @@
 import { useState, useCallback } from "react";
 import { ResizeHandle } from "./ResizeHandle";
 import { TasksTab } from "./TasksTab";
+import { TaskSection } from "./TaskSection";
+import { TaskItem } from "./TaskItem";
 import { BriefingDetail } from "./BriefingDetail";
 import { TaskDetail } from "./TaskDetail";
 import { ScheduleModal } from "./ScheduleModal";
@@ -167,21 +169,17 @@ export function RightPanel({
       <div className="flex-1 overflow-y-auto">
         {firstRunTask ? (
           <div className="px-2.5 pt-2.5 pb-2">
-            <div className="mb-1.5 flex items-center justify-between px-1.5">
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-t3">Active</span>
-                <span className="rounded-full bg-bg3h px-1.5 py-0 text-[10px] font-medium text-t3">1</span>
-              </div>
-            </div>
-            <button className="flex w-full items-center gap-3 rounded-lg px-2 py-2.5 text-left transition-all bg-bg3">
-              <div className="flex h-[36px] w-[36px] shrink-0 items-center justify-center rounded-md bg-bg3h">
-                <div className="h-2 w-2 rounded-full bg-as animate-pulse" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="truncate text-[13px] font-medium text-t1">{firstRunTask.title}</div>
-                <div className="mt-0.5 text-[11px] text-t3">Running now</div>
-              </div>
-            </button>
+            <TaskSection label="Active" count={1}>
+              <TaskItem
+                task={{
+                  id: "first-run",
+                  name: firstRunTask.title,
+                  status: "running",
+                  subtitle: "Running now",
+                  time: "",
+                }}
+              />
+            </TaskSection>
           </div>
         ) : (
           <TasksTab onSelectTask={handleSelectTask} teachPhase={teachPhase} teachTaskName={teachTaskName} />

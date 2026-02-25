@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { SimularLogo } from "./SimularLogo";
 
 const roles = [
@@ -33,6 +33,23 @@ export function WaitlistSignup({ onSubmit, onBack }: WaitlistSignupProps) {
   const [role, setRole] = useState("");
   const [selectedApps, setSelectedApps] = useState<string[]>([]);
   const [appsOpen, setAppsOpen] = useState(false);
+  const [roleOpen, setRoleOpen] = useState(false);
+  const roleRef = useRef<HTMLDivElement>(null);
+  const appsRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (roleRef.current && !roleRef.current.contains(e.target as Node)) {
+        setRoleOpen(false);
+      }
+      if (appsRef.current && !appsRef.current.contains(e.target as Node)) {
+        setAppsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const toggleApp = (id: string) => {
     setSelectedApps((prev) =>
@@ -68,56 +85,87 @@ export function WaitlistSignup({ onSubmit, onBack }: WaitlistSignupProps) {
         </p>
 
         {/* Email */}
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
-          placeholder="you@company.com"
-          className="mt-8 h-12 w-full rounded-md border border-b1 bg-bg3 px-4 text-[15px] text-t1 placeholder:text-t4 transition-colors focus:border-as focus:outline-none"
-        />
+        <div className="mt-8">
+          <label className="mb-1.5 block text-[13px] font-medium text-t1">
+            Email
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+            placeholder="you@company.com"
+            className="h-12 w-full rounded-md border border-b1 bg-bg3 px-4 text-[15px] text-t1 placeholder:text-t4 transition-colors focus:border-as focus:outline-none"
+          />
+        </div>
 
         {/* Role dropdown */}
-        <div className="relative mt-3">
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            className={`${selectCls} ${!role ? "text-t4" : ""}`}
+        <div className="relative mt-3" ref={roleRef}>
+          <label className="mb-1.5 block text-[13px] font-medium text-t1">
+            Role
+          </label>
+          <button
+            type="button"
+            onClick={() => { setRoleOpen((o) => !o); setAppsOpen(false); }}
+            className={`${selectCls} flex items-center justify-between text-left ${!role ? "text-t4" : ""}`}
           >
-            <option value="" disabled>
-              What best describes your role?
-            </option>
-            {roles.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.label}
-              </option>
-            ))}
-          </select>
-          <svg
-            className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-t4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9" />
-          </svg>
+            <span>{role ? roles.find((r) => r.id === role)?.label : "Select a role"}</span>
+            <svg
+              className={`ml-2 h-4 w-4 shrink-0 text-t4 transition-transform ${roleOpen ? "rotate-180" : ""}`}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          {roleOpen && (
+            <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+              {roles.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => {
+                    setRole(r.id);
+                    setRoleOpen(false);
+                  }}
+                  className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-bg3 ${
+                    role === r.id ? "text-t1" : "text-t2"
+                  }`}
+                >
+                  {role === r.id ? (
+                    <svg className="h-3.5 w-3.5 shrink-0 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : (
+                    <span className="w-3.5 shrink-0" />
+                  )}
+                  {r.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Apps multi-select dropdown */}
-        <div className="relative mt-3">
+        <div className="relative mt-3" ref={appsRef}>
+          <label className="mb-1.5 block text-[13px] font-medium text-t1">
+            Apps & services
+          </label>
           <button
             type="button"
-            onClick={() => setAppsOpen((o) => !o)}
+            onClick={() => { setAppsOpen((o) => !o); setRoleOpen(false); }}
             className={`${selectCls} flex items-center justify-between text-left ${
               selectedApps.length === 0 ? "text-t4" : ""
             }`}
           >
             <span className="truncate">
               {selectedApps.length === 0
-                ? "Which apps or services do you use?"
+                ? "Select apps you use"
                 : selectedApps
                     .map((id) => apps.find((a) => a.id === id)?.label)
                     .join(", ")}
@@ -136,35 +184,23 @@ export function WaitlistSignup({ onSubmit, onBack }: WaitlistSignupProps) {
           </button>
 
           {appsOpen && (
-            <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+            <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 max-h-[156px] overflow-y-auto rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
               {apps.map((app) => (
                 <button
                   key={app.id}
                   type="button"
                   onClick={() => toggleApp(app.id)}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left text-[14px] text-t2 transition-colors hover:bg-bg3"
+                  className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-[14px] transition-colors hover:bg-bg3 ${
+                    selectedApps.includes(app.id) ? "text-t1" : "text-t2"
+                  }`}
                 >
-                  <div
-                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors ${
-                      selectedApps.includes(app.id)
-                        ? "border-ab bg-ab"
-                        : "border-b2 bg-bg3"
-                    }`}
-                  >
-                    {selectedApps.includes(app.id) && (
-                      <svg
-                        className="h-3 w-3 text-white"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    )}
-                  </div>
+                  {selectedApps.includes(app.id) ? (
+                    <svg className="h-3.5 w-3.5 shrink-0 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : (
+                    <div className="h-3.5 w-3.5 shrink-0 rounded-[3px] border border-b2" />
+                  )}
                   {app.label}
                 </button>
               ))}

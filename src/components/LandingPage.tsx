@@ -50,7 +50,7 @@ export function LandingPage({
     const valid = VALID_INVITE_CODES.includes(code.toUpperCase());
     if (valid) {
       setCodeStatus("valid");
-      onClaimSpot(code.toUpperCase());
+      setTimeout(() => onClaimSpot(code.toUpperCase()), 800);
     } else {
       setCodeStatus("invalid");
       setShake(true);
@@ -92,13 +92,16 @@ export function LandingPage({
 
               {/* Code input */}
               <div className="mt-5">
+                <label className="mb-1.5 block text-[13px] font-medium text-t1">
+                  Invite code
+                </label>
                 <div className={`transition-transform ${shake ? "animate-[shake_0.3s_ease-in-out]" : ""}`}>
                   <input
                     type="text"
                     value={code}
                     onChange={(e) => handleCodeChange(e.target.value.toUpperCase())}
                     onKeyDown={(e) => e.key === "Enter" && handleClaimSpot()}
-                    placeholder="Enter invite code"
+                    placeholder="e.g. SIMULAR2026"
                     className={`h-12 w-full rounded-md border px-4 text-[15px] font-mono tracking-wider bg-bg3 text-t1 placeholder:text-t4 transition-colors focus:outline-none ${
                       codeStatus === "valid"
                         ? "border-g focus:border-g"

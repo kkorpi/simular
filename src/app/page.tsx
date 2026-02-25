@@ -8,6 +8,7 @@ import { FullWorkspaceView } from "@/components/FullWorkspaceView";
 import { ZeroState } from "@/components/ZeroState";
 import { SettingsOverlay, type SettingsSection } from "@/components/SettingsOverlay";
 import { CardGallery } from "@/components/CardGallery";
+import { DesignSystem } from "@/components/DesignSystem";
 import { LandingPage } from "@/components/LandingPage";
 import { SignupSSO } from "@/components/SignupSSO";
 import { SignupPayment } from "@/components/SignupPayment";
@@ -39,6 +40,7 @@ export default function Home() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSection, setSettingsSection] = useState<SettingsSection | undefined>(undefined);
   const [cardGalleryOpen, setCardGalleryOpen] = useState(false);
+  const [designSystemOpen, setDesignSystemOpen] = useState(false);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [workspaceMode, setWorkspaceMode] = useState<"default" | "login" | "teach">("default");
   const [workspaceService, setWorkspaceService] = useState<string>("");
@@ -80,6 +82,10 @@ export default function Home() {
       setUserProfile({ role: "vc" });
       setScreen("main-app");
       setCardGalleryOpen(true);
+    } else if (demo === "system") {
+      setUserProfile({ role: "vc" });
+      setScreen("main-app");
+      setDesignSystemOpen(true);
     }
   }, []);
 
@@ -98,12 +104,13 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [demoPickerOpen]);
 
-  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "teach" | "trial") => {
+  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "teach" | "trial" | "system") => {
     setDemoPickerOpen(false);
     setFirstRunTask(null);
     setWorkspaceOpen(false);
     setSettingsOpen(false);
     setCardGalleryOpen(false);
+    setDesignSystemOpen(false);
     setTeachPhase("idle");
     setTeachTaskName("");
     setTrialDialogOpen(false);
@@ -131,6 +138,9 @@ export default function Home() {
       setTrialDaysLeft(1);
       setActiveView("task-hover");
       setTimeout(() => setTrialDialogOpen(true), 400);
+    } else if (mode === "system") {
+      setTrialDaysLeft(6);
+      setDesignSystemOpen(true);
     }
   };
 
@@ -243,6 +253,18 @@ export default function Home() {
     };
   }, []);
 
+  // ── Demo picker hint (always visible) ──
+  const demoHint = !demoPickerOpen && (
+    <button
+      onClick={() => setDemoPickerOpen(true)}
+      className="fixed bottom-3 right-3 z-[60] flex items-center gap-0.5 rounded-md px-1.5 py-1 text-t4/60 transition-colors hover:text-t3"
+    >
+      {["⌘", "⇧", "D"].map((k) => (
+        <kbd key={k} className="flex h-[20px] min-w-[20px] items-center justify-center rounded border border-b1 bg-bg3 px-1 text-[10px] font-medium leading-none">{k}</kbd>
+      ))}
+    </button>
+  );
+
   // ── Demo picker overlay (Cmd+Shift+D) ──
   const demoPicker = demoPickerOpen && (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setDemoPickerOpen(false)}>
@@ -251,12 +273,13 @@ export default function Home() {
         <div className="mb-4 text-[11px] text-t3">Jump to any state. <span className="font-mono text-t4">Cmd+Shift+D</span></div>
         <div className="flex flex-col gap-2">
           {([
+            { mode: "landing" as const, label: "Landing page", desc: "Back to the gated signup flow", icon: "🏠" },
             { mode: "fresh" as const, label: "First run", desc: "ZeroState — pick a starter task", icon: "🌱" },
             { mode: "active" as const, label: "Active session", desc: "Full chat + tasks + workspace", icon: "💬" },
-            { mode: "gallery" as const, label: "Card gallery", desc: "Browse all 11 card components", icon: "🎴" },
+            { mode: "gallery" as const, label: "Card gallery", desc: "Browse all 12 card components", icon: "🎴" },
+            { mode: "system" as const, label: "Design system", desc: "Colors, type ramp, tokens", icon: "🎨" },
             { mode: "teach" as const, label: "Teach flow", desc: "Agent suggests showing it a custom task", icon: "📖" },
             { mode: "trial" as const, label: "Trial expiring", desc: "1 day left — charge warning dialog", icon: "⚠️" },
-            { mode: "landing" as const, label: "Landing page", desc: "Back to the gated signup flow", icon: "🏠" },
           ]).map((opt) => (
             <button
               key={opt.mode}
@@ -283,7 +306,7 @@ export default function Home() {
     case "landing":
       return (
         <>
-        {demoPicker}
+        {demoPicker}{demoHint}
         <LandingPage
           initialCode={inviteCode}
           seatsRemaining={seatsRemaining}
@@ -297,7 +320,7 @@ export default function Home() {
     case "waitlist-signup":
       return (
         <>
-        {demoPicker}
+        {demoPicker}{demoHint}
         <WaitlistSignup
           onSubmit={(email) => {
             handleJoinWaitlist(email);
@@ -310,7 +333,7 @@ export default function Home() {
     case "signup-sso":
       return (
         <>
-        {demoPicker}
+        {demoPicker}{demoHint}
         <SignupSSO
           onSignIn={() => setScreen("signup-payment")}
           onBack={() => setScreen("landing")}
@@ -321,7 +344,7 @@ export default function Home() {
     case "signup-payment":
       return (
         <>
-        {demoPicker}
+        {demoPicker}{demoHint}
         <SignupPayment
           onSubmit={() => setScreen("onboarding")}
           onBack={() => setScreen("signup-sso")}
@@ -332,7 +355,7 @@ export default function Home() {
     case "onboarding":
       return (
         <>
-        {demoPicker}
+        {demoPicker}{demoHint}
         <OnboardingScreen
           onReady={(profile) => {
             setUserProfile(profile);
@@ -348,7 +371,7 @@ export default function Home() {
     case "waitlist":
       return (
         <>
-        {demoPicker}
+        {demoPicker}{demoHint}
         <WaitlistConfirmation
           email={waitlistEmail}
           position={waitlistPosition}
@@ -507,11 +530,16 @@ export default function Home() {
             onClose={() => { setSettingsOpen(false); setSettingsSection(undefined); }}
             initialSection={settingsSection}
             onOpenCardGallery={() => setCardGalleryOpen(true)}
+            onOpenDesignSystem={() => setDesignSystemOpen(true)}
             trialDaysLeft={trialDaysLeft}
           />
           <CardGallery
             open={cardGalleryOpen}
             onClose={() => setCardGalleryOpen(false)}
+          />
+          <DesignSystem
+            open={designSystemOpen}
+            onClose={() => setDesignSystemOpen(false)}
           />
 
           {/* Trial expiring dialog */}
@@ -590,7 +618,7 @@ export default function Home() {
             </div>
           )}
 
-          {demoPicker}
+          {demoPicker}{demoHint}
         </div>
       );
   }
