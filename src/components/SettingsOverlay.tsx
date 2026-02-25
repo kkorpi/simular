@@ -10,6 +10,9 @@ interface SettingsOverlayProps {
   onOpenCardGallery?: () => void;
   onOpenDesignSystem?: () => void;
   trialDaysLeft?: number;
+  trialCancelled?: boolean;
+  onCancelTrial?: () => void;
+  onReactivateTrial?: () => void;
 }
 
 type SettingsSection =
@@ -31,7 +34,7 @@ const sections: { id: SettingsSection; label: string }[] = [
 
 export { type SettingsSection };
 
-export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGallery, onOpenDesignSystem, trialDaysLeft = 6 }: SettingsOverlayProps) {
+export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGallery, onOpenDesignSystem, trialDaysLeft = 6, trialCancelled, onCancelTrial, onReactivateTrial }: SettingsOverlayProps) {
   const [active, setActive] = useState<SettingsSection>(initialSection || "appearance");
 
   // Sync when initialSection changes (e.g., from slash command)
@@ -124,7 +127,7 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
             {active === "workspace" && <WorkspaceSettings />}
             {active === "commands" && <PlaceholderSection label="Commands" />}
             {active === "skills" && <SkillsSettings />}
-            {active === "subscription" && <SubscriptionSettings trialDaysLeft={trialDaysLeft} />}
+            {active === "subscription" && <SubscriptionSettings trialDaysLeft={trialDaysLeft} trialCancelled={trialCancelled} onCancelTrial={onCancelTrial} onReactivateTrial={onReactivateTrial} />}
             {active === "credits" && <CreditsSettings />}
           </div>
         </div>
@@ -421,135 +424,271 @@ function SkillsSettings() {
 }
 
 /* ── Subscription ── */
-function SubscriptionSettings({ trialDaysLeft = 6 }: { trialDaysLeft?: number }) {
+function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial, onReactivateTrial }: { trialDaysLeft?: number; trialCancelled?: boolean; onCancelTrial?: () => void; onReactivateTrial?: () => void }) {
   const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState<"plus" | "pro">("plus");
   const trialDay = 14 - trialDaysLeft;
   const trialPct = Math.round((trialDay / 14) * 100);
   const isUrgent = trialDaysLeft <= 1;
 
+  const plans = {
+    plus: {
+      name: "Plus",
+      price: "$20",
+      period: "/mo",
+      features: [
+        "5 tasks per day",
+        "Core integrations (Gmail, LinkedIn, Slack)",
+        "Full workspace access with screen recording",
+        "Recurring task scheduling",
+        "Community support",
+      ],
+    },
+    pro: {
+      name: "Pro",
+      price: "$500",
+      period: "/mo",
+      features: [
+        "Unlimited tasks",
+        "All integrations (Gmail, Salesforce, LinkedIn, HubSpot, etc.)",
+        "Full workspace access with screen recording",
+        "Recurring task scheduling",
+        "Teach mode — show your agent custom workflows",
+        "Priority support &amp; dedicated onboarding",
+        "Custom workflows &amp; API access",
+      ],
+    },
+  };
+
+  const plan = plans[selectedPlan];
+
   return (
     <div className="flex flex-col gap-6">
-      {/* Current plan */}
+      {/* Cancelled banner */}
+      {trialCancelled && trialDaysLeft > 0 && (
+        <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.04] px-4 py-3">
+          <div className="flex items-center gap-2">
+            <svg className="h-4 w-4 shrink-0 text-am" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="12" />
+              <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            <div className="flex-1">
+              <div className="text-[13px] font-medium text-t1">Trial cancelled</div>
+              <div className="text-[12px] text-t3">
+                Your workspace stays active for {trialDaysLeft} more day{trialDaysLeft !== 1 ? "s" : ""}. After that, you&apos;ll lose access.
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={onReactivateTrial}
+            className="mt-2.5 flex h-8 w-full items-center justify-center rounded-md border border-as/30 bg-as/10 text-[12px] font-medium text-blt transition-all hover:bg-as/20"
+          >
+            Reactivate trial
+          </button>
+        </div>
+      )}
+
+      {/* Current plan + switcher */}
       <div>
-        <div className="text-[14px] font-semibold text-t1">Current plan</div>
-        <div className={`mt-3 rounded-lg border p-4 ${isUrgent ? "border-amber-500/30 bg-amber-500/[0.04]" : "border-b1 bg-bg3/50"}`}>
+        <div className="flex items-center justify-between">
+          <div className="text-[14px] font-semibold text-t1">Current plan</div>
+          {/* Plan switcher */}
+          <div className="flex items-center rounded-md border border-b1 bg-bg3 p-0.5">
+            {(["plus", "pro"] as const).map((p) => (
+              <button
+                key={p}
+                onClick={() => setSelectedPlan(p)}
+                className={`relative rounded-[5px] px-3 py-1 text-[11px] font-semibold transition-all ${
+                  selectedPlan === p
+                    ? "bg-bg2 text-t1 shadow-sm"
+                    : "text-t3 hover:text-t2"
+                }`}
+              >
+                {plans[p].name}
+                {p === "plus" && (
+                  <span className={`ml-1.5 text-[9px] font-semibold ${trialCancelled ? "text-am" : "text-blt"}`}>{trialCancelled ? "CANCELLED" : "CURRENT"}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className={`mt-3 rounded-lg border p-4 ${trialCancelled ? "border-b1 bg-bg3/30" : isUrgent ? "border-amber-500/30 bg-amber-500/[0.04]" : "border-b1 bg-bg3/50"}`}>
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[14px] font-semibold text-t1">Pro Trial</span>
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${isUrgent ? "bg-amber-500/15 text-am" : "bg-as/15 text-blt"}`}>
-                  {isUrgent ? "EXPIRES TOMORROW" : "TRIAL"}
-                </span>
+                <span className={`text-[14px] font-semibold ${trialCancelled && selectedPlan === "plus" ? "text-t3" : "text-t1"}`}>{plan.name}{selectedPlan === "plus" ? " Trial" : ""}</span>
+                {selectedPlan === "plus" ? (
+                  trialCancelled ? (
+                    <span className="rounded-full bg-bg3 px-2 py-0.5 text-[10px] font-semibold text-t4 line-through">
+                      CANCELLED
+                    </span>
+                  ) : (
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${isUrgent ? "bg-amber-500/15 text-am" : "bg-as/15 text-blt"}`}>
+                      {isUrgent ? "EXPIRES TOMORROW" : "TRIAL"}
+                    </span>
+                  )
+                ) : (
+                  <span className="rounded-full bg-bg3 px-2 py-0.5 text-[10px] font-semibold text-t3">
+                    UPGRADE
+                  </span>
+                )}
               </div>
-              <div className="mt-1 text-[12px] text-t3">Started Feb 18, 2026 &middot; {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining</div>
+              {selectedPlan === "plus" ? (
+                trialCancelled ? (
+                  <div className="mt-1 text-[12px] text-t3">Access ends in {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""}</div>
+                ) : (
+                  <div className="mt-1 text-[12px] text-t3">Started Feb 18, 2026 &middot; {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining</div>
+                )
+              ) : (
+                <div className="mt-1 text-[12px] text-t3">For teams and power users</div>
+              )}
             </div>
             <div className="text-right">
-              <div className="text-[14px] font-semibold text-t1">$0</div>
-              <div className="text-[11px] text-t3">then $49/mo</div>
+              {selectedPlan === "plus" ? (
+                trialCancelled ? (
+                  <div className="text-[11px] text-t4">No charge</div>
+                ) : (
+                  <>
+                    <div className="text-[14px] font-semibold text-t1">$0</div>
+                    <div className="text-[11px] text-t3">then {plan.price}/mo</div>
+                  </>
+                )
+              ) : (
+                <>
+                  <div className="text-[14px] font-semibold text-t1">{plan.price}</div>
+                  <div className="text-[11px] text-t3">per month</div>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Trial progress bar */}
-          <div className="mt-3">
-            <div className="flex items-center justify-between text-[10px] text-t3 mb-1">
-              <span>Day {trialDay} of 14</span>
-              <span className={isUrgent ? "font-medium text-am" : ""}>{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} left</span>
+          {/* Trial progress bar (Plus only) */}
+          {selectedPlan === "plus" && (
+            <div className="mt-3">
+              <div className="flex items-center justify-between text-[10px] text-t3 mb-1">
+                <span>Day {trialDay} of 14</span>
+                <span className={trialCancelled ? "font-medium text-t4" : isUrgent ? "font-medium text-am" : ""}>{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} left</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-b1">
+                <div className={`h-1.5 rounded-full ${trialCancelled ? "bg-t4" : isUrgent ? "bg-am" : "bg-as"}`} style={{ width: `${trialPct}%` }} />
+              </div>
             </div>
-            <div className="h-1.5 rounded-full bg-b1">
-              <div className={`h-1.5 rounded-full ${isUrgent ? "bg-am" : "bg-as"}`} style={{ width: `${trialPct}%` }} />
-            </div>
-          </div>
+          )}
+
+          {/* Upgrade button (Pro only) */}
+          {selectedPlan === "pro" && (
+            <button className="mt-3 flex h-9 w-full items-center justify-center rounded-md bg-as text-[13px] font-medium text-white transition-all hover:bg-as2">
+              Upgrade to Pro
+            </button>
+          )}
         </div>
       </div>
 
       {/* What's included */}
       <div>
-        <div className="text-[14px] font-semibold text-t1">What&apos;s included</div>
+        <div className="text-[14px] font-semibold text-t1">What&apos;s included in {plan.name}</div>
         <div className="mt-3 flex flex-col gap-2">
-          {[
-            "Unlimited tasks",
-            "All integrations (Gmail, Salesforce, LinkedIn, etc.)",
-            "Full workspace access with screen recording",
-            "Recurring task scheduling",
-            "Teach mode — show your agent custom workflows",
-            "Priority support",
-          ].map((feature) => (
+          {plan.features.map((feature) => (
             <div key={feature} className="flex items-center gap-2 text-[12.5px] text-t2">
               <svg className="h-3.5 w-3.5 shrink-0 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
               </svg>
-              {feature}
+              <span dangerouslySetInnerHTML={{ __html: feature }} />
             </div>
           ))}
+          <a
+            href="https://simular.ai/pricing"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 inline-flex items-center gap-1 text-[12px] font-medium text-blt transition-colors hover:text-as2"
+          >
+            Compare plans
+            <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </a>
         </div>
       </div>
 
       <div className="h-px bg-b1" />
 
       {/* Payment method */}
-      <div>
-        <div className="text-[14px] font-semibold text-t1">Payment method</div>
-        <div className="mt-3 flex items-center gap-3">
-          <div className="flex h-8 w-12 items-center justify-center rounded border border-b1 bg-bg3 text-[10px] font-bold text-t2">VISA</div>
-          <div className="flex-1">
-            <div className="text-[13px] text-t1">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242</div>
-            <div className="text-[11px] text-t3">Expires 12/28</div>
-          </div>
-          <button className="text-[12px] font-medium text-blt transition-all hover:underline">
-            Update
-          </button>
-        </div>
-      </div>
-
-      <div className="h-px bg-b1" />
-
-      {/* Billing actions */}
-      <div>
-        <div className="text-[14px] font-semibold text-t1">Billing</div>
-        <div className="mt-3 flex flex-col gap-2.5">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-[13px] text-t2">Next billing date</div>
-              <div className="text-[11px] text-t3">Mar 4, 2026 &middot; $49.00</div>
+      {!trialCancelled && (
+        <div>
+          <div className="text-[14px] font-semibold text-t1">Payment method</div>
+          <div className="mt-3 flex items-center gap-3">
+            <div className="flex h-8 w-12 items-center justify-center rounded border border-b1 bg-bg3 text-[10px] font-bold text-t2">VISA</div>
+            <div className="flex-1">
+              <div className="text-[13px] text-t1">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242</div>
+              <div className="text-[11px] text-t3">Expires 12/28</div>
             </div>
             <button className="text-[12px] font-medium text-blt transition-all hover:underline">
-              View invoices
+              Update
             </button>
           </div>
         </div>
-      </div>
+      )}
 
-      <div className="h-px bg-b1" />
+      {!trialCancelled && <div className="h-px bg-b1" />}
 
-      {/* Cancel */}
-      <div>
-        {showCancelConfirm ? (
-          <div className="rounded-lg border border-r/30 bg-r/[0.04] p-4">
-            <div className="text-[13px] font-medium text-t1">Are you sure you want to cancel?</div>
-            <div className="mt-1 text-[12px] text-t3">
-              Your trial ends immediately and you&apos;ll lose access to all tasks, integrations, and recorded workflows. This can&apos;t be undone.
-            </div>
-            <div className="mt-3 flex items-center gap-2">
-              <button
-                onClick={() => setShowCancelConfirm(false)}
-                className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3"
-              >
-                Keep my trial
-              </button>
-              <button className="rounded-md bg-r px-3 py-1.5 text-[12px] font-medium text-white transition-all hover:brightness-110">
-                Cancel trial
+      {/* Billing actions */}
+      {!trialCancelled && (
+        <div>
+          <div className="text-[14px] font-semibold text-t1">Billing</div>
+          <div className="mt-3 flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-[13px] text-t2">Next billing date</div>
+                <div className="text-[11px] text-t3">Mar 4, 2026 &middot; $20.00</div>
+              </div>
+              <button className="text-[12px] font-medium text-blt transition-all hover:underline">
+                View invoices
               </button>
             </div>
           </div>
-        ) : (
-          <button
-            onClick={() => setShowCancelConfirm(true)}
-            className="text-[12px] font-medium text-t3 transition-all hover:text-r"
-          >
-            Cancel trial
-          </button>
-        )}
-      </div>
+        </div>
+      )}
+
+      {!trialCancelled && <div className="h-px bg-b1" />}
+
+      {/* Cancel */}
+      {!trialCancelled && (
+        <div>
+          {showCancelConfirm ? (
+            <div className="rounded-lg border border-r/30 bg-r/[0.04] p-4">
+              <div className="text-[13px] font-medium text-t1">Are you sure you want to cancel?</div>
+              <div className="mt-1 text-[12px] text-t3">
+                Your workspace stays active until your trial ends, then you&apos;ll lose access to all tasks, integrations, and recorded workflows.
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  onClick={() => setShowCancelConfirm(false)}
+                  className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3"
+                >
+                  Keep my trial
+                </button>
+                <button
+                  onClick={() => { setShowCancelConfirm(false); onCancelTrial?.(); }}
+                  className="rounded-md bg-r px-3 py-1.5 text-[12px] font-medium text-white transition-all hover:brightness-110"
+                >
+                  Cancel trial
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowCancelConfirm(true)}
+              className="text-[12px] font-medium text-t3 transition-all hover:text-r"
+            >
+              Cancel trial
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

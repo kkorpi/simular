@@ -71,7 +71,7 @@ export function SignupPayment({ onSubmit, onBack }: SignupPaymentProps) {
               <polyline points="20 6 9 17 4 12" />
             </svg>
             <span className="text-[13px] font-medium text-blt">
-              7-day free trial
+              7-day free trial · Plus
             </span>
           </div>
         </div>

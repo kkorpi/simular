@@ -57,6 +57,7 @@ export default function Home() {
   const [teachPhase, setTeachPhase] = useState<TeachPhase>("idle");
   const [teachTaskName, setTeachTaskName] = useState("");
   const [trialDaysLeft, setTrialDaysLeft] = useState(6);
+  const [trialCancelled, setTrialCancelled] = useState(false);
   const [trialDialogOpen, setTrialDialogOpen] = useState(false);
   const [pipWidth, setPipWidth] = useState(PIP_DEFAULT_WIDTH);
   const pipDragging = useRef(false);
@@ -104,7 +105,7 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [demoPickerOpen]);
 
-  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "teach" | "trial" | "system") => {
+  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "teach" | "trial" | "system" | "expired") => {
     setDemoPickerOpen(false);
     setFirstRunTask(null);
     setWorkspaceOpen(false);
@@ -114,6 +115,7 @@ export default function Home() {
     setTeachPhase("idle");
     setTeachTaskName("");
     setTrialDialogOpen(false);
+    setTrialCancelled(false);
     if (mode === "landing") {
       setScreen("landing");
       return;
@@ -141,6 +143,10 @@ export default function Home() {
     } else if (mode === "system") {
       setTrialDaysLeft(6);
       setDesignSystemOpen(true);
+    } else if (mode === "expired") {
+      setTrialDaysLeft(0);
+      setTrialCancelled(true);
+      setActiveView("task-hover");
     }
   };
 
@@ -280,6 +286,7 @@ export default function Home() {
             { mode: "system" as const, label: "Design system", desc: "Colors, type ramp, tokens", icon: "🎨" },
             { mode: "teach" as const, label: "Teach flow", desc: "Agent suggests showing it a custom task", icon: "📖" },
             { mode: "trial" as const, label: "Trial expiring", desc: "1 day left — charge warning dialog", icon: "⚠️" },
+            { mode: "expired" as const, label: "Trial expired", desc: "Cancelled trial — locked out", icon: "🔒" },
           ]).map((opt) => (
             <button
               key={opt.mode}
@@ -532,6 +539,9 @@ export default function Home() {
             onOpenCardGallery={() => setCardGalleryOpen(true)}
             onOpenDesignSystem={() => setDesignSystemOpen(true)}
             trialDaysLeft={trialDaysLeft}
+            trialCancelled={trialCancelled}
+            onCancelTrial={() => setTrialCancelled(true)}
+            onReactivateTrial={() => setTrialCancelled(false)}
           />
           <CardGallery
             open={cardGalleryOpen}
@@ -541,6 +551,93 @@ export default function Home() {
             open={designSystemOpen}
             onClose={() => setDesignSystemOpen(false)}
           />
+
+          {/* Trial expired lockout */}
+          {trialCancelled && trialDaysLeft <= 0 && (
+            <div className="fixed inset-0 z-[90] flex items-center justify-center overflow-y-auto bg-bg/95 backdrop-blur-md py-10">
+              <div className="w-full max-w-[640px] px-8 text-center">
+                <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-bg3">
+                  <svg className="h-7 w-7 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0110 0v4" />
+                  </svg>
+                </div>
+                <h2 className="text-[20px] font-semibold text-t1">Your trial has ended</h2>
+                <p className="mt-2 text-[14px] leading-[1.6] text-t3">
+                  Choose a plan to continue using Simular.
+                </p>
+
+                {/* Plan comparison */}
+                <div className="mt-8 grid grid-cols-2 gap-4 text-left">
+                  {/* Plus */}
+                  <div className="rounded-xl border border-b1 bg-bg2 p-5">
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-t3">Plus</div>
+                    <div className="mt-1 flex items-baseline gap-1">
+                      <span className="text-[28px] font-bold text-t1">$20</span>
+                      <span className="text-[13px] text-t3">/mo</span>
+                    </div>
+                    <p className="mt-2 text-[12px] leading-[1.5] text-t3">For individuals getting started with AI automation.</p>
+                    <div className="mt-4 flex flex-col gap-2">
+                      {["5 tasks per day", "Core integrations", "Workspace + recording", "Task scheduling", "Community support"].map((f) => (
+                        <div key={f} className="flex items-center gap-2 text-[12px] text-t2">
+                          <svg className="h-3 w-3 shrink-0 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                          {f}
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => { setTrialCancelled(false); setTrialDaysLeft(6); }}
+                      className="mt-5 flex h-10 w-full items-center justify-center rounded-md bg-as text-[13px] font-medium text-white transition-all hover:bg-as2"
+                    >
+                      Subscribe to Plus
+                    </button>
+                  </div>
+
+                  {/* Pro */}
+                  <div className="rounded-xl border border-as/30 bg-bg2 p-5 relative">
+                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full bg-as px-3 py-0.5 text-[10px] font-semibold text-white">RECOMMENDED</div>
+                    <div className="text-[11px] font-semibold uppercase tracking-wide text-blt">Pro</div>
+                    <div className="mt-1 flex items-baseline gap-1">
+                      <span className="text-[28px] font-bold text-t1">$500</span>
+                      <span className="text-[13px] text-t3">/mo</span>
+                    </div>
+                    <p className="mt-2 text-[12px] leading-[1.5] text-t3">For teams and power users who need unlimited access.</p>
+                    <div className="mt-4 flex flex-col gap-2">
+                      {["Unlimited tasks", "All integrations", "Teach mode", "Priority support", "API access"].map((f) => (
+                        <div key={f} className="flex items-center gap-2 text-[12px] text-t2">
+                          <svg className="h-3 w-3 shrink-0 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                          {f}
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => { setTrialCancelled(false); setTrialDaysLeft(6); }}
+                      className="mt-5 flex h-10 w-full items-center justify-center rounded-md border border-as/30 bg-as/10 text-[13px] font-medium text-blt transition-all hover:bg-as/20"
+                    >
+                      Upgrade to Pro
+                    </button>
+                  </div>
+                </div>
+
+                <a
+                  href="https://simular.ai/pricing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 inline-flex items-center gap-1 text-[12px] font-medium text-blt transition-colors hover:text-as2"
+                >
+                  Full plan details
+                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+                    <polyline points="15 3 21 3 21 9" />
+                    <line x1="10" y1="14" x2="21" y2="3" />
+                  </svg>
+                </a>
+                <p className="mt-2 text-[12px] text-t4">
+                  Your data is preserved for 30 days after cancellation.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Trial expiring dialog */}
           {trialDialogOpen && (
@@ -562,7 +659,7 @@ export default function Home() {
                     </div>
                   </div>
                   <p className="text-[13px] leading-[1.6] text-t2">
-                    Your free trial of Simular Pro expires tomorrow. Your card ending in <strong className="font-medium text-t1">4242</strong> will be charged <strong className="font-medium text-t1">$49/month</strong> starting February 25th.
+                    Your free trial of Simular Plus expires tomorrow. Your card ending in <strong className="font-medium text-t1">4242</strong> will be charged <strong className="font-medium text-t1">$20/month</strong> starting February 25th.
                   </p>
                 </div>
 
