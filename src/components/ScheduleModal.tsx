@@ -108,7 +108,7 @@ export function ScheduleModal({
       onClick={onClose}
     >
       <div
-        className="w-[420px] overflow-hidden rounded-2xl border border-b1 bg-bg shadow-[var(--sc)]"
+        className="w-[420px] max-md:w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-b1 bg-bg shadow-[var(--sc)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

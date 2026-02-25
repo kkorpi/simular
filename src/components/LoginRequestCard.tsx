@@ -73,7 +73,7 @@ export function LoginRequestCard({
   }
 
   return (
-    <div className="mt-2 max-w-[480px] overflow-hidden rounded-lg border border-b1 bg-bg3/50">
+    <div className="mt-2 max-w-[480px] overflow-hidden rounded-lg border border-b1 bg-bgcard">
       <div className="flex items-center gap-3.5 px-4 py-3.5">
         {/* LinkedIn logo */}
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[#0A66C2]">

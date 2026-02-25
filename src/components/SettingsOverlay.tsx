@@ -7,6 +7,8 @@ interface SettingsOverlayProps {
   open: boolean;
   onClose: () => void;
   initialSection?: SettingsSection;
+  onOpenCardGallery?: () => void;
+  trialDaysLeft?: number;
 }
 
 type SettingsSection =
@@ -28,7 +30,7 @@ const sections: { id: SettingsSection; label: string }[] = [
 
 export { type SettingsSection };
 
-export function SettingsOverlay({ open, onClose, initialSection }: SettingsOverlayProps) {
+export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGallery, trialDaysLeft = 6 }: SettingsOverlayProps) {
   const [active, setActive] = useState<SettingsSection>(initialSection || "appearance");
 
   // Sync when initialSection changes (e.g., from slash command)
@@ -40,26 +42,44 @@ export function SettingsOverlay({ open, onClose, initialSection }: SettingsOverl
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/65 backdrop-blur-[5px]" onClick={onClose}>
-      <div className="flex h-[560px] w-[720px] overflow-hidden rounded-2xl border border-b1 bg-bg shadow-[var(--sc)]" onClick={(e) => e.stopPropagation()}>
-        {/* Left nav */}
-        <div className="flex w-[200px] shrink-0 flex-col border-r border-b1 bg-bg2 py-4">
+      <div className="flex h-[560px] w-[720px] max-md:h-full max-md:w-full max-md:rounded-none overflow-hidden rounded-2xl border border-b1 max-md:border-0 bg-bg shadow-[var(--sc)] max-md:flex-col" onClick={(e) => e.stopPropagation()}>
+        {/* Left nav (desktop) / Top nav (mobile) */}
+        <div className="flex w-[200px] shrink-0 flex-col border-r border-b1 bg-bg2 py-4 max-md:w-full max-md:flex-row max-md:items-center max-md:border-r-0 max-md:border-b max-md:py-2 max-md:px-2 max-md:gap-0 max-md:overflow-x-auto">
           {sections.map((s) => (
             <button
               key={s.id}
               onClick={() => setActive(s.id)}
-              className={`px-5 py-2.5 text-left text-[13.5px] font-medium transition-all ${
+              className={`px-5 py-2.5 text-left text-[13.5px] font-medium transition-all max-md:px-3 max-md:py-1.5 max-md:text-center max-md:text-[12px] max-md:whitespace-nowrap max-md:rounded-md max-md:shrink-0 ${
                 active === s.id
-                  ? "text-t1"
+                  ? "text-t1 max-md:bg-bg3"
                   : "text-t3 hover:text-t2"
               }`}
             >
               {s.label}
             </button>
           ))}
+
+          {onOpenCardGallery && (
+            <div className="max-md:hidden">
+              <div className="mx-5 my-2 h-px bg-b1" />
+              <button
+                onClick={() => { onOpenCardGallery(); onClose(); }}
+                className="flex items-center gap-2 px-5 py-2.5 text-left text-[13.5px] font-medium text-t3 transition-all hover:text-t2"
+              >
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                </svg>
+                Card gallery
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* Right content */}
-        <div className="flex flex-1 flex-col overflow-y-auto">
+        {/* Right content (desktop) / Bottom content (mobile) */}
+        <div className="flex flex-1 flex-col overflow-y-auto min-h-0">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-b1 px-6 py-4">
             <div className="flex items-center gap-2 text-[13px] text-t3">
@@ -86,8 +106,8 @@ export function SettingsOverlay({ open, onClose, initialSection }: SettingsOverl
             {active === "workspace" && <WorkspaceSettings />}
             {active === "commands" && <PlaceholderSection label="Commands" />}
             {active === "skills" && <SkillsSettings />}
-            {active === "subscription" && <PlaceholderSection label="Subscription" />}
-            {active === "credits" && <PlaceholderSection label="Credits" />}
+            {active === "subscription" && <SubscriptionSettings trialDaysLeft={trialDaysLeft} />}
+            {active === "credits" && <CreditsSettings />}
           </div>
         </div>
       </div>
@@ -335,6 +355,198 @@ function SkillsSettings() {
             </button>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Subscription ── */
+function SubscriptionSettings({ trialDaysLeft = 6 }: { trialDaysLeft?: number }) {
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+  const trialDay = 14 - trialDaysLeft;
+  const trialPct = Math.round((trialDay / 14) * 100);
+  const isUrgent = trialDaysLeft <= 1;
+
+  return (
+    <div className="flex flex-col gap-6">
+      {/* Current plan */}
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Current plan</div>
+        <div className={`mt-3 rounded-lg border p-4 ${isUrgent ? "border-amber-500/30 bg-amber-500/[0.04]" : "border-b1 bg-bg3/50"}`}>
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[14px] font-semibold text-t1">Pro Trial</span>
+                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${isUrgent ? "bg-amber-500/15 text-am" : "bg-as/15 text-blt"}`}>
+                  {isUrgent ? "EXPIRES TOMORROW" : "TRIAL"}
+                </span>
+              </div>
+              <div className="mt-1 text-[12px] text-t3">Started Feb 18, 2026 &middot; {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[14px] font-semibold text-t1">$0</div>
+              <div className="text-[11px] text-t3">then $49/mo</div>
+            </div>
+          </div>
+
+          {/* Trial progress bar */}
+          <div className="mt-3">
+            <div className="flex items-center justify-between text-[10px] text-t3 mb-1">
+              <span>Day {trialDay} of 14</span>
+              <span className={isUrgent ? "font-medium text-am" : ""}>{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} left</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-b1">
+              <div className={`h-1.5 rounded-full ${isUrgent ? "bg-am" : "bg-as"}`} style={{ width: `${trialPct}%` }} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* What's included */}
+      <div>
+        <div className="text-[14px] font-semibold text-t1">What&apos;s included</div>
+        <div className="mt-3 flex flex-col gap-2">
+          {[
+            "Unlimited tasks",
+            "All integrations (Gmail, Salesforce, LinkedIn, etc.)",
+            "Full workspace access with screen recording",
+            "Recurring task scheduling",
+            "Teach mode — show your agent custom workflows",
+            "Priority support",
+          ].map((feature) => (
+            <div key={feature} className="flex items-center gap-2 text-[12.5px] text-t2">
+              <svg className="h-3.5 w-3.5 shrink-0 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              {feature}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="h-px bg-b1" />
+
+      {/* Payment method */}
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Payment method</div>
+        <div className="mt-3 flex items-center gap-3">
+          <div className="flex h-8 w-12 items-center justify-center rounded border border-b1 bg-bg3 text-[10px] font-bold text-t2">VISA</div>
+          <div className="flex-1">
+            <div className="text-[13px] text-t1">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242</div>
+            <div className="text-[11px] text-t3">Expires 12/28</div>
+          </div>
+          <button className="text-[12px] font-medium text-blt transition-all hover:underline">
+            Update
+          </button>
+        </div>
+      </div>
+
+      <div className="h-px bg-b1" />
+
+      {/* Billing actions */}
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Billing</div>
+        <div className="mt-3 flex flex-col gap-2.5">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[13px] text-t2">Next billing date</div>
+              <div className="text-[11px] text-t3">Mar 4, 2026 &middot; $49.00</div>
+            </div>
+            <button className="text-[12px] font-medium text-blt transition-all hover:underline">
+              View invoices
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="h-px bg-b1" />
+
+      {/* Cancel */}
+      <div>
+        {showCancelConfirm ? (
+          <div className="rounded-lg border border-r/30 bg-r/[0.04] p-4">
+            <div className="text-[13px] font-medium text-t1">Are you sure you want to cancel?</div>
+            <div className="mt-1 text-[12px] text-t3">
+              Your trial ends immediately and you&apos;ll lose access to all tasks, integrations, and recorded workflows. This can&apos;t be undone.
+            </div>
+            <div className="mt-3 flex items-center gap-2">
+              <button
+                onClick={() => setShowCancelConfirm(false)}
+                className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3"
+              >
+                Keep my trial
+              </button>
+              <button className="rounded-md bg-r px-3 py-1.5 text-[12px] font-medium text-white transition-all hover:brightness-110">
+                Cancel trial
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowCancelConfirm(true)}
+            className="text-[12px] font-medium text-t3 transition-all hover:text-r"
+          >
+            Cancel trial
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Credits ── */
+function CreditsSettings() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Credit usage</div>
+        <div className="mt-3 rounded-lg border border-b1 bg-bg3/50 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-[24px] font-semibold text-t1">847</div>
+              <div className="text-[12px] text-t3">credits remaining this month</div>
+            </div>
+            <div className="text-right">
+              <div className="text-[13px] text-t2">1,000 / month</div>
+              <div className="text-[11px] text-t3">Resets Mar 4</div>
+            </div>
+          </div>
+          <div className="mt-3">
+            <div className="h-1.5 rounded-full bg-b1">
+              <div className="h-1.5 rounded-full bg-as" style={{ width: "85%" }} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Usage breakdown</div>
+        <div className="mt-3 flex flex-col gap-2.5">
+          {[
+            { label: "Research tasks", credits: 72, icon: "🔍" },
+            { label: "Writing tasks", credits: 45, icon: "✍️" },
+            { label: "Workspace sessions", credits: 28, icon: "🖥️" },
+            { label: "Recurring tasks", credits: 8, icon: "🔁" },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-3">
+              <span className="text-[14px]">{item.icon}</span>
+              <span className="flex-1 text-[13px] text-t2">{item.label}</span>
+              <span className="text-[13px] font-medium text-t1">{item.credits} credits</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="h-px bg-b1" />
+
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-[13px] text-t2">Need more credits?</div>
+          <div className="text-[11px] text-t3">Add-on packs available for high-usage months</div>
+        </div>
+        <button className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3">
+          Buy credits
+        </button>
       </div>
     </div>
   );

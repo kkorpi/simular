@@ -65,7 +65,7 @@ export function ZeroState({ onStartTask, onCreateOwn, userRole }: ZeroStateProps
   const requiresLogin = tasks.filter((t) => t.trustLevel === "needs-auth");
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-8">
+    <div className="flex flex-1 flex-col items-center justify-center px-8 max-md:px-4 max-md:overflow-y-auto">
       <div className="w-full max-w-[620px]">
         {/* Greeting */}
         <div className="mb-8 flex gap-2.5">
@@ -115,7 +115,7 @@ export function ZeroState({ onStartTask, onCreateOwn, userRole }: ZeroStateProps
         )}
 
         {/* Footer links */}
-        <div className="mt-8 flex items-center justify-between">
+        <div className="mt-8 flex items-center justify-between max-md:flex-col max-md:gap-3">
           <button
             className="flex items-center gap-1.5 text-[13px] text-t3 transition-colors hover:text-t1"
           >
@@ -152,7 +152,7 @@ function StarterTaskCard({
   return (
     <button
       onClick={onStart}
-      className="group flex items-center gap-4 rounded-lg border border-b1 bg-bg3 px-4 py-4 text-left transition-all hover:bg-bg2"
+      className="group flex items-center gap-4 rounded-lg border border-b1 bg-bgcard px-4 py-4 text-left shadow-[var(--card-shadow)] transition-all hover:bg-bg2"
     >
       {/* Icon */}
       <div className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-md bg-bg3h">
@@ -179,7 +179,7 @@ function StarterTaskCard({
             <path d="M7 11V7a5 5 0 0110 0v4" />
           </svg>
         )}
-        {task.trustLabel}
+        <span className="max-md:hidden">{task.trustLabel}</span>
       </div>
     </button>
   );

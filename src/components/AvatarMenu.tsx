@@ -6,9 +6,11 @@ interface AvatarMenuProps {
   open: boolean;
   onClose: () => void;
   onOpenSettings: () => void;
+  onOpenSubscription?: () => void;
+  onOpenCredits?: () => void;
 }
 
-export function AvatarMenu({ open, onClose, onOpenSettings }: AvatarMenuProps) {
+export function AvatarMenu({ open, onClose, onOpenSettings, onOpenSubscription, onOpenCredits }: AvatarMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -52,6 +54,10 @@ export function AvatarMenu({ open, onClose, onOpenSettings }: AvatarMenuProps) {
             </svg>
           }
           label="Subscription"
+          onClick={() => {
+            onClose();
+            onOpenSubscription?.();
+          }}
         />
         <MenuItem
           icon={
@@ -63,6 +69,10 @@ export function AvatarMenu({ open, onClose, onOpenSettings }: AvatarMenuProps) {
           }
           label="Credits"
           trailing="$8.88"
+          onClick={() => {
+            onClose();
+            onOpenCredits?.();
+          }}
         />
         <MenuItem
           icon={

@@ -8,6 +8,7 @@
   --bg2: #1e1e22;
   --bg3: #252529;
   --bg3h: #2c2c31;
+  --bgcard: #252529;
   --bgi: #222226;
   --bgm: #1c201e;
   --bgmb: #283830;
@@ -34,6 +35,7 @@
   --lb: #e8e8eb;
   --lt: #18181b;
   --sc: 0 1px 3px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--b1);
+  --card-shadow: none;
   --mg: radial-gradient(ellipse at 30% 0%, rgba(61, 214, 140, 0.06) 0%, transparent 50%);
   --st: #8e8e96;
   --sb: #2e2e34;
@@ -44,12 +46,13 @@
 [data-theme="light"] {
   --logo-bg: #000000;
   --logo-fg: #FEFEFE;
-  --bg: #fafafa;
-  --bg2: #f2f2f4;
+  --bg: #f7f7f8;
+  --bg2: #f0f0f2;
   --bg3: #e9e9ec;
   --bg3h: #e0e0e4;
+  --bgcard: #ffffff;
   --bgi: #f5f5f7;
-  --bgm: #f0f7f3;
+  --bgm: #eef6f1;
   --bgmb: #c8e0d0;
   --b1: #d8d8dc;
   --b2: #c4c4ca;
@@ -74,6 +77,7 @@
   --lb: #1a1a1e;
   --lt: #fff;
   --sc: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--b1);
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   --mg: radial-gradient(ellipse at 30% 0%, rgba(24, 135, 90, 0.06) 0%, transparent 50%);
   --st: #1a1a1e;
   --sb: #c4c4ca;
@@ -86,6 +90,7 @@
   --color-bg2: var(--bg2);
   --color-bg3: var(--bg3);
   --color-bg3h: var(--bg3h);
+  --color-bgcard: var(--bgcard);
   --color-bgi: var(--bgi);
   --color-bgm: var(--bgm);
   --color-bgmb: var(--bgmb);
@@ -127,8 +132,8 @@ body {
 
 /* ===== Animations ===== */
 @keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 5px var(--gg); }
-  50% { box-shadow: 0 0 12px var(--gg); }
+  0%, 100% { box-shadow: 0 0 5px var(--pulse-glow, var(--gg)); }
+  50% { box-shadow: 0 0 12px var(--pulse-glow, var(--gg)); }
 }
 
 @keyframes working-dots {

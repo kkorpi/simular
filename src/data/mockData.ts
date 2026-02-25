@@ -776,6 +776,68 @@ export const starterTasks: StarterTask[] = [
   },
 ];
 
+// ===== First-Run Experience =====
+
+/** Maps starter task categories to a realistic progress sequence */
+export interface FirstRunStep {
+  label: string;
+  detail?: string;
+}
+
+export const firstRunSequences: Record<string, { intro: string; steps: FirstRunStep[]; resultTitle: string; resultSummary: string }> = {
+  research: {
+    intro: "On it — I'll research this now. Let me fire up a browser and start pulling sources.",
+    steps: [
+      { label: "Opening Chrome browser" },
+      { label: "Searching for recent news and background" },
+      { label: "Pulling LinkedIn profiles and company data" },
+      { label: "Cross-referencing with Crunchbase" },
+      { label: "Compiling findings into a summary" },
+    ],
+    resultTitle: "Research Summary",
+    resultSummary: "I've compiled a comprehensive summary with background, key data points, and relevant sources. You can review the full document or open it in your workspace.",
+  },
+  crm: {
+    intro: "Sure — I'll check the data and put together an update for you.",
+    steps: [
+      { label: "Opening Chrome browser" },
+      { label: "Connecting to your CRM" },
+      { label: "Pulling recent activity and records" },
+      { label: "Analyzing patterns and gaps" },
+      { label: "Preparing actionable recommendations" },
+    ],
+    resultTitle: "CRM Analysis",
+    resultSummary: "I've reviewed your CRM records and identified actionable items. Here's a summary of what needs attention along with suggested next steps.",
+  },
+  email: {
+    intro: "Got it — I'll pull the relevant notes and start drafting.",
+    steps: [
+      { label: "Opening Chrome browser" },
+      { label: "Pulling meeting notes and context" },
+      { label: "Extracting key discussion points" },
+      { label: "Drafting personalized emails" },
+      { label: "Saving drafts for your review" },
+    ],
+    resultTitle: "Email Drafts Ready",
+    resultSummary: "I've drafted your emails based on the meeting notes and saved them for review. Each one includes personalized talking points and next steps.",
+  },
+};
+
+// ===== Teach Mode Flow =====
+
+export type TeachPhase = "idle" | "suggest" | "recording" | "complete";
+
+export const TEACH_TASK_NAME = "Forward Asana weekly digest to Slack";
+
+export const teachRecordedSteps = [
+  "Open Asana and navigate to Weekly Digest page",
+  "Select 'Engineering' and 'Design' sections",
+  "Copy formatted digest content",
+  "Open Slack and go to #updates channel",
+  "Paste and format as a message",
+  "Send the message",
+];
+
 // ===== Gated Trial =====
 
 export const VALID_INVITE_CODES = ["SIMULAR2026", "EARLY100", "LAUNCH", "BETA", "VIP"];

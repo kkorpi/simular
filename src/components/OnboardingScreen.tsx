@@ -14,17 +14,25 @@ const setupSteps = [
   { label: "Preparing your coworker", tip: "Once set up, your coworker works around the clock, even while you sleep." },
 ];
 
+/** Role options for dropdown */
+const roleOptions = [
+  { id: "vc", label: "VC / Investor" },
+  { id: "sales", label: "Sales" },
+  { id: "marketing", label: "Marketing" },
+  { id: "ops", label: "Operations" },
+  { id: "founder", label: "Founder" },
+  { id: "engineer", label: "Engineer" },
+  { id: "researcher", label: "Researcher" },
+  { id: "student", label: "Student" },
+  { id: "other", label: "Other" },
+];
+
 /** Onboarding questions shown alongside setup progress */
 const onboardingQuestions = [
   {
     question: "What best describes your role?",
-    options: [
-      { id: "vc", label: "VC / Investor" },
-      { id: "sales", label: "Sales" },
-      { id: "marketing", label: "Marketing" },
-      { id: "ops", label: "Operations" },
-      { id: "founder", label: "Founder" },
-    ],
+    type: "role-dropdown" as const,
+    options: roleOptions,
   },
   {
     question: "Which apps do you use most?",
@@ -122,11 +130,6 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
       setShowQuestion(true);
     }, 300);
   }, []);
-
-  const handleSelectRole = (id: string) => {
-    setRole(id);
-    advanceQuestion();
-  };
 
   const handleToggleApp = (id: string) => {
     setApps((prev) =>
@@ -242,58 +245,92 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                   {currentQ.question}
                 </p>
 
-                <div className="flex flex-wrap gap-2">
-                  {currentQ.options.map((opt) => {
-                    // Multi-select (apps question)
-                    if (questionIndex === 1) {
-                      const selected = apps.includes(opt.id);
-                      return (
-                        <button
-                          key={opt.id}
-                          onClick={() => handleToggleApp(opt.id)}
-                          className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-all ${
-                            selected
-                              ? "border-as/50 bg-as/10 text-blt"
-                              : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h"
-                          }`}
-                        >
-                          {opt.label}
-                        </button>
-                      );
-                    }
-                    // Single-select (role, handoff)
-                    const isSelected =
-                      questionIndex === 0 ? role === opt.id : handoff === opt.id;
-                    return (
+                {"type" in currentQ && currentQ.type === "role-dropdown" ? (
+                  /* ── Role dropdown ── */
+                  <>
+                    <div className="relative">
+                      <select
+                        value={role || ""}
+                        onChange={(e) => setRole(e.target.value)}
+                        className={`h-12 w-full appearance-none rounded-md border border-b1 bg-bg3 px-4 text-[14px] text-t1 transition-colors focus:border-as focus:outline-none ${!role ? "text-t4" : ""}`}
+                      >
+                        <option value="" disabled>
+                          Select your role
+                        </option>
+                        {roleOptions.map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.label}
+                          </option>
+                        ))}
+                      </select>
+                      <svg
+                        className="pointer-events-none absolute right-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-t4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </div>
+                    <button
+                      onClick={advanceQuestion}
+                      className={`mt-4 text-[13px] font-medium transition-colors ${
+                        role ? "text-blt hover:text-as2" : "text-t4"
+                      }`}
+                    >
+                      {role ? "Next \u2192" : "Skip \u2192"}
+                    </button>
+                  </>
+                ) : currentQ.multi ? (
+                  /* ── Multi-select pills (apps) ── */
+                  <>
+                    <div className="flex flex-wrap gap-2">
+                      {currentQ.options.map((opt) => {
+                        const selected = apps.includes(opt.id);
+                        return (
+                          <button
+                            key={opt.id}
+                            onClick={() => handleToggleApp(opt.id)}
+                            className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-all ${
+                              selected
+                                ? "border-as/50 bg-as/10 text-blt"
+                                : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h"
+                            }`}
+                          >
+                            {opt.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <button
+                      onClick={advanceQuestion}
+                      className={`mt-4 text-[13px] font-medium transition-colors ${
+                        apps.length > 0 ? "text-blt hover:text-as2" : "text-t4"
+                      }`}
+                    >
+                      {apps.length > 0 ? "Continue \u2192" : "Skip \u2192"}
+                    </button>
+                  </>
+                ) : (
+                  /* ── Single-select pills (handoff) ── */
+                  <div className="flex flex-wrap gap-2">
+                    {currentQ.options.map((opt) => (
                       <button
                         key={opt.id}
-                        onClick={() =>
-                          questionIndex === 0
-                            ? handleSelectRole(opt.id)
-                            : handleSelectHandoff(opt.id)
-                        }
+                        onClick={() => handleSelectHandoff(opt.id)}
                         className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-all ${
-                          isSelected
+                          handoff === opt.id
                             ? "border-as/50 bg-as/10 text-blt"
                             : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h"
                         }`}
                       >
                         {opt.label}
                       </button>
-                    );
-                  })}
-                </div>
-
-                {/* Continue button for multi-select */}
-                {questionIndex === 1 && (
-                  <button
-                    onClick={advanceQuestion}
-                    className={`mt-4 text-[13px] font-medium transition-colors ${
-                      apps.length > 0 ? "text-blt hover:text-as2" : "text-t4"
-                    }`}
-                  >
-                    {apps.length > 0 ? "Continue →" : "Skip →"}
-                  </button>
+                    ))}
+                  </div>
                 )}
               </div>
             ) : (

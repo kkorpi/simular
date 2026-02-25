@@ -37,12 +37,21 @@ export function FullWorkspaceView({
   onLoginSuccess,
   mode,
   service,
+  instruction,
+  teachTaskName,
+  onDoneTeach,
 }: {
   open: boolean;
   onClose: () => void;
   onLoginSuccess?: () => void;
   mode?: "default" | "login" | "teach";
   service?: string;
+  /** Persistent instruction from the agent, shown as a banner below the coaching bar */
+  instruction?: string;
+  /** Name of the task being taught — shown in the header bar */
+  teachTaskName?: string;
+  /** Called when user clicks "Done" in teach mode */
+  onDoneTeach?: () => void;
 }) {
   const [stepsVisible, setStepsVisible] = useState(true);
   const [loginSuccess, setLoginSuccess] = useState(false);
@@ -215,7 +224,7 @@ export function FullWorkspaceView({
               <>
                 Recording:{" "}
                 <strong className="font-semibold text-t1">
-                  Send an email in Gmail
+                  {teachTaskName ?? "Send an email in Gmail"}
                 </strong>
               </>
             ) : mode === "login" && loginSuccess ? (
@@ -339,10 +348,32 @@ export function FullWorkspaceView({
               Perform the task as you normally would. Each step will be recorded so Simular can repeat it later.
             </div>
           </div>
-          <div className="flex items-center gap-1.5 rounded-full bg-violet-500/15 px-2.5 py-1 text-[11px] font-medium text-violet-500">
-            <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse" />
-            Recording
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 rounded-full bg-violet-500/15 px-2.5 py-1 text-[11px] font-medium text-violet-500">
+              <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse-dot" style={{ "--pulse-glow": "rgba(139, 92, 246, 0.5)" } as React.CSSProperties} />
+              Recording
+            </div>
+            <button
+              onClick={() => onDoneTeach?.()}
+              className="rounded-md bg-violet-500 px-3 py-1 text-[11px] font-semibold text-white transition-all hover:bg-violet-600"
+            >
+              Done
+            </button>
           </div>
+        </div>
+      )}
+
+      {/* Agent instruction banner (persists during workspace handoff) */}
+      {instruction && (
+        <div className="flex shrink-0 items-center gap-3 border-b border-as/20 bg-as/[0.04] px-5 py-2.5">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-as/10">
+            <svg className="h-3.5 w-3.5 text-as" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+          </div>
+          <div className="flex-1 text-[12px] leading-[1.5] text-t2">{instruction}</div>
         </div>
       )}
 
@@ -458,7 +489,7 @@ export function FullWorkspaceView({
           ref={panelRef}
           onMouseDown={handleMouseDown}
           style={panelStyle()}
-          className={`absolute w-[300px] rounded-lg bg-bg2/90 backdrop-blur-md shadow-lg select-none ${
+          className={`absolute w-[300px] max-md:w-[240px] rounded-lg bg-bg2/90 backdrop-blur-md shadow-lg select-none ${
             dragging ? "cursor-grabbing" : "cursor-grab"
           } ${
             stepsVisible
@@ -492,7 +523,10 @@ export function FullWorkspaceView({
                   </svg>
                 ) : step.status === "active" ? (
                   <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
-                    <div className={`h-[7px] w-[7px] rounded-full animate-pulse-dot ${mode === "teach" ? "bg-violet-500 shadow-[0_0_6px_rgb(139,92,246)]" : "bg-g shadow-[0_0_6px_var(--gg)]"}`} />
+                    <div
+                      className={`h-[7px] w-[7px] rounded-full animate-pulse-dot ${mode === "teach" ? "bg-violet-500" : "bg-g"}`}
+                      style={mode === "teach" ? { "--pulse-glow": "rgba(139, 92, 246, 0.5)" } as React.CSSProperties : undefined}
+                    />
                   </div>
                 ) : (
                   <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
@@ -517,7 +551,7 @@ export function FullWorkspaceView({
       </div>
 
       {/* Footer */}
-      <div className="flex shrink-0 items-center gap-[18px] border-t border-b1 px-5 py-2.5">
+      <div className="flex shrink-0 items-center gap-[18px] border-t border-b1 px-5 py-2.5 max-md:flex-wrap max-md:gap-3">
         <div className="flex items-center gap-[5px] text-[11px] text-t3">
           <svg
             className="h-3 w-3 text-g"

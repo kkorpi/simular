@@ -35,7 +35,7 @@ export function RunningTaskDetail({
   const elapsedLabel = `${elapsedSeconds}s elapsed`;
 
   return (
-    <div className="mt-2 overflow-hidden rounded-lg border border-g/30 bg-bg3/50">
+    <div className="mt-2 overflow-hidden rounded-lg border border-g/30 bg-bgcard">
       {/* Subtask indicators */}
       <div className="flex flex-col gap-3.5 px-3.5 pt-3 pb-2">
         {subtasks.map((label, i) => (
