@@ -53,6 +53,8 @@ export default function Home() {
   const [linkedinConnected, setLinkedinConnected] = useState(false);
   const [workspaceConnecting, setWorkspaceConnecting] = useState(false);
   const [firstRunTask, setFirstRunTask] = useState<StarterTask | null>(null);
+  const [firstRunDone, setFirstRunDone] = useState(false);
+  const [firstRunRecurring, setFirstRunRecurring] = useState(false);
   const [demoPickerOpen, setDemoPickerOpen] = useState(false);
   const [teachPhase, setTeachPhase] = useState<TeachPhase>("idle");
   const [teachTaskName, setTeachTaskName] = useState("");
@@ -171,6 +173,8 @@ export default function Home() {
   // ── Main app handlers ──
   const handleStartTask = (task: StarterTask) => {
     setFirstRunTask(task);
+    setFirstRunDone(false);
+    setFirstRunRecurring(false);
     setWorkspaceConnecting(true);
     setActiveView("task-hover");
     setTimeout(() => setWorkspaceConnecting(false), 3000);
@@ -417,7 +421,10 @@ export default function Home() {
                   onCloseNewTask={() => setShowNewTaskCard(false)}
                   linkedinConnected={linkedinConnected}
                   firstRunTask={firstRunTask}
+                  onFirstRunDone={() => setFirstRunDone(true)}
                   onFirstRunComplete={() => setFirstRunTask(null)}
+                  onFirstRunMakeRecurring={() => { setFirstRunRecurring(true); }}
+                  onFirstRunRemoveRecurring={() => { setFirstRunRecurring(false); }}
                   teachPhase={teachPhase}
                   teachTaskName={teachTaskName}
                   onStartTeach={handleStartTeach}
@@ -434,6 +441,9 @@ export default function Home() {
                   onToggleCollapse={() => setPanelCollapsed((c) => !c)}
                   workspaceConnecting={workspaceConnecting}
                   firstRunTask={firstRunTask}
+                  firstRunDone={firstRunDone}
+                  firstRunRecurring={firstRunRecurring}
+                  onFirstRunRemoveRecurring={() => setFirstRunRecurring(false)}
                   teachPhase={teachPhase}
                   teachTaskName={teachTaskName}
                 />

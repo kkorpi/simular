@@ -3,9 +3,10 @@ export interface ScheduleBarProps {
   nextRun?: string;
   onEdit?: () => void;
   onTurnOff?: () => void;
+  onTurnOn?: () => void;
 }
 
-export function ScheduleBar({ schedule, onEdit, onTurnOff }: ScheduleBarProps) {
+export function ScheduleBar({ schedule, onEdit, onTurnOff, onTurnOn }: ScheduleBarProps) {
   return (
     <div className="flex items-center gap-2 border-t border-b1 px-3.5 py-2">
       <svg className="h-3 w-3 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -29,6 +30,14 @@ export function ScheduleBar({ schedule, onEdit, onTurnOff }: ScheduleBarProps) {
           className="text-[11px] font-medium text-t3 transition-all hover:text-t1"
         >
           Turn off
+        </button>
+      )}
+      {onTurnOn && (
+        <button
+          onClick={onTurnOn}
+          className="text-[11px] font-medium text-blt transition-all hover:underline"
+        >
+          Make recurring
         </button>
       )}
     </div>

@@ -9,7 +9,108 @@ import { BriefingDetail } from "./BriefingDetail";
 import { TaskDetail } from "./TaskDetail";
 import { ScheduleModal } from "./ScheduleModal";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { firstRunSequences } from "@/data/mockData";
 import type { ViewState, Task, StarterTask, TeachPhase } from "@/data/mockData";
+
+/** Build a Task object for the first-run task based on its current state */
+function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean): Task {
+  const seq = firstRunSequences[task.category] ?? firstRunSequences.research;
+
+  if (recurring) {
+    return {
+      id: "first-run-recurring",
+      name: task.title,
+      status: "recurring",
+      subtitle: "Runs automatically",
+      time: "",
+      detail: {
+        description: task.description,
+        schedule: "Every weekday at 8:00am",
+        nextRun: "Tomorrow 8:00am",
+        result: seq.resultSummary,
+      },
+    };
+  }
+
+  return {
+    id: "first-run",
+    name: task.title,
+    status: done ? "completed" : "running",
+    subtitle: done ? "Just finished" : "Running now",
+    time: "",
+    thumbEmoji: "🔍",
+    thumbStatus: "Working on task",
+    detail: {
+      description: task.description,
+      duration: done ? "Just now" : "Running",
+      steps: seq.steps.map((s, i) => ({
+        label: s.label,
+        done: done ? true : i < seq.steps.length - 1,
+      })),
+      ...(done ? { result: seq.resultSummary } : {}),
+    },
+  };
+}
+
+function FirstRunTaskList({
+  firstRunTask,
+  firstRunDone,
+  firstRunRecurring,
+  onSelectTask,
+}: {
+  firstRunTask: StarterTask;
+  firstRunDone: boolean;
+  firstRunRecurring: boolean;
+  onSelectTask: (task: Task) => void;
+}) {
+  const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring);
+  const completedTask: Task = {
+    id: "first-run-completed",
+    name: firstRunTask.title,
+    status: "completed",
+    subtitle: "Just now",
+    time: "",
+    detail: {
+      description: firstRunTask.description,
+      duration: "Just now",
+      result: (firstRunSequences[firstRunTask.category] ?? firstRunSequences.research).resultSummary,
+    },
+  };
+
+  // Still running
+  if (!firstRunDone) {
+    return (
+      <div className="px-2.5 pt-2.5 pb-2">
+        <TaskSection label="Active" count={1}>
+          <TaskItem task={task} onClick={() => onSelectTask(task)} />
+        </TaskSection>
+      </div>
+    );
+  }
+
+  // Done + recurring
+  if (firstRunRecurring) {
+    return (
+      <div className="px-2.5 pt-2.5 pb-2">
+        <TaskSection label="Recurring" count={1}>
+          <TaskItem task={task} onClick={() => onSelectTask(task)} />
+        </TaskSection>
+        <TaskSection label="Completed today" count={1} defaultOpen={false}>
+          <TaskItem task={completedTask} onClick={() => onSelectTask(completedTask)} />
+        </TaskSection>
+      </div>
+    );
+  }
+
+  // Done, not recurring
+  return (
+    <div className="px-2.5 pt-2.5 pb-2">
+      <TaskSection label="Completed today" count={1}>
+        <TaskItem task={completedTask} onClick={() => onSelectTask(completedTask)} />
+      </TaskSection>
+    </div>
+  );
+}
 
 export function RightPanel({
   view,
@@ -19,6 +120,9 @@ export function RightPanel({
   onToggleCollapse,
   workspaceConnecting = false,
   firstRunTask,
+  firstRunDone = false,
+  firstRunRecurring = false,
+  onFirstRunRemoveRecurring,
   teachPhase = "idle",
   teachTaskName,
 }: {
@@ -29,6 +133,9 @@ export function RightPanel({
   onToggleCollapse: () => void;
   workspaceConnecting?: boolean;
   firstRunTask?: StarterTask | null;
+  firstRunDone?: boolean;
+  firstRunRecurring?: boolean;
+  onFirstRunRemoveRecurring?: () => void;
   teachPhase?: TeachPhase;
   teachTaskName?: string;
 }) {
@@ -78,8 +185,8 @@ export function RightPanel({
       {/* Panel header: working status + close toggle */}
       <div className="flex shrink-0 items-center px-3 py-2.5">
         <div className="flex flex-1 items-center justify-center gap-2">
-          <div className="h-[7px] w-[7px] rounded-full bg-g shadow-[0_0_6px_var(--gg)] animate-pulse-dot" />
-          <span className="font-mono text-[11.5px] text-t3">{firstRunTask ? "Working on first task" : "Working \u00B7 3.2 hrs"}</span>
+          <div className={`h-[7px] w-[7px] rounded-full ${workspaceConnecting ? "bg-am animate-pulse" : `bg-g ${firstRunTask && !firstRunDone ? "shadow-[0_0_6px_var(--gg)] animate-pulse-dot" : ""}`}`} />
+          <span className="font-mono text-[11.5px] text-t3">{workspaceConnecting ? "Setting up workspace" : firstRunTask ? (firstRunDone ? "Idle" : "Working on first task") : "Working \u00B7 3.2 hrs"}</span>
         </div>
         <button
           onClick={onToggleCollapse}
@@ -146,7 +253,7 @@ export function RightPanel({
                 </svg>
               </div>
               <div className="flex flex-col items-center gap-1 text-center text-[11px] text-t4">
-                {firstRunTask ? (
+                {firstRunTask && !firstRunDone ? (
                   <>
                     <svg className="h-4 w-4 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
@@ -168,19 +275,12 @@ export function RightPanel({
       {/* Task list */}
       <div className="flex-1 overflow-y-auto">
         {firstRunTask ? (
-          <div className="px-2.5 pt-2.5 pb-2">
-            <TaskSection label="Active" count={1}>
-              <TaskItem
-                task={{
-                  id: "first-run",
-                  name: firstRunTask.title,
-                  status: "running",
-                  subtitle: "Running now",
-                  time: "",
-                }}
-              />
-            </TaskSection>
-          </div>
+          <FirstRunTaskList
+            firstRunTask={firstRunTask}
+            firstRunDone={firstRunDone}
+            firstRunRecurring={firstRunRecurring}
+            onSelectTask={handleSelectTask}
+          />
         ) : (
           <TasksTab onSelectTask={handleSelectTask} teachPhase={teachPhase} teachTaskName={teachTaskName} />
         )}
@@ -209,6 +309,14 @@ export function RightPanel({
               onEditSchedule={
                 selectedTask.status === "recurring"
                   ? () => setScheduleOpen(true)
+                  : undefined
+              }
+              onDisable={
+                selectedTask.status === "recurring" && selectedTask.id === "first-run-recurring"
+                  ? () => {
+                      onFirstRunRemoveRecurring?.();
+                      handleSelectTask(null);
+                    }
                   : undefined
               }
             />

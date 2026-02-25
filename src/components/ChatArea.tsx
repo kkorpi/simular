@@ -43,6 +43,79 @@ function UserMessage({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** First-run result: auto-makes the task recurring by default, shown via the card's schedule footer */
+function FirstRunResult({
+  seq,
+  taskTitle,
+  onOpenDetail,
+  onFirstRunMakeRecurring,
+  onFirstRunRemoveRecurring,
+  onOpenSchedule,
+}: {
+  seq: { resultTitle: string; resultSummary: string };
+  taskTitle: string;
+  onOpenDetail: () => void;
+  onFirstRunMakeRecurring?: () => void;
+  onFirstRunRemoveRecurring?: () => void;
+  onOpenSchedule?: (name: string, schedule?: string, nextRun?: string) => void;
+}) {
+  const [madeRecurring, setMadeRecurring] = useState(false);
+
+  // Auto-make recurring after the result card appears
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMadeRecurring(true);
+      onFirstRunMakeRecurring?.();
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <>
+      {/* Non-blocking divider */}
+      <div className="flex items-center gap-2 py-1">
+        <div className="h-px flex-1 bg-b1" />
+        <span className="text-[10px] text-t4">task complete</span>
+        <div className="h-px flex-1 bg-b1" />
+      </div>
+
+      <AgentMessage>
+        <div className="text-sm leading-[1.6] text-t2 mb-3">
+          All done. {seq.resultSummary}
+        </div>
+        <NewResultCard
+          icon={
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          }
+          title={seq.resultTitle}
+          body={{ type: "prose", text: seq.resultSummary }}
+          actions={[
+            { label: "View full results", style: "primary", onClick: onOpenDetail },
+            { label: "Open in workspace", style: "outline", onClick: () => {} },
+          ]}
+          accent="green"
+          schedule={madeRecurring ? {
+            schedule: "Set as recurring task",
+            onEdit: () => onOpenSchedule?.(taskTitle, "Every weekday at 8:00am", "Tomorrow 8:00am"),
+            onTurnOff: () => {
+              setMadeRecurring(false);
+              onFirstRunRemoveRecurring?.();
+            },
+          } : {
+            schedule: "Not recurring",
+            onTurnOn: () => {
+              setMadeRecurring(true);
+              onFirstRunMakeRecurring?.();
+            },
+          }}
+        />
+      </AgentMessage>
+    </>
+  );
+}
+
 export function ChatArea({
   view,
   onOpenDetail,
@@ -53,7 +126,10 @@ export function ChatArea({
   onCloseNewTask,
   linkedinConnected,
   firstRunTask,
+  onFirstRunDone,
   onFirstRunComplete,
+  onFirstRunMakeRecurring,
+  onFirstRunRemoveRecurring,
   teachPhase = "idle",
   teachTaskName = "",
   onStartTeach,
@@ -71,7 +147,10 @@ export function ChatArea({
   onCloseNewTask?: () => void;
   linkedinConnected?: boolean;
   firstRunTask?: StarterTask | null;
+  onFirstRunDone?: () => void;
   onFirstRunComplete?: () => void;
+  onFirstRunMakeRecurring?: () => void;
+  onFirstRunRemoveRecurring?: () => void;
   teachPhase?: TeachPhase;
   teachTaskName?: string;
   onStartTeach?: () => void;
@@ -120,6 +199,7 @@ export function ChatArea({
           if (firstRunTimerRef.current) clearInterval(firstRunTimerRef.current);
           setFirstRunStep(seq.steps.length);
           setFirstRunDone(true);
+          onFirstRunDone?.();
           // Show result after a brief pause
           setTimeout(() => setFirstRunShowResult(true), 800);
         } else {
@@ -263,54 +343,14 @@ export function ChatArea({
             </AgentMessage>
 
             {firstRunShowResult && (
-              <>
-                {/* Non-blocking divider */}
-                <div className="flex items-center gap-2 py-1">
-                  <div className="h-px flex-1 bg-b1" />
-                  <span className="text-[10px] text-t4">task complete</span>
-                  <div className="h-px flex-1 bg-b1" />
-                </div>
-
-                <AgentMessage>
-                  <div className="text-sm leading-[1.6] text-t2 mb-3">
-                    All done. {seq.resultSummary}
-                  </div>
-                  <NewResultCard
-                    icon={
-                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12" />
-                      </svg>
-                    }
-                    title={seq.resultTitle}
-                    body={{ type: "prose", text: seq.resultSummary }}
-                    actions={[
-                      { label: "View full results", style: "primary", onClick: onOpenDetail },
-                      { label: "Open in workspace", style: "outline", onClick: () => {} },
-                    ]}
-                    accent="green"
-                  />
-                </AgentMessage>
-
-                <AgentMessage>
-                  <div className="text-sm leading-[1.6] text-t2">
-                    Want me to set this up as a recurring task, or is there something else I can help with?
-                  </div>
-                  <div className="mt-2.5 flex gap-2">
-                    <button
-                      onClick={() => onFirstRunComplete?.()}
-                      className="flex items-center gap-1.5 rounded-md bg-ab px-3 py-1.5 text-[12.5px] font-medium text-abt transition-all hover:brightness-110"
-                    >
-                      Make it recurring
-                    </button>
-                    <button
-                      onClick={() => onFirstRunComplete?.()}
-                      className="flex items-center gap-1.5 rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12.5px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3h hover:text-t1"
-                    >
-                      Try something else
-                    </button>
-                  </div>
-                </AgentMessage>
-              </>
+              <FirstRunResult
+                seq={seq}
+                taskTitle={firstRunTask.title}
+                onOpenDetail={onOpenDetail}
+                onFirstRunMakeRecurring={onFirstRunMakeRecurring}
+                onFirstRunRemoveRecurring={onFirstRunRemoveRecurring}
+                onOpenSchedule={openSchedule}
+              />
             )}
           </>
         )}

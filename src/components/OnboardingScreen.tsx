@@ -8,9 +8,9 @@ import { SimularLogo } from "./SimularLogo";
  * Framed as a coworker getting set up. Never mention VMs or containers.
  */
 const setupSteps = [
-  { label: "Setting up your workspace", tip: "Your coworker gets their own private machine. A real computer in the cloud, just for you." },
-  { label: "Installing Chrome and apps", tip: "Simular uses the same apps you do. Real browser, real clicks, real work." },
-  { label: "Configuring a secure environment", tip: "Your credentials never leave your workspace. Everything is encrypted and isolated." },
+  { label: "Setting up your workspace" },
+  { label: "Installing Chrome and apps" },
+  { label: "Configuring a secure environment" },
   { label: "Preparing your coworker" },
 ];
 
@@ -184,7 +184,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
               7-day free trial started
             </span>
             <span className="text-[12px] text-blt/60">
-              · no credit card required
+              · cancel anytime
             </span>
           </div>
         </div>
@@ -370,25 +370,6 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                     ))}
                   </div>
                 )}
-              </div>
-            ) : setupSteps[currentStep]?.tip ? (
-              /* Educational tip when questions are done */
-              <div className="rounded-lg border border-b1 bg-bg2 px-5 py-4">
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-as/10">
-                    <svg className="h-3.5 w-3.5 text-blt" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="12" y1="16" x2="12" y2="12" />
-                      <line x1="12" y1="8" x2="12.01" y2="8" />
-                    </svg>
-                  </div>
-                  <p
-                    key={currentStep}
-                    className="text-[13px] leading-[1.7] text-t3 animate-fade-in"
-                  >
-                    {setupSteps[currentStep]?.tip}
-                  </p>
-                </div>
               </div>
             ) : null}
           </>

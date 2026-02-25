@@ -46,7 +46,7 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/65 backdrop-blur-[5px]" onClick={onClose}>
-      <div className="flex h-[560px] w-[720px] max-md:h-full max-md:w-full max-md:rounded-none overflow-hidden rounded-2xl border border-b1 max-md:border-0 bg-bg shadow-[var(--sc)] max-md:flex-col" onClick={(e) => e.stopPropagation()}>
+      <div className="flex h-[640px] w-[840px] max-md:h-full max-md:w-full max-md:rounded-none overflow-hidden rounded-2xl border border-b1 max-md:border-0 bg-bg shadow-[var(--sc)] max-md:flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Left nav (desktop) / Top nav (mobile) */}
         <div className="flex w-[200px] shrink-0 flex-col border-r border-b1 bg-bg2 py-4 max-md:w-full max-md:flex-row max-md:items-center max-md:border-r-0 max-md:border-b max-md:py-2 max-md:px-2 max-md:gap-0 max-md:overflow-x-auto">
           {sections.map((s) => (
@@ -611,35 +611,12 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
       {!trialCancelled && (
         <div>
           <div className="text-[14px] font-semibold text-t1">Payment method</div>
-          <div className="mt-3 flex items-center gap-3">
-            <div className="flex h-8 w-12 items-center justify-center rounded border border-b1 bg-bg3 text-[10px] font-bold text-t2">VISA</div>
-            <div className="flex-1">
-              <div className="text-[13px] text-t1">&bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242</div>
-              <div className="text-[11px] text-t3">Expires 12/28</div>
-            </div>
-            <button className="text-[12px] font-medium text-blt transition-all hover:underline">
-              Update
+          <div className="mt-3 rounded-lg border border-b1 bg-bg3/50 p-4">
+            <div className="text-[13px] text-t2">No payment method on file</div>
+            <div className="mt-1 text-[11px] text-t3">Add a card before your trial ends to keep access.</div>
+            <button className="mt-3 rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3 hover:text-t1">
+              Add payment method
             </button>
-          </div>
-        </div>
-      )}
-
-      {!trialCancelled && <div className="h-px bg-b1" />}
-
-      {/* Billing actions */}
-      {!trialCancelled && (
-        <div>
-          <div className="text-[14px] font-semibold text-t1">Billing</div>
-          <div className="mt-3 flex flex-col gap-2.5">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-[13px] text-t2">Next billing date</div>
-                <div className="text-[11px] text-t3">Mar 4, 2026 &middot; $20.00</div>
-              </div>
-              <button className="text-[12px] font-medium text-blt transition-all hover:underline">
-                View invoices
-              </button>
-            </div>
           </div>
         </div>
       )}

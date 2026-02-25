@@ -148,12 +148,14 @@ export function TaskDetail({
   onViewResult,
   onOpenWorkspace,
   onEditSchedule,
+  onDisable,
 }: {
   task: Task;
   onBack: () => void;
   onViewResult?: () => void;
   onOpenWorkspace?: () => void;
   onEditSchedule?: () => void;
+  onDisable?: () => void;
 }) {
   const d = task.detail;
   const [showAllRuns, setShowAllRuns] = useState(false);
@@ -461,7 +463,10 @@ export function TaskDetail({
             >
               Edit schedule
             </button>
-            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+            <button
+              onClick={onDisable}
+              className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+            >
               Disable
             </button>
           </>
