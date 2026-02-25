@@ -11,7 +11,7 @@ const setupSteps = [
   { label: "Setting up your workspace", tip: "Your coworker gets their own private machine. A real computer in the cloud, just for you." },
   { label: "Installing Chrome and apps", tip: "Simular uses the same apps you do. Real browser, real clicks, real work." },
   { label: "Configuring a secure environment", tip: "Your credentials never leave your workspace. Everything is encrypted and isolated." },
-  { label: "Preparing your coworker", tip: "Once set up, your coworker works around the clock, even while you sleep." },
+  { label: "Preparing your coworker" },
 ];
 
 /** Role options for dropdown */
@@ -100,7 +100,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
   // Show completion only when BOTH steps finished AND questions answered
   useEffect(() => {
     if (stepsFinished && allQuestionsAnswered && !done) {
-      const timer = setTimeout(() => setDone(true), 400);
+      const timer = setTimeout(() => setDone(true), 1200);
       return () => clearTimeout(timer);
     }
   }, [stepsFinished, allQuestionsAnswered, done]);
@@ -109,7 +109,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
   useEffect(() => {
     if (stepsFinished || currentStep >= setupSteps.length) return;
 
-    const durations = [3000, 2400, 3000, 2400];
+    const durations = [3000, 2400, 3000, 3500];
     const duration = durations[currentStep] || 2400;
 
     const startProgress = (currentStep / setupSteps.length) * 100;
@@ -259,7 +259,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                   showQuestion ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
                 }`}
               >
-                <p className="mb-4 text-[14px] font-medium text-t1">
+                <p className="mb-4 text-center text-[14px] font-medium text-t1">
                   {currentQ.question}
                 </p>
 
@@ -315,7 +315,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                     </div>
                     <button
                       onClick={advanceQuestion}
-                      className={`mt-4 text-[13px] font-medium transition-colors ${
+                      className={`mt-4 w-full text-center text-[13px] font-medium transition-colors ${
                         role ? "text-blt hover:text-as2" : "text-t4"
                       }`}
                     >
@@ -325,7 +325,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                 ) : currentQ.multi ? (
                   /* ── Multi-select pills (apps) ── */
                   <>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap justify-center gap-2">
                       {currentQ.options.map((opt) => {
                         const selected = apps.includes(opt.id);
                         return (
@@ -345,7 +345,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                     </div>
                     <button
                       onClick={advanceQuestion}
-                      className={`mt-4 text-[13px] font-medium transition-colors ${
+                      className={`mt-4 w-full text-center text-[13px] font-medium transition-colors ${
                         apps.length > 0 ? "text-blt hover:text-as2" : "text-t4"
                       }`}
                     >
@@ -354,7 +354,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                   </>
                 ) : (
                   /* ── Single-select pills (handoff) ── */
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap justify-center gap-2">
                     {currentQ.options.map((opt) => (
                       <button
                         key={opt.id}
@@ -371,7 +371,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                   </div>
                 )}
               </div>
-            ) : (
+            ) : setupSteps[currentStep]?.tip ? (
               /* Educational tip when questions are done */
               <div className="rounded-lg border border-b1 bg-bg2 px-5 py-4">
                 <div className="flex items-start gap-3">
@@ -390,9 +390,26 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                   </p>
                 </div>
               </div>
-            )}
+            ) : null}
           </>
         )}
+
+        {/* Trust signals */}
+        <div className="mt-8 flex items-center justify-center gap-4 text-[11px] text-t4">
+          <div className="flex items-center gap-1.5">
+            <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0110 0v4" />
+            </svg>
+            Private workspace
+          </div>
+          <div className="flex items-center gap-1.5">
+            <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            All activity logged
+          </div>
+        </div>
       </div>
     </div>
   );
