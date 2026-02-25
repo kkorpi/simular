@@ -39,19 +39,20 @@ export function SignupSSO({ onSignIn, onBack }: SignupSSOProps) {
         </p>
 
         {/* TOS checkbox */}
-        <label className="mt-8 flex cursor-pointer items-start gap-3">
-          <input
-            type="checkbox"
-            checked={agreed}
-            onChange={(e) => setAgreed(e.target.checked)}
-            className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer appearance-none rounded border border-b2 bg-bg3 transition-colors checked:border-ab checked:bg-ab"
-          />
+        <button type="button" onClick={() => setAgreed((a) => !a)} className="mt-8 flex cursor-pointer items-start gap-2.5 text-left">
+          {agreed ? (
+            <svg className="mt-0.5 h-3.5 w-3.5 shrink-0 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <div className="mt-0.5 h-3.5 w-3.5 shrink-0 rounded-[3px] border border-b2" />
+          )}
           <span className="text-[13px] leading-[1.6] text-t3">
             By checking this box, I agree to{" "}
-            <span className="font-medium text-t1">Terms of Services</span> and{" "}
-            <span className="font-medium text-t1">Privacy Policy</span>
+            <a href="https://simular.ai/terms" target="_blank" rel="noopener noreferrer" className="font-medium text-t1 underline decoration-b2 underline-offset-2 hover:decoration-t3">Terms of Service</a> and{" "}
+            <a href="https://simular.ai/privacy" target="_blank" rel="noopener noreferrer" className="font-medium text-t1 underline decoration-b2 underline-offset-2 hover:decoration-t3">Privacy Policy</a>
           </span>
-        </label>
+        </button>
 
         {/* Google sign-in button */}
         <button

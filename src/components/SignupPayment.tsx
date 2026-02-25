@@ -77,8 +77,8 @@ export function SignupPayment({ onSubmit, onBack }: SignupPaymentProps) {
         </div>
 
         {/* Trust framing */}
-        <p className="mt-8 text-center text-[13px] leading-[1.7] text-t2">
-          We ask for a card to keep out bots and ensure real people get these limited spots. You won&apos;t be charged for 7 days. Cancel anytime.
+        <p className="mt-8 text-center text-[15px] leading-[1.7] text-t3">
+          We ask for a card to keep out bots and ensure real people get these limited spots. You won&apos;t be charged for 7 days.<br />Cancel anytime.
         </p>
 
         {/* Mock card form */}

@@ -44,6 +44,8 @@ const onboardingQuestions = [
       { id: "slack", label: "Slack" },
       { id: "hubspot", label: "HubSpot" },
       { id: "notion", label: "Notion" },
+      { id: "sheets", label: "Google Sheets" },
+      { id: "jira", label: "Jira" },
     ],
   },
   {
@@ -54,6 +56,9 @@ const onboardingQuestions = [
       { id: "crm", label: "CRM updates" },
       { id: "meeting-prep", label: "Meeting prep" },
       { id: "monitoring", label: "Monitoring" },
+      { id: "scheduling", label: "Scheduling" },
+      { id: "data-entry", label: "Data entry" },
+      { id: "reporting", label: "Reporting" },
     ],
   },
 ];
