@@ -94,7 +94,7 @@ export function ErrorCard({
     <CardShell accent={errorType === "rate_limited" || errorType === "scope_too_large" ? "amber" : "default"}>
       {/* Header */}
       <div className="flex items-start gap-2.5 px-3.5 py-3">
-        <div className="mt-0.5 flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-r/10 text-r">
+        <div className="mt-0.5 flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-rd/10 text-rd">
           {errorIcons[errorType]}
         </div>
         <div className="min-w-0 flex-1">

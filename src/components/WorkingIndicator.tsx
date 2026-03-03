@@ -3,11 +3,14 @@
 export function WorkingIndicator({ label, done }: { label: string; done?: boolean }) {
   return (
     <div className="flex items-center">
-      <div className={`mr-2 h-[7px] w-[7px] shrink-0 rounded-full ${done ? "bg-g" : "bg-g animate-pulse-dot"}`} />
-      <span className={`text-[13px] font-medium ${done ? "text-t1" : "shimmer-text text-t3"}`}>
+      {done ? (
+        <div className="mr-2 h-[7px] w-[7px] shrink-0 rounded-full bg-t4" />
+      ) : (
+        <div className="mr-2 h-[14px] w-[14px] shrink-0 rounded-full border-2 border-g/30 border-t-g animate-spin" />
+      )}
+      <span className={`text-[13px] font-medium ${done ? "text-t2" : "text-t3 shimmer-text"}`}>
         {label}
       </span>
-      {!done && <span className="blink-cursor text-[13px] font-medium text-g ml-0.5">_</span>}
     </div>
   );
 }

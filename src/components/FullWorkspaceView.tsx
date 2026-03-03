@@ -6,13 +6,14 @@ import { workspaceSteps, loginSteps, loginSuccessSteps, teachSteps } from "@/dat
 type Corner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
 const PADDING = 16;
+const TOP_PADDING = 56; // Clear the floating controls pill
 
 function getCornerPosition(corner: Corner, container: DOMRect, panel: DOMRect) {
   switch (corner) {
     case "top-left":
       return { x: PADDING, y: PADDING };
     case "top-right":
-      return { x: container.width - panel.width - PADDING, y: PADDING };
+      return { x: container.width - panel.width - PADDING, y: TOP_PADDING };
     case "bottom-left":
       return { x: PADDING, y: container.height - panel.height - PADDING };
     case "bottom-right":
@@ -182,97 +183,6 @@ export function FullWorkspaceView({
           : "inset(0 0 100% 100% round 12px)",
       }}
     >
-      {/* Bar */}
-      <div className="flex shrink-0 items-center gap-3 border-b border-b1 px-5 py-2.5">
-        <button
-          onClick={onClose}
-          className="flex items-center justify-center rounded-md p-1 text-t3 transition-all hover:bg-bg3 hover:text-t1"
-          title="Close workspace"
-        >
-          <svg
-            className="h-5 w-5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="4 14 10 14 10 20" />
-            <polyline points="20 10 14 10 14 4" />
-            <line x1="14" y1="10" x2="21" y2="3" />
-            <line x1="3" y1="21" x2="10" y2="14" />
-          </svg>
-        </button>
-        <div className="flex items-center gap-1.5 text-xs font-medium text-t2">
-          {mode === "teach" ? (
-            <>
-              <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-running-glow" />
-              <span className="text-violet-500">Learning mode</span>
-            </>
-          ) : (
-            <>
-              <div className="h-1.5 w-1.5 rounded-full bg-g animate-running-glow" />
-              Workspace online
-            </>
-          )}
-        </div>
-
-        <div className="ml-auto flex items-center gap-3">
-          <div className="text-xs text-t3">
-            {mode === "teach" ? (
-              <>
-                Recording:{" "}
-                <strong className="font-semibold text-t1">
-                  {teachTaskName ?? "Send an email in Gmail"}
-                </strong>
-              </>
-            ) : mode === "login" && loginSuccess ? (
-              <>
-                <strong className="font-semibold text-g">
-                  {service} connected
-                </strong>
-                {" "}· resuming task
-              </>
-            ) : mode === "login" ? (
-              <>
-                Waiting for{" "}
-                <strong className="font-semibold text-t1">
-                  {service} sign in
-                </strong>
-              </>
-            ) : (
-              <>
-                Working on:{" "}
-                <strong className="font-semibold text-t1">
-                  Research inbound founder
-                </strong>{" "}
-                (2:18)
-              </>
-            )}
-          </div>
-          {/* Steps toggle */}
-          <button
-            onClick={() => setStepsVisible((v) => !v)}
-            className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-[11px] font-medium transition-colors ${
-              stepsVisible
-                ? "bg-bg3 text-t2"
-                : "text-t4 hover:bg-bg3 hover:text-t2"
-            }`}
-            title={stepsVisible ? "Hide steps" : "Show steps"}
-          >
-            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="8" y1="6" x2="21" y2="6" />
-              <line x1="8" y1="12" x2="21" y2="12" />
-              <line x1="8" y1="18" x2="21" y2="18" />
-              <line x1="3" y1="6" x2="3.01" y2="6" />
-              <line x1="3" y1="12" x2="3.01" y2="12" />
-              <line x1="3" y1="18" x2="3.01" y2="18" />
-            </svg>
-            Steps
-          </button>
-        </div>
-      </div>
 
       {/* Login coaching banner */}
       {mode === "login" && service && (
@@ -379,13 +289,52 @@ export function FullWorkspaceView({
 
       {/* Screen area */}
       <div ref={containerRef} className="relative flex flex-1 items-center justify-center overflow-hidden bg-bg3">
-        {/* LIVE badge (teach mode uses the coaching banner instead) */}
-        {mode !== "teach" && (
-          <div className="absolute top-3 right-3 flex items-center gap-1 rounded-full bg-bg2/90 px-2 py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
-            <div className="h-1 w-1 rounded-full bg-g" />
-            LIVE
-          </div>
-        )}
+        {/* Floating controls — top-right of screen area */}
+        <div className="absolute top-4 right-4 z-10 flex items-center divide-x divide-b1 rounded-xl bg-bg2/90 shadow-md backdrop-blur-sm">
+          {/* LIVE / REC indicator */}
+          {mode === "teach" ? (
+            <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-violet-500">
+              <div className="h-2 w-2 rounded-full bg-violet-500 animate-pulse-dot" style={{ "--pulse-glow": "rgba(139, 92, 246, 0.5)" } as React.CSSProperties} />
+              REC
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-g">
+              <div className="h-2 w-2 rounded-full bg-g animate-running-glow" />
+              LIVE
+            </div>
+          )}
+          {/* Steps toggle */}
+          <button
+            onClick={() => setStepsVisible((v) => !v)}
+            className={`px-2.5 py-2 transition-colors ${
+              stepsVisible ? "text-t2" : "text-t4 hover:text-t2"
+            }`}
+            title={stepsVisible ? "Hide steps" : "Show steps"}
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="8" y1="6" x2="21" y2="6" />
+              <line x1="8" y1="12" x2="21" y2="12" />
+              <line x1="8" y1="18" x2="21" y2="18" />
+              <line x1="3" y1="6" x2="3.01" y2="6" />
+              <line x1="3" y1="12" x2="3.01" y2="12" />
+              <line x1="3" y1="18" x2="3.01" y2="18" />
+            </svg>
+          </button>
+          {/* Close workspace */}
+          <button
+            onClick={onClose}
+            className="flex items-center gap-2 px-3 py-2 text-t2 transition-colors hover:text-t1"
+            title="Close workspace (Esc)"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="4 14 10 14 10 20" />
+              <polyline points="20 10 14 10 14 4" />
+              <line x1="14" y1="10" x2="21" y2="3" />
+              <line x1="3" y1="21" x2="10" y2="14" />
+            </svg>
+            <kbd className="rounded border border-b1 bg-bg3/80 px-1.5 py-0.5 text-[10px] font-medium text-t4">Esc</kbd>
+          </button>
+        </div>
 
         {/* Placeholder content */}
         {mode === "teach" ? (
@@ -508,6 +457,17 @@ export function FullWorkspaceView({
               <circle cx="9" cy="19" r="1.5" />
               <circle cx="15" cy="19" r="1.5" />
             </svg>
+            <span className="flex-1" />
+            <button
+              onClick={(e) => { e.stopPropagation(); setStepsVisible(false); }}
+              className="rounded p-0.5 text-t4 transition-colors hover:text-t2"
+              title="Hide steps"
+            >
+              <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
           </div>
           <div className="flex flex-col gap-0.5 px-3.5 pb-3">
             {activeSteps.map((step, i) => (

@@ -57,14 +57,14 @@ export interface ResultCardProps {
 const dotColors = {
   amber: "bg-am",
   green: "bg-g",
-  red: "bg-r",
+  red: "bg-rd",
   neutral: "bg-t4",
 } as const;
 
 const urgencyStyles = {
   info: { dot: "bg-as", text: "text-t3" },
   attention: { dot: "bg-am", text: "text-am" },
-  urgent: { dot: "bg-r animate-pulse", text: "text-r" },
+  urgent: { dot: "bg-rdanimate-pulse", text: "text-rd" },
 } as const;
 
 /* ── Component ── */

@@ -627,7 +627,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
       {!trialCancelled && (
         <div>
           {showCancelConfirm ? (
-            <div className="rounded-lg border border-r/30 bg-r/[0.04] p-4">
+            <div className="rounded-lg border border-rd/30 bg-rd/[0.04] p-4">
               <div className="text-[13px] font-medium text-t1">Are you sure you want to cancel?</div>
               <div className="mt-1 text-[12px] text-t3">
                 Your workspace stays active until your trial ends, then you&apos;ll lose access to all tasks, integrations, and recorded workflows.
@@ -641,7 +641,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
                 </button>
                 <button
                   onClick={() => { setShowCancelConfirm(false); onCancelTrial?.(); }}
-                  className="rounded-md bg-r px-3 py-1.5 text-[12px] font-medium text-white transition-all hover:brightness-110"
+                  className="rounded-md bg-rd px-3 py-1.5 text-[12px] font-medium text-white transition-all hover:brightness-110"
                 >
                   Cancel trial
                 </button>
@@ -650,7 +650,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
           ) : (
             <button
               onClick={() => setShowCancelConfirm(true)}
-              className="text-[12px] font-medium text-t3 transition-all hover:text-r"
+              className="text-[12px] font-medium text-t3 transition-all hover:text-rd"
             >
               Cancel trial
             </button>

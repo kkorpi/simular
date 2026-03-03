@@ -8,7 +8,6 @@ import {
   DraftCard,
   BatchReviewCard,
   FormCard,
-  ProgressCard,
   ErrorCard,
   type ResultBody,
   type ChoiceOption,
@@ -16,17 +15,19 @@ import {
   type BatchItem,
   type CardAccent,
   type FormField,
-  type ProgressStep,
-  type PromptSeverity,
   type ComparisonAttribute,
 } from "./cards";
 import { LoginRequestCard } from "./LoginRequestCard";
+import { RunningTaskDetail } from "./RunningTaskDetail";
+import type { RunningStep } from "@/data/mockData";
 
 /* ── Card type definitions ── */
 
 type CardType = "result" | "draft" | "choice" | "prompt" | "batch" | "form" | "progress" | "error" | "notification" | "destructive" | "comparison" | "login";
 
-const cardTypes: { id: CardType; label: string; description: string; scenario: string }[] = [
+type GalleryEntry = { id: CardType; label: string; description: string; scenario: string };
+
+const cardTypes: GalleryEntry[] = [
   { id: "result", label: "Result Card", description: "Agent delivers output", scenario: "Task completes and agent presents findings — research summaries, reports, compiled data. Supports prose, highlights, key-value, table, and section layouts." },
   { id: "notification", label: "Notification", description: "Async status update", scenario: "A recurring or background task fires while the user is away — price drops, overdue reminders, daily digests. Urgency levels drive visual weight." },
   { id: "draft", label: "Draft Card", description: "Review before sending", scenario: "Agent drafts something that needs human approval before sending — emails, social comments, bookings, calendar invites. User can edit inline." },
@@ -35,7 +36,7 @@ const cardTypes: { id: CardType; label: string; description: string; scenario: s
   { id: "prompt", label: "Prompt Card", description: "Agent suggests action", scenario: "Agent proactively offers to do something — pull a briefing, set up a recurring task, enable a feature. Standard and compact variants." },
   { id: "destructive", label: "Destructive", description: "Confirm risky action", scenario: "Agent needs explicit confirmation for an irreversible action — mass unsubscribe, bulk delete, account changes. Requires typing confirmation text." },
   { id: "form", label: "Form Card", description: "Structured input", scenario: "Agent needs structured parameters to proceed — flight search criteria, file renaming rules, monitoring thresholds. Validates before submission." },
-  { id: "progress", label: "Progress Card", description: "Multi-step status", scenario: "Agent is working through a multi-step task — email classification, lead list building, daily digest compilation. Shows live step-by-step progress." },
+  { id: "progress", label: "Task Progress", description: "Live step-by-step tracking", scenario: "Agent is working through a task — researching people, pulling data, checking records. Shows timestamped steps, subtask indicators, and expandable detail log." },
   { id: "error", label: "Error Card", description: "Failure + recovery", scenario: "Something went wrong and agent needs help — expired login, CAPTCHA block, scope too large. Always offers recovery actions, never a dead end." },
   { id: "login", label: "Login Request", description: "Branded sign-in", scenario: "Agent needs access to a third-party service — LinkedIn, Gmail, Salesforce. Shows branded service card with trust signals. User signs in via workspace." },
   { id: "batch", label: "Batch Review", description: "Review multiple items", scenario: "Agent has several items that each need a quick decision — email triage, pending approvals, task review queue. Expandable rows with per-item actions." },
@@ -50,7 +51,21 @@ const resultBodyPresets: { label: string; body: ResultBody }[] = [
       type: "prose",
       text: (
         <>
-          <strong className="font-semibold text-t1">Sequoia Scouts</strong> ($2.5B AUM). P1 LP since Fund II, last touchpoint 45 days ago. Key contact: Ravi Gupta, Managing Director.
+          I&apos;ve compiled a comprehensive summary with background, key data points, and relevant sources. You can review the full document or open it in your workspace.
+          {/* Artifact link */}
+          <button className="mt-3 flex w-full items-center gap-2.5 rounded-md border border-b1 bg-bg3h/50 px-3 py-2.5 text-left transition-all hover:bg-bg3h hover:border-b2">
+            <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-bg3h">
+              <svg className="h-4 w-4 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <span className="truncate text-[12.5px] font-medium text-t1">Founder Research — Daniel Park</span>
+                <span className="shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider bg-[rgba(59,130,246,0.15)] text-[#60a5fa]">DOC</span>
+              </div>
+              <div className="mt-0.5 text-[11px] text-t3">Google Docs · 6 sources</div>
+            </div>
+            <svg className="h-3.5 w-3.5 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>
+          </button>
         </>
       ),
     },
@@ -310,39 +325,42 @@ const formPresets: { label: string; fields: FormField[]; title: string; submitLa
   },
 ];
 
-const progressPresets: { label: string; steps: ProgressStep[]; title: string; subtitle?: string }[] = [
+const progressPresets: { label: string; steps: RunningStep[]; subtasks: string[]; done: boolean }[] = [
   {
     label: "In Progress",
-    title: "Classifying inbox emails",
-    subtitle: "50 emails across 4 folders",
+    subtasks: ["Researching Sequoia Scouts"],
+    done: false,
     steps: [
-      { label: "Scanning inbox for last 50 emails", status: "done" },
-      { label: "Analyzing email content and senders", status: "done" },
-      { label: "Sorting into categories (FYI, Scheduling, Requests, Newsletters)", status: "running", detail: "32 of 50 processed" },
-      { label: "Moving emails to folders", status: "pending" },
-      { label: "Generating summary report", status: "pending" },
+      { timestamp: "0:02", label: "Opened Chrome and navigated to LinkedIn", done: true },
+      { timestamp: "0:04", label: "Opened LinkedIn founder profile", done: true },
+      { timestamp: "0:10", label: "Pulled background, education, and work history", done: true },
+      { timestamp: "0:16", label: "Extracted mutual connections and endorsements", done: true },
+      { timestamp: "0:24", label: "Reviewed recent posts on X", done: true },
+      { timestamp: "0:30", label: "Pulling Crunchbase company profile...", done: false },
     ],
   },
   {
-    label: "With Error",
-    title: "Building lead list from LinkedIn",
-    subtitle: "Finding Simular employees",
+    label: "With User Action",
+    subtasks: ["Checking LinkedIn profile viewers"],
+    done: false,
     steps: [
-      { label: "Searching LinkedIn for Simular", status: "done" },
-      { label: "Extracting employee profiles", status: "done", detail: "Found 11 people" },
-      { label: "Collecting profile details", status: "error", detail: "Rate limited by LinkedIn after 6 profiles" },
-      { label: "Writing to Google Sheet", status: "pending" },
+      { timestamp: "0:01", label: "Opened Chrome", done: true },
+      { timestamp: "0:03", label: "Navigated to linkedin.com/login", done: true },
+      { timestamp: "0:05", label: "Detected login required — waiting for credentials", done: true },
+      { timestamp: "0:09", label: "Signed in to LinkedIn", done: true, userAction: true },
+      { timestamp: "0:11", label: "Navigated to profile viewers page", done: true },
+      { timestamp: "0:14", label: "Parsing viewer list and extracting profiles...", done: false },
     ],
   },
   {
     label: "Complete",
-    title: "Daily email digest",
-    subtitle: "Morning run at 7:04 AM",
+    subtasks: ["Compiling LP touchpoint report"],
+    done: true,
     steps: [
-      { label: "Fetching unread emails", status: "done", detail: "23 new emails" },
-      { label: "Categorizing by priority", status: "done" },
-      { label: "Generating digest summary", status: "done" },
-      { label: "Checking calendar for conflicts", status: "done" },
+      { timestamp: "0:02", label: "Opened Salesforce and queried LP records", done: true },
+      { timestamp: "0:08", label: "Filtered for P1 relationships with last touch > 30 days", done: true },
+      { timestamp: "0:14", label: "Cross-referenced calendar for upcoming meetings", done: true },
+      { timestamp: "0:20", label: "Compiled touchpoint summary with recommendations", done: true },
     ],
   },
 ];
@@ -378,8 +396,8 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
 
   // Result config
   const [resultBodyIndex, setResultBodyIndex] = useState(0);
-  const [resultAccent, setResultAccent] = useState<CardAccent>("default");
-  const [showSchedule, setShowSchedule] = useState(false);
+  const [resultAccent, setResultAccent] = useState<CardAccent>("green");
+  const [showSchedule, setShowSchedule] = useState(true);
   const [showNotification, setShowNotification] = useState(false);
 
   // Draft config
@@ -391,8 +409,7 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
   const [choiceKey, setChoiceKey] = useState(0);
 
   // Prompt config
-  const [promptVariant, setPromptVariant] = useState<"standard" | "compact">("standard");
-  const [promptSeverity, setPromptSeverity] = useState<PromptSeverity | "none">("none");
+  const [promptPresetIndex, setPromptPresetIndex] = useState(0);
   const [promptKey, setPromptKey] = useState(0);
 
   // Batch config
@@ -421,6 +438,7 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
 
   // Notification config
   const [notifUrgency, setNotifUrgency] = useState<"info" | "attention" | "urgent">("attention");
+
 
   if (!open) return null;
 
@@ -489,18 +507,17 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
               {activeCard === "result" && (
                 <ResultCard
                   icon={
-                    <svg className="h-3.5 w-3.5 text-t1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
-                      <polyline points="14 2 14 8 20 8" />
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
                     </svg>
                   }
-                  title="LP Meeting Prep - Sequoia Scouts"
-                  subtitle="5 sources - just now"
+                  title="Research Summary"
+                  subtitle="6 sources · just now"
                   body={resultBodyPresets[resultBodyIndex].body}
                   accent={resultAccent}
                   actions={[
                     { label: "View details", style: "primary", onClick: () => {} },
-                    { label: "Copy", style: "outline", onClick: () => {} },
+                    { label: "Open in Docs", style: "outline", icon: <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>, onClick: () => {} },
                   ]}
                   schedule={showSchedule ? { schedule: "Every morning at 7am", onEdit: () => {}, onTurnOff: () => {} } : undefined}
                   notification={showNotification ? { triggeredBy: "Daily LP digest", timestamp: "Today at 7:04 AM", urgency: "info" } : undefined}
@@ -512,7 +529,7 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
                 <ResultCard
                   key={`notif-${notifUrgency}`}
                   icon={
-                    <svg className="h-3.5 w-3.5 text-t1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
                       <path d="M13.73 21a2 2 0 01-3.46 0" />
                     </svg>
@@ -588,19 +605,51 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
               )}
 
               {/* Prompt */}
-              {activeCard === "prompt" && (
+              {activeCard === "prompt" && promptPresetIndex === 0 && (
                 <PromptCard
-                  key={`prompt-${promptKey}`}
-                  variant={promptVariant}
-                  severity={promptSeverity === "none" ? undefined : promptSeverity}
-                  message={
-                    <>
-                      You have an <strong className="font-semibold text-t1">LP meeting with Sequoia Scouts on Thursday</strong>. Want me to pull your prep briefing now?
-                    </>
-                  }
+                  key={`prompt-${promptKey}-0`}
+                  message={<>I can learn this by watching you do it once. I&apos;ll record each step so I can <strong className="font-semibold text-t1">repeat it autonomously</strong> next time.</>}
                   actions={[
-                    { label: "Pull briefing", style: "primary", onClick: () => {} },
-                    { label: "Skip", style: "outline", onClick: () => {} },
+                    { label: "Show me how", style: "primary", onClick: () => {} },
+                    { label: "Just describe it", style: "outline", onClick: () => {} },
+                  ]}
+                  resolvedMessage="Starting teach mode..."
+                />
+              )}
+              {activeCard === "prompt" && promptPresetIndex === 1 && (
+                <PromptCard
+                  key={`prompt-${promptKey}-1`}
+                  variant="compact"
+                  icon={
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="17 1 21 5 17 9" />
+                      <path d="M3 11V9a4 4 0 014-4h14" />
+                      <polyline points="7 23 3 19 7 15" />
+                      <path d="M21 13v2a4 4 0 01-4 4H3" />
+                    </svg>
+                  }
+                  message={<>Want me to do this <strong className="font-semibold text-t1">every Monday at 9am</strong>?</>}
+                  actions={[
+                    { label: "Yes, every Monday", style: "primary", onClick: () => {} },
+                    { label: "Save without schedule", style: "outline", onClick: () => {} },
+                  ]}
+                  resolvedMessage="Scheduled: Asana digest → every Monday 9am"
+                />
+              )}
+              {activeCard === "prompt" && promptPresetIndex === 2 && (
+                <PromptCard
+                  key={`prompt-${promptKey}-2`}
+                  variant="compact"
+                  icon={
+                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
+                      <line x1="12" y1="18" x2="12.01" y2="18" />
+                    </svg>
+                  }
+                  message={<><strong className="font-semibold text-t1">Get updates on mobile.</strong> I&apos;ll ping you when this task is done.</>}
+                  actions={[
+                    { label: "Send me the link", style: "primary", onClick: () => {} },
+                    { label: "Maybe later", style: "outline", onClick: () => {} },
                   ]}
                 />
               )}
@@ -640,18 +689,16 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
 
               {/* Progress */}
               {activeCard === "progress" && (
-                <ProgressCard
-                  title={progressPresets[progressPresetIndex].title}
-                  subtitle={progressPresets[progressPresetIndex].subtitle}
-                  steps={progressPresets[progressPresetIndex].steps}
-                  onCancel={progressPresets[progressPresetIndex].steps.some((s) => s.status === "running") ? () => {} : undefined}
-                  onRetry={progressPresets[progressPresetIndex].steps.some((s) => s.status === "error") ? () => {} : undefined}
-                  actions={
-                    progressPresets[progressPresetIndex].steps.every((s) => s.status === "done")
-                      ? [{ label: "View report", style: "primary", onClick: () => {} }]
-                      : undefined
-                  }
-                />
+                <div className="max-w-[620px]">
+                  <RunningTaskDetail
+                    key={progressPresetIndex}
+                    steps={progressPresets[progressPresetIndex].steps}
+                    subtasks={progressPresets[progressPresetIndex].subtasks}
+                    onViewActivityLog={() => {}}
+                    done={progressPresets[progressPresetIndex].done}
+                    initialExpanded
+                  />
+                </div>
               )}
 
               {/* Error */}
@@ -791,20 +838,11 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
 
               {activeCard === "prompt" && (
                 <div className="flex flex-col gap-4">
-                  <ControlRow label="Variant">
+                  <ControlRow label="Preset">
                     <div className="flex gap-1.5">
-                      {(["standard", "compact"] as const).map((v) => (
-                        <PillButton key={v} active={promptVariant === v} onClick={() => setPromptVariant(v)}>
-                          {v}
-                        </PillButton>
-                      ))}
-                    </div>
-                  </ControlRow>
-                  <ControlRow label="Severity">
-                    <div className="flex gap-1.5">
-                      {(["none", "info", "warning", "destructive"] as const).map((s) => (
-                        <PillButton key={s} active={promptSeverity === s} onClick={() => { setPromptSeverity(s); setPromptKey((k) => k + 1); }}>
-                          {s}
+                      {(["Teach Mode", "Schedule", "Mobile Update"] as const).map((label, i) => (
+                        <PillButton key={label} active={promptPresetIndex === i} onClick={() => { setPromptPresetIndex(i); setPromptKey((k) => k + 1); }}>
+                          {label}
                         </PillButton>
                       ))}
                     </div>

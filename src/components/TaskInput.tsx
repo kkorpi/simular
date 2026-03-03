@@ -80,7 +80,7 @@ const slashCommands: SlashCommand[] = [
   },
 ];
 
-export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: string) => void }) {
+export function TaskInput({ onSlashCommand, onSend, prefillText }: { onSlashCommand?: (command: string) => void; onSend?: (text: string) => void; prefillText?: string }) {
   const [value, setValue] = useState("");
   const [model, setModel] = useState("Claude 4.6 Opus");
   const [modelOpen, setModelOpen] = useState(false);
@@ -94,6 +94,11 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
   const actionsRef = useRef<HTMLButtonElement>(null);
 
   const showMenu = slashOpen || menuOpen;
+
+  // Auto-fill text from parent (e.g. autoplay prefill)
+  useEffect(() => {
+    if (prefillText !== undefined) setValue(prefillText);
+  }, [prefillText]);
 
   const models = ["Claude 4.6 Opus", "Claude 4.5 Sonnet", "GPT-4o", "Gemini 2.5 Pro"];
 
@@ -157,8 +162,9 @@ export function TaskInput({ onSlashCommand }: { onSlashCommand?: (command: strin
   };
 
   const handleSend = () => {
-    if (!value.trim() || showMenu) return;
-    // Prototype: just clear the input
+    if (showMenu) return;
+    if (!value.trim()) return;
+    onSend?.(value.trim());
     setValue("");
   };
 

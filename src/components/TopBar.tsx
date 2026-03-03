@@ -12,6 +12,7 @@ export function TopBar({
   onOpenCredits,
   onOpenPanel,
   trialDaysLeft = 6,
+  workspaceSetupLabel,
 }: {
   isZeroState?: boolean;
   onOpenSettings?: () => void;
@@ -20,6 +21,8 @@ export function TopBar({
   onOpenCredits?: () => void;
   onOpenPanel?: () => void;
   trialDaysLeft?: number;
+  /** Shown during onboarding while workspace is setting up */
+  workspaceSetupLabel?: string;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -34,28 +37,35 @@ export function TopBar({
         <span className="text-sm font-semibold text-t1 max-md:hidden">Simular</span>
       </button>
 
-      {/* Center: trial info (always visible, clickable → subscription settings) */}
+      {/* Center: workspace setup progress OR trial info */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <button
-          onClick={onOpenSubscription}
-          className={`pointer-events-auto flex items-center gap-1.5 rounded-full border px-3 py-1 transition-all ${
-            trialDaysLeft <= 1
-              ? "border-amber-500/40 bg-amber-500/10 hover:border-amber-500/60 hover:bg-amber-500/15"
-              : "border-b1 bg-bg2 hover:border-b2 hover:bg-bg3"
-          }`}
-        >
-          <div className={`h-1.5 w-1.5 rounded-full ${trialDaysLeft <= 1 ? "bg-am" : "bg-as"}`} />
-          <span className={`font-mono text-[11px] max-md:text-[10px] ${trialDaysLeft <= 1 ? "text-am" : "text-t3"}`}>
-            <span className="max-md:hidden">Free trial &ndash; {trialDaysLeft}d left</span>
-            <span className="hidden max-md:inline">{trialDaysLeft}d left</span>
-          </span>
-        </button>
+        {workspaceSetupLabel ? (
+          <div className="pointer-events-auto flex items-center gap-2 rounded-full border border-b1 bg-bg2 px-3 py-1">
+            <div className="h-1.5 w-1.5 rounded-full bg-g animate-pulse-dot" />
+            <span className="text-[11px] text-t3">{workspaceSetupLabel}</span>
+          </div>
+        ) : (
+          <button
+            onClick={onOpenSubscription}
+            className={`pointer-events-auto flex items-center gap-1.5 rounded-full border px-3 py-1 transition-all ${
+              trialDaysLeft <= 1
+                ? "border-amber-500/40 bg-amber-500/10 hover:border-amber-500/60 hover:bg-amber-500/15"
+                : "border-b1 bg-bg2 hover:border-b2 hover:bg-bg3"
+            }`}
+          >
+            <div className={`h-1.5 w-1.5 rounded-full ${trialDaysLeft <= 1 ? "bg-am" : "bg-as"}`} />
+            <span className={`font-mono text-[11px] max-md:text-[10px] ${trialDaysLeft <= 1 ? "text-am" : "text-t3"}`}>
+              <span className="max-md:hidden">Pro trial &ndash; {trialDaysLeft}d left</span>
+              <span className="hidden max-md:inline">{trialDaysLeft}d left</span>
+            </span>
+          </button>
+        )}
       </div>
 
       {/* Right: task toggle (mobile only) + avatar */}
       <div className="relative z-10 ml-auto flex items-center gap-2">
         {/* Mobile task panel toggle */}
-        {!isZeroState && onOpenPanel && (
+        {onOpenPanel && (
           <button
             onClick={onOpenPanel}
             className="hidden max-md:flex items-center justify-center rounded-md p-1.5 text-t3 transition-colors hover:bg-bg3 hover:text-t1"

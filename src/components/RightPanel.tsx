@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ResizeHandle } from "./ResizeHandle";
 import { TasksTab } from "./TasksTab";
 import { TaskSection } from "./TaskSection";
@@ -9,8 +9,26 @@ import { BriefingDetail } from "./BriefingDetail";
 import { TaskDetail } from "./TaskDetail";
 import { ScheduleModal } from "./ScheduleModal";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { firstRunSequences } from "@/data/mockData";
+import { firstRunSequences, activeTasks as defaultActiveTasks, recurringTasks as defaultRecurringTasks, completedTasks as defaultCompletedTasks } from "@/data/mockData";
 import type { ViewState, Task, StarterTask, TeachPhase } from "@/data/mockData";
+
+const SETUP_STEPS = [
+  "Setting up your workspace",
+  "Installing Chrome and apps",
+  "Configuring a secure environment",
+  "Preparing your coworker",
+];
+
+/** Map integration name → fake address bar URL */
+const INTEGRATION_URLS: Record<string, string> = {
+  LinkedIn: "linkedin.com/in/john-doe",
+  Crunchbase: "crunchbase.com/organization/acme",
+  Salesforce: "salesforce.com/lightning/opportunities",
+  Gmail: "mail.google.com/mail/inbox",
+  Calendar: "calendar.google.com",
+  Granola: "app.granola.so/notes",
+  X: "x.com/search",
+};
 
 /** Build a Task object for the first-run task based on its current state */
 function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean): Task {
@@ -33,6 +51,7 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean)
         lastRun: "Just now",
         nextRun: "Tomorrow 8:00am",
         result: seq.resultSummary,
+        artifact: seq.artifact,
         runHistory: [
           { date: "Just now", duration: "28s", summary: seq.resultSummary },
         ],
@@ -56,7 +75,7 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean)
         label: s.label,
         done: done ? true : i < seq.steps.length - 1,
       })),
-      ...(done ? { result: seq.resultSummary } : {}),
+      ...(done ? { result: seq.resultSummary, artifact: seq.artifact } : {}),
     },
   };
 }
@@ -84,7 +103,9 @@ function FirstRunTaskList({
     detail: {
       description: firstRunTask.description,
       duration: "28s",
+      steps: seq.steps.map((s) => ({ label: s.label, done: true })),
       result: seq.resultSummary,
+      artifact: seq.artifact,
     },
   };
 
@@ -134,8 +155,15 @@ export function RightPanel({
   firstRunDone = false,
   firstRunRecurring = false,
   onFirstRunRemoveRecurring,
+  openFirstRunDetail = false,
+  onCloseFirstRunDetail,
   teachPhase = "idle",
   teachTaskName,
+  isOnboarding = false,
+  workspaceSetupStep = 0,
+  workspaceSetupDone = false,
+  isAutoPlay = false,
+  autoStep = -1,
 }: {
   view: ViewState;
   onViewChange: (v: ViewState) => void;
@@ -147,14 +175,35 @@ export function RightPanel({
   firstRunDone?: boolean;
   firstRunRecurring?: boolean;
   onFirstRunRemoveRecurring?: () => void;
+  /** When true, auto-select the first-run task in the TaskDetail slide-over */
+  openFirstRunDetail?: boolean;
+  onCloseFirstRunDetail?: () => void;
   teachPhase?: TeachPhase;
   teachTaskName?: string;
+  /** True during onboarding — show workspace setup progress */
+  isOnboarding?: boolean;
+  /** Current setup step index (0–3) */
+  workspaceSetupStep?: number;
+  /** True when all setup steps are complete */
+  workspaceSetupDone?: boolean;
+  /** Auto-play demo mode — show working state like a first-run task */
+  isAutoPlay?: boolean;
+  /** Current auto-play step — used to derive dynamic task list */
+  autoStep?: number;
 }) {
   const isMobile = useIsMobile();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [panelWidth, setPanelWidth] = useState(470);
   const [isDragging, setIsDragging] = useState(false);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+
+  // Auto-select first-run task when "View details" clicked in chat
+  useEffect(() => {
+    if (openFirstRunDetail && firstRunTask) {
+      const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring);
+      setSelectedTask(task);
+    }
+  }, [openFirstRunDetail, firstRunTask, firstRunDone, firstRunRecurring]);
 
   const minWidth = view === "result-detail" ? 440 : 280;
   const maxWidth = 720;
@@ -190,14 +239,130 @@ export function RightPanel({
     );
   }
 
+  // Fresh state: zero-state with no task running and not onboarding (e.g. demo selector → fresh)
+  const isFreshState = view === "zero-state" && !isOnboarding && !firstRunTask && !isAutoPlay;
+
+  // ── Derive task lists for auto-play based on chat progress ──
+  // Steps: 0-2 SAI greeting, 3 user pulls briefing, 4 running briefing task,
+  //   5 user asks LP touchpoint, 6 running LP task, 7 briefing result, 8 LP result,
+  //   9 LinkedIn flow
+  const autoPlayTasks = (() => {
+    if (!isAutoPlay) return null;
+    const active: Task[] = [];
+    const recurring = [...defaultRecurringTasks];
+    const completed = [...defaultCompletedTasks];
+    const demoDone = autoStep >= 10; // All tasks resolved
+
+    // "Research inbound founder" — running until demo done
+    if (!demoDone) {
+      active.push(defaultActiveTasks[0]);
+    } else {
+      completed.unshift({
+        ...defaultActiveTasks[0],
+        status: "completed",
+        subtitle: "Completed",
+        time: "just now",
+      });
+    }
+
+    // Steps 4-6: LP meeting prep briefing is running
+    if (autoStep >= 4 && autoStep < 7) {
+      active.push({
+        id: "auto-briefing",
+        name: "Sequoia Scouts LP meeting prep",
+        status: "running",
+        subtitle: "Running now",
+        time: "now",
+      });
+    }
+
+    // Step 7+: LP meeting prep done → move to completed
+    if (autoStep >= 7) {
+      completed.unshift({
+        id: "auto-briefing-done",
+        name: "Sequoia Scouts LP meeting prep",
+        status: "completed",
+        subtitle: "Completed",
+        time: "just now",
+      });
+    }
+
+    // Steps 6-7: LP touchpoint tracker is running
+    if (autoStep >= 6 && autoStep < 8) {
+      active.push({
+        id: "auto-touchpoint",
+        name: "LP touchpoint tracker",
+        status: "running",
+        subtitle: "Running now",
+        time: "now",
+      });
+    }
+
+    // Step 8+: LP touchpoint done → move to completed
+    if (autoStep >= 8) {
+      completed.unshift({
+        id: "auto-touchpoint-done",
+        name: "LP touchpoint report",
+        status: "completed",
+        subtitle: "Completed",
+        time: "just now",
+      });
+    }
+
+    // Step 9 only: LinkedIn profile viewers running
+    if (autoStep >= 9 && !demoDone) {
+      active.push({
+        id: "auto-linkedin",
+        name: "Check LinkedIn profile viewers",
+        status: "running",
+        subtitle: "Running now",
+        time: "now",
+      });
+    }
+
+    // Step 10+: LinkedIn done → move to completed
+    if (demoDone) {
+      completed.unshift({
+        id: "auto-linkedin-done",
+        name: "Check LinkedIn profile viewers",
+        status: "completed",
+        subtitle: "Completed",
+        time: "just now",
+      });
+    }
+
+    // "Compile meeting debrief" stays queued unless demo done
+    if (!demoDone) {
+      active.push(defaultActiveTasks[1]);
+    } else {
+      active.push({
+        ...defaultActiveTasks[1],
+        status: "running",
+        subtitle: "Running now",
+        time: "now",
+      });
+    }
+
+    return { active, recurring, completed };
+  })();
+
+  // Whether any task is actively running (for the spinner)
+  const hasActiveTask = isAutoPlay
+    ? autoStep >= 4 && autoStep < 10 // Tasks run from step 4, stop at demo completion
+    : !isOnboarding && !workspaceConnecting && (firstRunTask != null && !firstRunDone);
+
   // ── Panel content (shared between desktop inline and mobile drawer) ──
   const panelContent = (
     <>
       {/* Panel header: working status + close toggle */}
       <div className="flex shrink-0 items-center px-3 py-2.5">
         <div className="flex flex-1 items-center justify-center gap-2">
-          <div className={`h-[7px] w-[7px] rounded-full ${workspaceConnecting ? "bg-am animate-pulse" : `bg-g ${firstRunTask && !firstRunDone ? "shadow-[0_0_6px_var(--gg)] animate-pulse-dot" : ""}`}`} />
-          <span className="font-mono text-[11.5px] text-t3">{workspaceConnecting ? "Setting up workspace" : firstRunTask ? (firstRunDone ? "Idle" : "Working on first task") : "Working \u00B7 3.2 hrs"}</span>
+          {hasActiveTask ? (
+            <div className="h-[14px] w-[14px] shrink-0 rounded-full border-2 border-g/30 border-t-g animate-spin" />
+          ) : (
+            <div className={`h-[7px] w-[7px] rounded-full ${isOnboarding && !workspaceSetupDone ? "bg-am animate-pulse" : workspaceConnecting ? "bg-am animate-pulse" : "bg-g"}`} />
+          )}
+          <span className="font-mono text-[11.5px] text-t3">{isFreshState ? "Ready" : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace") : workspaceConnecting ? "Setting up workspace" : hasActiveTask ? "Working" : (isAutoPlay && autoStep >= 10) ? "Ready" : (firstRunTask && firstRunDone) ? "Ready" : "Working \u00B7 3.2 hrs"}</span>
         </div>
         <button
           onClick={onToggleCollapse}
@@ -222,70 +387,182 @@ export function RightPanel({
       {/* Live workspace preview */}
       <div className="shrink-0 p-3">
         <div
-          onClick={() => !workspaceConnecting && onOpenWorkspace()}
-          className={`relative flex aspect-video items-center justify-center overflow-hidden rounded-lg border border-b1 bg-bg3 transition-all ${
-            workspaceConnecting ? "" : "cursor-pointer hover:border-b2"
+          onClick={() => !workspaceConnecting && !isOnboarding && onOpenWorkspace()}
+          className={`relative flex aspect-[16/11] flex-col overflow-hidden rounded-lg border border-b1 bg-bg3 transition-all ${
+            workspaceConnecting || isOnboarding ? "" : "cursor-pointer hover:border-b2"
           }`}
         >
-          {workspaceConnecting ? (
-            <div className="flex flex-col items-center gap-3 text-center">
-              <div className="flex gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-am animate-bounce [animation-delay:0ms]" />
-                <div className="h-2 w-2 rounded-full bg-am animate-bounce [animation-delay:150ms]" />
-                <div className="h-2 w-2 rounded-full bg-am animate-bounce [animation-delay:300ms]" />
-              </div>
-              <div className="flex flex-col items-center gap-0.5">
-                <span className="text-[12px] font-medium text-t2">Connecting to workspace</span>
-                <span className="text-[10px] text-t4">Setting up your private environment</span>
-              </div>
-              <div className="flex items-center gap-3 mt-1">
-                <div className="flex items-center gap-1 text-[9px] text-t4">
-                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0110 0v4" /></svg>
-                  Private
-                </div>
-                <div className="flex items-center gap-1 text-[9px] text-t4">
-                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg>
-                  Encrypted
-                </div>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-full bg-bg2/90 px-[7px] py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
-                <div className="h-1 w-1 rounded-full bg-g" />
-                LIVE
-              </div>
-              <div className="absolute bottom-1.5 right-1.5 flex items-center justify-center rounded-md bg-bg2/80 p-0.5 backdrop-blur-sm">
-                <svg className="h-4 w-4 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="15 3 21 3 21 9" />
-                  <polyline points="9 21 3 21 3 15" />
-                  <line x1="21" y1="3" x2="14" y2="10" />
-                  <line x1="3" y1="21" x2="10" y2="14" />
-                </svg>
-              </div>
-              <div className="flex flex-col items-center gap-1 text-center text-[11px] text-t4">
-                {firstRunTask && !firstRunDone ? (
-                  <>
-                    <svg className="h-4 w-4 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
-                    <span className="max-w-[140px] leading-tight">Working on task</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="h-4 w-4 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
-                    <span>LinkedIn{"\n"}Founder profile</span>
-                  </>
+          {(() => {
+            // Determine address bar URL based on state
+            const taskIsRunning = !isFreshState && !isOnboarding && !workspaceConnecting && ((isAutoPlay && autoStep < 10) || (firstRunTask && !firstRunDone));
+            const seq = firstRunTask ? (firstRunSequences[firstRunTask.category] ?? firstRunSequences.research) : null;
+            const currentIntegration = seq?.integrations?.[0] || "";
+            const addressUrl = taskIsRunning
+              ? (isAutoPlay ? "linkedin.com/in/john-doe" : (INTEGRATION_URLS[currentIntegration] || "app.simular.ai"))
+              : isOnboarding || workspaceConnecting
+                ? "workspace.simular.ai"
+                : "linkedin.com/in/john-doe";
+
+            return (
+              <>
+                {/* Browser chrome header — only when workspace is active (not during setup/connecting/fresh) */}
+                {!isFreshState && !workspaceConnecting && !(isOnboarding && !workspaceSetupDone) && (
+                  <div className="flex items-center gap-1.5 bg-bg2 px-2.5 py-1.5 border-b border-b1">
+                    <div className="flex gap-1">
+                      <div className="h-[6px] w-[6px] rounded-full bg-t4/30" />
+                      <div className="h-[6px] w-[6px] rounded-full bg-t4/30" />
+                      <div className="h-[6px] w-[6px] rounded-full bg-t4/30" />
+                    </div>
+                    <div className="flex-1 mx-2 h-[14px] rounded-sm bg-bg3 flex items-center px-2">
+                      <span className="text-[8px] text-t4 truncate">{addressUrl}</span>
+                    </div>
+                    <div className="flex items-center gap-1 rounded-full bg-g/10 px-1.5 py-px text-[7px] font-semibold text-g">
+                      <div className="h-1 w-1 rounded-full bg-g" />
+                      LIVE
+                    </div>
+                  </div>
                 )}
-              </div>
-            </>
-          )}
+
+                {/* Workspace content area — fills remaining space */}
+                <div className="relative flex-1 bg-bg3/50 overflow-hidden">
+                  {isOnboarding ? (
+                    workspaceSetupDone ? (
+                      <div className="flex h-full flex-col items-center justify-center gap-2 animate-fade-in">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-g/15">
+                          <svg className="h-4 w-4 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </div>
+                        <span className="text-[11px] font-medium text-g">Ready</span>
+                      </div>
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <svg width="36" height="36" viewBox="0 0 90 90" fill="none">
+                          {/* S outline — always visible */}
+                          <path d="M46.8811 39.9023C52.0446 39.9111 55.9579 41.1993 59.6867 44.835C65.8177 50.813 65.7738 61.0332 59.758 67.0771C54.952 71.9053 50.502 71.958 44.1174 71.9531L35.8488 71.9512C34.1834 71.9612 32.5511 71.9811 30.8898 71.8486C29.0445 69.7504 27.3865 64.4789 25.8479 62.0576L41.6047 62.0664C43.9119 62.068 46.2222 62.079 48.5275 62.0342C51.3212 62.0388 54.468 59.0716 54.384 56.2031C54.244 51.4282 51.0181 50.0477 46.8723 50.0059L46.8811 39.9023ZM42.3781 18.0117C44.824 17.897 48.1085 17.9839 50.6154 17.9863L64.1867 18.0098C63.2843 20.06 62.3385 22.0911 61.3508 24.1016C60.8509 25.1418 59.995 26.8015 59.6379 27.8437C55.5791 27.9546 51.5154 27.8219 47.4572 27.8779C44.9163 28.0486 40.7938 27.3678 38.6066 28.8779C33.7709 32.217 35.164 38.7457 40.9455 39.9023C41.7567 39.9445 42.279 39.9446 43.09 39.9023L43.0773 50.0371C38.152 50.1004 34.9951 49.0198 31.1398 45.8584C24.6286 40.5187 23.9569 30.0406 29.4738 23.748C33.1794 19.5214 36.8061 18.294 42.3781 18.0117Z" fill="none" stroke="var(--t4)" strokeWidth="1.5" className="opacity-30" />
+                          {/* S filled — clips from bottom to top */}
+                          <path d="M46.8811 39.9023C52.0446 39.9111 55.9579 41.1993 59.6867 44.835C65.8177 50.813 65.7738 61.0332 59.758 67.0771C54.952 71.9053 50.502 71.958 44.1174 71.9531L35.8488 71.9512C34.1834 71.9612 32.5511 71.9811 30.8898 71.8486C29.0445 69.7504 27.3865 64.4789 25.8479 62.0576L41.6047 62.0664C43.9119 62.068 46.2222 62.079 48.5275 62.0342C51.3212 62.0388 54.468 59.0716 54.384 56.2031C54.244 51.4282 51.0181 50.0477 46.8723 50.0059L46.8811 39.9023ZM42.3781 18.0117C44.824 17.897 48.1085 17.9839 50.6154 17.9863L64.1867 18.0098C63.2843 20.06 62.3385 22.0911 61.3508 24.1016C60.8509 25.1418 59.995 26.8015 59.6379 27.8437C55.5791 27.9546 51.5154 27.8219 47.4572 27.8779C44.9163 28.0486 40.7938 27.3678 38.6066 28.8779C33.7709 32.217 35.164 38.7457 40.9455 39.9023C41.7567 39.9445 42.279 39.9446 43.09 39.9023L43.0773 50.0371C38.152 50.1004 34.9951 49.0198 31.1398 45.8584C24.6286 40.5187 23.9569 30.0406 29.4738 23.748C33.1794 19.5214 36.8061 18.294 42.3781 18.0117Z" fill="var(--t3)" className="animate-logo-fill" />
+                        </svg>
+                      </div>
+                    )
+                  ) : workspaceConnecting ? (
+                    <div className="flex h-full items-center justify-center">
+                      <svg width="36" height="36" viewBox="0 0 90 90" fill="none">
+                        <path d="M46.8811 39.9023C52.0446 39.9111 55.9579 41.1993 59.6867 44.835C65.8177 50.813 65.7738 61.0332 59.758 67.0771C54.952 71.9053 50.502 71.958 44.1174 71.9531L35.8488 71.9512C34.1834 71.9612 32.5511 71.9811 30.8898 71.8486C29.0445 69.7504 27.3865 64.4789 25.8479 62.0576L41.6047 62.0664C43.9119 62.068 46.2222 62.079 48.5275 62.0342C51.3212 62.0388 54.468 59.0716 54.384 56.2031C54.244 51.4282 51.0181 50.0477 46.8723 50.0059L46.8811 39.9023ZM42.3781 18.0117C44.824 17.897 48.1085 17.9839 50.6154 17.9863L64.1867 18.0098C63.2843 20.06 62.3385 22.0911 61.3508 24.1016C60.8509 25.1418 59.995 26.8015 59.6379 27.8437C55.5791 27.9546 51.5154 27.8219 47.4572 27.8779C44.9163 28.0486 40.7938 27.3678 38.6066 28.8779C33.7709 32.217 35.164 38.7457 40.9455 39.9023C41.7567 39.9445 42.279 39.9446 43.09 39.9023L43.0773 50.0371C38.152 50.1004 34.9951 49.0198 31.1398 45.8584C24.6286 40.5187 23.9569 30.0406 29.4738 23.748C33.1794 19.5214 36.8061 18.294 42.3781 18.0117Z" fill="none" stroke="var(--t4)" strokeWidth="1.5" className="opacity-30" />
+                        <path d="M46.8811 39.9023C52.0446 39.9111 55.9579 41.1993 59.6867 44.835C65.8177 50.813 65.7738 61.0332 59.758 67.0771C54.952 71.9053 50.502 71.958 44.1174 71.9531L35.8488 71.9512C34.1834 71.9612 32.5511 71.9811 30.8898 71.8486C29.0445 69.7504 27.3865 64.4789 25.8479 62.0576L41.6047 62.0664C43.9119 62.068 46.2222 62.079 48.5275 62.0342C51.3212 62.0388 54.468 59.0716 54.384 56.2031C54.244 51.4282 51.0181 50.0477 46.8723 50.0059L46.8811 39.9023ZM42.3781 18.0117C44.824 17.897 48.1085 17.9839 50.6154 17.9863L64.1867 18.0098C63.2843 20.06 62.3385 22.0911 61.3508 24.1016C60.8509 25.1418 59.995 26.8015 59.6379 27.8437C55.5791 27.9546 51.5154 27.8219 47.4572 27.8779C44.9163 28.0486 40.7938 27.3678 38.6066 28.8779C33.7709 32.217 35.164 38.7457 40.9455 39.9023C41.7567 39.9445 42.279 39.9446 43.09 39.9023L43.0773 50.0371C38.152 50.1004 34.9951 49.0198 31.1398 45.8584C24.6286 40.5187 23.9569 30.0406 29.4738 23.748C33.1794 19.5214 36.8061 18.294 42.3781 18.0117Z" fill="var(--t3)" className="animate-logo-fill" />
+                      </svg>
+                    </div>
+                  ) : taskIsRunning ? (
+                    /* ── Fake browser page while task is running ── */
+                    <div className="flex w-full h-full animate-fade-in">
+                      {/* Mini sidebar */}
+                      <div className="w-[28px] shrink-0 border-r border-b1/40 bg-bg2/40 flex flex-col items-center pt-2 gap-2.5">
+                        <div className="h-[6px] w-[6px] rounded-[2px] bg-t4/25" />
+                        <div className="h-[6px] w-[6px] rounded-[2px] bg-blt/30" />
+                        <div className="h-[6px] w-[6px] rounded-[2px] bg-t4/15" />
+                        <div className="h-[6px] w-[6px] rounded-[2px] bg-t4/15" />
+                      </div>
+                      {/* Main content */}
+                      <div className="flex-1 flex flex-col p-2.5 gap-1.5 relative">
+                        {/* Page header */}
+                        <div className="flex items-center gap-2 pb-1.5 mb-1 border-b border-b1/30">
+                          <div className="h-[5px] w-[35%] rounded-full bg-t4/25" />
+                          <div className="flex-1" />
+                          <div className="h-[10px] w-[28px] rounded-[3px] bg-blt/20" />
+                        </div>
+                        {/* Data rows */}
+                        {[
+                          { w1: 65, w2: 18, highlight: false },
+                          { w1: 50, w2: 22, highlight: true },
+                          { w1: 72, w2: 15, highlight: false },
+                          { w1: 40, w2: 20, highlight: false },
+                          { w1: 58, w2: 17, highlight: false },
+                        ].map((row, i) => (
+                          <div key={i} className={`flex items-center gap-2 rounded-[3px] px-1 py-[3px] ${row.highlight ? "bg-blt/5 ring-1 ring-blt/15" : ""}`}>
+                            <div className="h-[4px] rounded-full bg-t4/15" style={{ width: `${row.w1}%` }} />
+                            <div className="flex-1" />
+                            <div className="h-[4px] rounded-full bg-t4/10" style={{ width: `${row.w2}%` }} />
+                          </div>
+                        ))}
+                        {/* Animated cursor */}
+                        <div className="absolute bottom-2 right-3">
+                          <svg className="h-3 w-3 text-g/70 animate-pulse" viewBox="0 0 24 24" fill="currentColor"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86h8.08c.45 0 .67-.54.35-.85L5.85 2.85a.5.5 0 00-.35.36z" /></svg>
+                        </div>
+                      </div>
+                    </div>
+                  ) : isFreshState ? (
+                    /* ── Fresh state — workspace ready ── */
+                    <div className="flex h-full flex-col items-center justify-center gap-2 animate-fade-in">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-g/15">
+                        <svg className="h-4 w-4 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </div>
+                      <span className="text-[11px] font-medium text-g">Ready</span>
+                    </div>
+                  ) : (
+                    /* ── Idle state ── */
+                    <>
+                      <div className="flex h-full flex-col items-center justify-center gap-1 text-center text-[11px] text-t4">
+                        <svg className="h-4 w-4 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
+                        <span>LinkedIn{"\n"}Founder profile</span>
+                      </div>
+                      <div className="absolute bottom-1.5 right-1.5 flex items-center justify-center rounded-md bg-bg2/80 p-0.5 backdrop-blur-sm">
+                        <svg className="h-4 w-4 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="15 3 21 3 21 9" />
+                          <polyline points="9 21 3 21 3 15" />
+                          <line x1="21" y1="3" x2="14" y2="10" />
+                          <line x1="3" y1="21" x2="10" y2="14" />
+                        </svg>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </>
+            );
+          })()}
         </div>
       </div>
 
       {/* Task list */}
       <div className="flex-1 overflow-y-auto">
-        {firstRunTask ? (
+        {isFreshState ? (
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 px-4 py-8 text-center">
+            <div className="text-[11px] text-t4">Pick a task to get started</div>
+          </div>
+        ) : isOnboarding ? (
+          <div className="px-4 py-4">
+            <div className="mb-2.5 text-[10px] font-semibold uppercase tracking-wide text-t4">Setup progress</div>
+            <div className="flex flex-col gap-0">
+              {SETUP_STEPS.map((step, i) => {
+                const isDone = workspaceSetupDone || i < workspaceSetupStep;
+                const isCurrent = !workspaceSetupDone && i === workspaceSetupStep;
+                return (
+                  <div key={i} className="flex items-center gap-2.5 py-1.5">
+                    {isDone ? (
+                      <div className="flex h-[16px] w-[16px] shrink-0 items-center justify-center rounded-full bg-g/15">
+                        <svg className="h-2.5 w-2.5 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      </div>
+                    ) : isCurrent ? (
+                      <div className="flex h-[16px] w-[16px] shrink-0 items-center justify-center">
+                        <div className="h-1.5 w-1.5 rounded-full bg-am animate-pulse" />
+                      </div>
+                    ) : (
+                      <div className="flex h-[16px] w-[16px] shrink-0 items-center justify-center">
+                        <div className="h-1 w-1 rounded-full bg-t4/30" />
+                      </div>
+                    )}
+                    <span className={`text-[11px] leading-tight ${isDone ? "text-t2" : isCurrent ? "text-t2 font-medium" : "text-t4"}`}>
+                      {step}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : firstRunTask ? (
           <FirstRunTaskList
             firstRunTask={firstRunTask}
             firstRunDone={firstRunDone}
@@ -293,7 +570,14 @@ export function RightPanel({
             onSelectTask={handleSelectTask}
           />
         ) : (
-          <TasksTab onSelectTask={handleSelectTask} teachPhase={teachPhase} teachTaskName={teachTaskName} />
+          <TasksTab
+            onSelectTask={handleSelectTask}
+            teachPhase={teachPhase}
+            teachTaskName={teachTaskName}
+            activeTasksOverride={autoPlayTasks?.active}
+            recurringTasksOverride={autoPlayTasks?.recurring}
+            completedTasksOverride={autoPlayTasks?.completed}
+          />
         )}
       </div>
 
@@ -307,7 +591,7 @@ export function RightPanel({
           <>
             <TaskDetail
               task={selectedTask}
-              onBack={() => handleSelectTask(null)}
+              onBack={() => { handleSelectTask(null); onCloseFirstRunDetail?.(); }}
               onViewResult={
                 selectedTask.detail?.resultType === "briefing"
                   ? () => {

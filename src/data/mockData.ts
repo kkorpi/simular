@@ -11,7 +11,7 @@ export interface RunHistoryEntry {
   summary: string;
 }
 
-export type ResultFormat = "text" | "briefing" | "document" | "spreadsheet" | "code" | "link";
+export type ResultFormat = "text" | "briefing" | "document" | "spreadsheet" | "code" | "link" | "email" | "calendar";
 
 export interface ResultArtifact {
   format: ResultFormat;
@@ -61,7 +61,6 @@ export interface Person {
 }
 
 export interface Source {
-  icon: string;
   title: string;
   url: string;
 }
@@ -93,7 +92,7 @@ export const activeTasks: Task[] = [
   },
   {
     id: "2",
-    name: "Draft LP follow-up emails from today's meetings",
+    name: "Compile meeting debrief from today's calendar",
     status: "queued",
     subtitle: "Queued",
     time: "queue",
@@ -332,7 +331,7 @@ export const completedTasks: Task[] = [
       duration: "5m 30s",
       result: "3 thank-you emails drafted. Personalized for GIC, Tiger Global, and Wellington. Each includes meeting highlights and next steps. Ready for review in Gmail drafts.",
       artifact: {
-        format: "document",
+        format: "email",
         title: "LP Thank-You Emails - Feb 12",
         subtitle: "3 drafts in Gmail",
         icon: "\uD83D\uDCE7",
@@ -399,11 +398,11 @@ export const briefingPeople: Person[] = [
 ];
 
 export const briefingSources: Source[] = [
-  { icon: "\uD83C\uDF10", title: "Salesforce - Sequoia Scouts LP profile", url: "salesforce.com/lp/sequoia-scouts" },
-  { icon: "\uD83D\uDCC5", title: "Calendar - Last 4 meeting touchpoints", url: "calendar.google.com" },
-  { icon: "\uD83D\uDCDD", title: "Granola - Recent meeting notes", url: "granola.ai/notes" },
-  { icon: "\uD83D\uDCE7", title: "Email - Recent correspondence thread", url: "gmail.com/threads/sequoia" },
-  { icon: "\uD83D\uDCF0", title: "Sequoia Scouts - Recent portfolio announcements", url: "sequoiacap.com/scouts" },
+  { title: "Salesforce - Sequoia Scouts LP profile", url: "salesforce.com/lp/sequoia-scouts" },
+  { title: "Calendar - Last 4 meeting touchpoints", url: "calendar.google.com" },
+  { title: "Granola - Recent meeting notes", url: "granola.ai/notes" },
+  { title: "Email - Recent correspondence thread", url: "gmail.com/threads/sequoia" },
+  { title: "Sequoia Scouts - Recent portfolio announcements", url: "sequoiacap.com/scouts" },
 ];
 
 export const briefingOverview = {
@@ -442,12 +441,13 @@ export interface RunningStep {
 }
 
 export const runningTaskSteps: RunningStep[] = [
-  { timestamp: "0:01", label: "Opened Chrome", done: true },
-  { timestamp: "0:04", label: "Navigated to linkedin.com/in/daniel-park", site: "linkedin.com", trustSignal: "Secure connection", done: true },
-  { timestamp: "0:12", label: "Pulled founder background, education, and experience", done: true },
-  { timestamp: "0:18", label: "Checked notable followers and mutual connections", done: true },
-  { timestamp: "0:25", label: "Opened x.com/danielpark_ai for recent posts", site: "x.com", trustSignal: "Secure connection", done: true },
-  { timestamp: "0:32", label: "Reviewed last 10 posts for product insights", done: true },
+  { timestamp: "0:02", label: "Opened Chrome and navigated to LinkedIn", done: true },
+  { timestamp: "0:04", label: "Opened LinkedIn founder profile", site: "linkedin.com", done: true },
+  { timestamp: "0:10", label: "Pulled background, education, and work history", done: true },
+  { timestamp: "0:16", label: "Extracted mutual connections and endorsements", done: true },
+  { timestamp: "0:24", label: "Reviewed recent posts on X", site: "x.com", done: true },
+  { timestamp: "0:30", label: "Pulled Crunchbase company profile and funding rounds", done: true },
+  { timestamp: "0:38", label: "Cross-referenced Salesforce for existing deal record", done: true },
   { timestamp: "0:40", label: "Checking company website and product...", done: false },
 ];
 
@@ -468,9 +468,12 @@ export const workspaceSteps: WorkspaceStep[] = [
 
 export const linkedinLoginSteps: RunningStep[] = [
   { timestamp: "0:01", label: "Opened Chrome", done: true },
-  { timestamp: "0:03", label: "Navigated to linkedin.com/login", site: "linkedin.com", trustSignal: "Secure connection", done: true },
+  { timestamp: "0:03", label: "Navigated to linkedin.com/login", site: "linkedin.com", done: true },
+  { timestamp: "0:05", label: "Detected login required — waiting for credentials", done: true },
   { timestamp: "0:09", label: "Signed in to LinkedIn", done: true, userAction: true },
-  { timestamp: "0:12", label: "Pulling profile viewer list...", done: false },
+  { timestamp: "0:11", label: "Navigated to profile viewers page", done: true },
+  { timestamp: "0:14", label: "Parsing viewer list and extracting profiles", done: true },
+  { timestamp: "0:18", label: "Pulling profile viewer list...", done: false },
 ];
 
 export const loginSteps: WorkspaceStep[] = [
@@ -537,11 +540,15 @@ export const disambiguationProfiles: LinkedInProfile[] = [
 
 export const linkedinDisambiguatedSteps: RunningStep[] = [
   { timestamp: "0:01", label: "Opened Chrome", done: true },
-  { timestamp: "0:03", label: "Navigated to linkedin.com/login", site: "linkedin.com", trustSignal: "Secure connection", done: true },
+  { timestamp: "0:03", label: "Navigated to linkedin.com/login", site: "linkedin.com", done: true },
+  { timestamp: "0:05", label: "Detected login required — waiting for credentials", done: true },
   { timestamp: "0:09", label: "Signed in to LinkedIn", done: true, userAction: true },
+  { timestamp: "0:12", label: "Searched for Daniel Park on LinkedIn", done: true },
   { timestamp: "0:14", label: "Found 3 matching profiles for Daniel Park", done: true },
   { timestamp: "0:16", label: "User selected Daniel Park, CEO at Luma AI", done: true, userAction: true },
-  { timestamp: "0:18", label: "Pulling profile viewer list...", done: false },
+  { timestamp: "0:19", label: "Navigated to profile viewers page", done: true },
+  { timestamp: "0:22", label: "Parsing viewer list and extracting profiles", done: true },
+  { timestamp: "0:25", label: "Pulling full profile details for each viewer...", done: false },
 ];
 
 // ===== Teach Mode Steps =====
@@ -569,210 +576,179 @@ export interface StarterTask {
   category: string;
   /** Which roles this task is shown for. Undefined = shown for all roles. */
   roles?: string[];
+  /** Real apps this task uses — shown as tags on the card */
+  apps?: string[];
 }
 
-/** Role-aware starter tasks. Tasks with `roles` only appear for matching users. */
+/** Role-aware starter tasks. Every task names 2+ real apps and describes
+ *  a multi-step browser workflow only a screen-controlling agent can do. */
 export const starterTasks: StarterTask[] = [
   // ── VC / Investor ──
   {
     id: "vc-1",
-    title: "Research a founder and build a one-pager",
-    description: "Pull LinkedIn, X, Crunchbase, and press. Compile background, company overview, and thesis fit.",
-    trustLevel: "low",
-    trustLabel: "No sign in required",
+    title: "Build a founder dossier before your next meeting",
+    description: "Pull their LinkedIn, Crunchbase, and recent X posts. Cross-reference with your Salesforce deal notes and compile a one-pager.",
+    trustLevel: "needs-auth",
+    trustLabel: "LinkedIn · Salesforce sign in",
     icon: "🔍",
     category: "research",
     roles: ["vc"],
+    apps: ["LinkedIn", "Crunchbase", "X", "Salesforce"],
   },
   {
     id: "vc-2",
-    title: "Compile today's deal sourcing digest",
-    description: "Scan funding news, YC batches, and X for new deals matching your investment themes.",
-    trustLevel: "low",
-    trustLabel: "No sign in required",
-    icon: "📋",
-    category: "research",
+    title: "Compile a meeting debrief from today's calendar",
+    description: "Check Google Calendar for today's meetings, pull notes from Granola, then compile key takeaways and action items into a single debrief doc.",
+    trustLevel: "needs-auth",
+    trustLabel: "Calendar · Granola sign in",
+    icon: "📄",
+    category: "email",
     roles: ["vc"],
+    apps: ["Google Calendar", "Granola", "Google Docs"],
   },
   {
     id: "vc-3",
-    title: "Check LP touchpoints and suggest outreach",
-    description: "Review Salesforce, calendar, and email to find overdue LP relationships and suggest actions.",
+    title: "Surface warm intros from my network for a deal",
+    description: "Look up the founders on LinkedIn, check mutual connections, then search Gmail and Salesforce for anyone I've spoken with who could intro.",
     trustLevel: "needs-auth",
-    trustLabel: "Salesforce sign in",
+    trustLabel: "LinkedIn · Gmail sign in",
     icon: "📊",
     category: "crm",
     roles: ["vc"],
-  },
-  {
-    id: "vc-4",
-    title: "Draft follow-up emails from today's meetings",
-    description: "Pull Granola notes, extract key points, draft personalized follow-ups for each meeting.",
-    trustLevel: "needs-auth",
-    trustLabel: "Gmail sign in",
-    icon: "📧",
-    category: "email",
-    roles: ["vc"],
+    apps: ["LinkedIn", "Gmail", "Salesforce"],
   },
   // ── Sales ──
   {
     id: "sales-1",
-    title: "Research a prospect before your next call",
-    description: "Pull LinkedIn, company site, and recent news. Build a quick brief with talking points.",
-    trustLevel: "low",
-    trustLabel: "No sign in required",
+    title: "Prep a prospect brief before my next call",
+    description: "Pull the contact's LinkedIn, check their company on Crunchbase, scan recent news, then update talking points in my HubSpot deal notes.",
+    trustLevel: "needs-auth",
+    trustLabel: "LinkedIn · HubSpot sign in",
     icon: "🔍",
     category: "research",
     roles: ["sales"],
+    apps: ["LinkedIn", "Crunchbase", "HubSpot"],
   },
   {
     id: "sales-2",
-    title: "Find new leads matching your ICP",
-    description: "Scan LinkedIn and industry news for companies that fit your ideal customer profile.",
-    trustLevel: "low",
-    trustLabel: "No sign in required",
-    icon: "📋",
-    category: "research",
-    roles: ["sales"],
-  },
-  {
-    id: "sales-3",
-    title: "Update CRM with this week's pipeline changes",
-    description: "Review email and calendar, then update deal stages and notes in Salesforce or HubSpot.",
+    title: "Update my pipeline from this week's emails",
+    description: "Scan Gmail for replies from prospects, update deal stages and next steps in Salesforce, then flag stale deals that need follow-up.",
     trustLevel: "needs-auth",
-    trustLabel: "CRM sign in",
+    trustLabel: "Gmail · Salesforce sign in",
     icon: "📊",
     category: "crm",
     roles: ["sales"],
+    apps: ["Gmail", "Salesforce"],
   },
   {
-    id: "sales-4",
-    title: "Draft follow-up emails for open deals",
-    description: "Pull recent meeting notes and draft personalized follow-ups for each active opportunity.",
+    id: "sales-3",
+    title: "Find lookalike leads from my best customers",
+    description: "Pull firmographics from my top accounts in Salesforce, then search LinkedIn for similar companies and save matches to a Google Sheet.",
     trustLevel: "needs-auth",
-    trustLabel: "Gmail sign in",
-    icon: "📧",
-    category: "email",
+    trustLabel: "Salesforce · LinkedIn sign in",
+    icon: "📋",
+    category: "research",
     roles: ["sales"],
+    apps: ["Salesforce", "LinkedIn", "Google Sheets"],
   },
   // ── Marketing ──
   {
     id: "mkt-1",
-    title: "Monitor competitors for new announcements",
-    description: "Scan competitor websites, blogs, and social channels for product launches, pricing, or campaigns.",
+    title: "Turn this week's blog posts into social content",
+    description: "Read published blog posts on your site, then draft LinkedIn and X posts for each — with different hooks per platform.",
+    trustLevel: "needs-auth",
+    trustLabel: "LinkedIn · X sign in",
+    icon: "📧",
+    category: "email",
+    roles: ["marketing"],
+    apps: ["LinkedIn", "X", "Company Blog"],
+  },
+  {
+    id: "mkt-2",
+    title: "Build a competitive intel report",
+    description: "Scan competitor websites, Product Hunt, and G2 reviews. Pull their latest LinkedIn posts and compile changes in positioning or pricing into a Google Doc.",
     trustLevel: "low",
     trustLabel: "No sign in required",
     icon: "🔍",
     category: "research",
     roles: ["marketing"],
-  },
-  {
-    id: "mkt-2",
-    title: "Compile a weekly content performance report",
-    description: "Pull engagement metrics from social channels, blog, and newsletter. Summarize what's working.",
-    trustLevel: "low",
-    trustLabel: "No sign in required",
-    icon: "📋",
-    category: "research",
-    roles: ["marketing"],
+    apps: ["Product Hunt", "G2", "LinkedIn", "Google Docs"],
   },
   {
     id: "mkt-3",
-    title: "Draft social posts from this week's blog content",
-    description: "Read published blog posts and create platform-specific social copy for LinkedIn, X, and more.",
+    title: "Pull campaign metrics and build a weekly report",
+    description: "Open Google Analytics, LinkedIn Campaign Manager, and Mailchimp. Collect engagement numbers and compile them into a performance summary in Google Sheets.",
     trustLevel: "needs-auth",
-    trustLabel: "Social sign in",
-    icon: "📧",
-    category: "email",
-    roles: ["marketing"],
-  },
-  {
-    id: "mkt-4",
-    title: "Build a briefing doc for next week's campaign",
-    description: "Gather assets, messaging, audience data, and timeline into a single campaign brief.",
-    trustLevel: "low",
-    trustLabel: "No sign in required",
+    trustLabel: "Google · LinkedIn sign in",
     icon: "📊",
     category: "crm",
     roles: ["marketing"],
+    apps: ["Google Analytics", "LinkedIn", "Mailchimp", "Google Sheets"],
   },
   // ── Founder ──
   {
     id: "fnd-1",
-    title: "Research a potential investor",
-    description: "Pull portfolio, thesis, recent deals, and partner backgrounds. Build a one-pager for outreach.",
-    trustLevel: "low",
-    trustLabel: "No sign in required",
-    icon: "🔍",
-    category: "research",
+    title: "Prep for today's meetings using my calendar",
+    description: "Check Google Calendar, look up each attendee on LinkedIn, pull their company from Crunchbase, and create a brief with context and talking points.",
+    trustLevel: "needs-auth",
+    trustLabel: "Calendar · LinkedIn sign in",
+    icon: "📊",
+    category: "crm",
     roles: ["founder"],
+    apps: ["Google Calendar", "LinkedIn", "Crunchbase"],
   },
   {
     id: "fnd-2",
-    title: "Compile a daily industry news digest",
-    description: "Scan TechCrunch, X, and industry blogs for news relevant to your space.",
-    trustLevel: "low",
-    trustLabel: "No sign in required",
-    icon: "📋",
-    category: "research",
-    roles: ["founder"],
-  },
-  {
-    id: "fnd-3",
-    title: "Prep for today's meetings",
-    description: "Check your calendar, pull attendee backgrounds, and draft an agenda for each meeting.",
-    trustLevel: "needs-auth",
-    trustLabel: "Calendar sign in",
-    icon: "📊",
-    category: "crm",
-    roles: ["founder"],
-  },
-  {
-    id: "fnd-4",
-    title: "Draft investor update email",
-    description: "Pull key metrics, milestones, and asks. Draft a concise monthly update for your investors.",
-    trustLevel: "needs-auth",
-    trustLabel: "Gmail sign in",
-    icon: "📧",
-    category: "email",
-    roles: ["founder"],
-  },
-  // ── General / fallback (no role match, ops, other) ──
-  {
-    id: "gen-1",
-    title: "Research a topic and summarize findings",
-    description: "Search the web, compile sources, and produce a clear summary doc with key takeaways.",
+    title: "Research investors for my next fundraise",
+    description: "Search Crunchbase for active investors in my space, pull their LinkedIn profiles and recent X posts to gauge thesis fit, then rank by relevance.",
     trustLevel: "low",
     trustLabel: "No sign in required",
     icon: "🔍",
     category: "research",
+    roles: ["founder"],
+    apps: ["Crunchbase", "LinkedIn", "X"],
+  },
+  {
+    id: "fnd-3",
+    title: "Draft and send investor update from my metrics",
+    description: "Pull key numbers from Google Sheets, check milestones in Linear, then draft a monthly investor update email in Gmail.",
+    trustLevel: "needs-auth",
+    trustLabel: "Gmail · Google Sheets sign in",
+    icon: "📧",
+    category: "email",
+    roles: ["founder"],
+    apps: ["Google Sheets", "Linear", "Gmail"],
+  },
+  // ── General / cross-role greatest hits ──
+  {
+    id: "gen-1",
+    title: "Prep for today's meetings using my calendar",
+    description: "Check Google Calendar, look up each attendee on LinkedIn, pull relevant context from the web, and create a brief with talking points for each meeting.",
+    trustLevel: "needs-auth",
+    trustLabel: "Calendar · LinkedIn sign in",
+    icon: "📊",
+    category: "crm",
+    apps: ["Google Calendar", "LinkedIn"],
   },
   {
     id: "gen-2",
-    title: "Compile a daily news digest for your industry",
-    description: "Scan top sources and X for relevant news. Deliver a morning briefing with highlights.",
+    title: "Research a person or company across the web",
+    description: "Pull their LinkedIn, company website, Crunchbase, and recent X posts. Compile a dossier with background, news, and key facts.",
     trustLevel: "low",
     trustLabel: "No sign in required",
-    icon: "📋",
+    icon: "🔍",
     category: "research",
+    apps: ["LinkedIn", "Crunchbase", "X"],
   },
   {
     id: "gen-3",
-    title: "Prep for today's meetings",
-    description: "Check your calendar, pull attendee backgrounds, and draft talking points for each meeting.",
+    title: "Compile a meeting debrief from today's calendar",
+    description: "Check my calendar for today's meetings, pull notes and context from Granola, then compile key takeaways and action items into a debrief doc.",
     trustLevel: "needs-auth",
-    trustLabel: "Calendar sign in",
-    icon: "📊",
-    category: "crm",
-  },
-  {
-    id: "gen-4",
-    title: "Draft follow-up emails from today's meetings",
-    description: "Pull meeting notes, extract key points, draft personalized follow-ups for each meeting.",
-    trustLevel: "needs-auth",
-    trustLabel: "Gmail sign in",
-    icon: "📧",
+    trustLabel: "Calendar · Granola sign in",
+    icon: "📄",
     category: "email",
+    apps: ["Google Calendar", "Granola", "Google Docs"],
   },
 ];
 
@@ -785,6 +761,7 @@ export interface FirstRunSequence {
   steps: RunningStep[];
   resultTitle: string;
   resultSummary: string;
+  artifact: ResultArtifact;
 }
 
 export const firstRunSequences: Record<string, FirstRunSequence> = {
@@ -793,42 +770,123 @@ export const firstRunSequences: Record<string, FirstRunSequence> = {
     subtask: "Researching founder background",
     integrations: ["LinkedIn", "Crunchbase", "X"],
     steps: [
-      { timestamp: "0:01", label: "Opened Chrome", done: true },
-      { timestamp: "0:04", label: "Searching for recent news and background", done: true },
-      { timestamp: "0:12", label: "Navigated to linkedin.com for founder profile", site: "linkedin.com", trustSignal: "Secure connection", done: true },
-      { timestamp: "0:20", label: "Pulled company data from crunchbase.com", site: "crunchbase.com", trustSignal: "Secure connection", done: true },
+      { timestamp: "0:02", label: "Opened Chrome and navigated to LinkedIn", done: true },
+      { timestamp: "0:04", label: "Searching background on LinkedIn and Crunchbase", done: true },
+      { timestamp: "0:10", label: "Pulled founder work history and education", done: true },
+      { timestamp: "0:15", label: "Extracted mutual connections and endorsements", done: true },
+      { timestamp: "0:20", label: "Pulling company data and funding history", done: true },
+      { timestamp: "0:24", label: "Reviewed recent posts and activity on X", done: true },
       { timestamp: "0:28", label: "Compiling findings into a summary...", done: false },
     ],
     resultTitle: "Research Summary",
     resultSummary: "I've compiled a comprehensive summary with background, key data points, and relevant sources. You can review the full document or open it in your workspace.",
+    artifact: {
+      format: "document",
+      title: "Founder Research — Daniel Park",
+      subtitle: "Google Docs · 6 sources",
+      icon: "📄",
+      url: "docs.google.com/founder-research-daniel-park",
+    },
   },
   crm: {
     intro: "Sure — I'll check the data and put together an update for you.",
     subtask: "Checking CRM records",
     integrations: ["Salesforce", "Calendar"],
     steps: [
-      { timestamp: "0:01", label: "Opened Chrome", done: true },
-      { timestamp: "0:03", label: "Navigated to salesforce.com", site: "salesforce.com", trustSignal: "Secure connection", done: true },
-      { timestamp: "0:10", label: "Pulling recent activity and records", done: true },
-      { timestamp: "0:18", label: "Analyzing patterns and gaps", done: true },
+      { timestamp: "0:02", label: "Opened Salesforce and navigated to pipeline view", done: true },
+      { timestamp: "0:06", label: "Pulling active deal records and stages", done: true },
+      { timestamp: "0:12", label: "Cross-referencing calendar for recent LP touchpoints", done: true },
+      { timestamp: "0:18", label: "Analyzing activity patterns and gaps", done: true },
+      { timestamp: "0:22", label: "Flagging stale deals with no activity in 30+ days", done: true },
       { timestamp: "0:25", label: "Preparing actionable recommendations...", done: false },
     ],
     resultTitle: "CRM Analysis",
     resultSummary: "I've reviewed your CRM records and identified actionable items. Here's a summary of what needs attention along with suggested next steps.",
+    artifact: {
+      format: "spreadsheet",
+      title: "CRM Pipeline Review",
+      subtitle: "Google Sheets · 12 records",
+      icon: "📊",
+      url: "docs.google.com/spreadsheets/crm-pipeline-review",
+    },
   },
   email: {
-    intro: "Got it — I'll pull the relevant notes and start drafting.",
-    subtask: "Drafting follow-up emails",
-    integrations: ["Gmail", "Granola", "Calendar"],
+    intro: "On it — I'll pull notes from today's meetings and put together a debrief.",
+    subtask: "Compiling meeting debrief",
+    integrations: ["Granola", "Calendar", "Google Docs"],
     steps: [
-      { timestamp: "0:01", label: "Opened Chrome", done: true },
-      { timestamp: "0:04", label: "Pulling meeting notes from Granola", done: true },
-      { timestamp: "0:12", label: "Extracting key discussion points", done: true },
-      { timestamp: "0:20", label: "Navigated to mail.google.com to draft emails", site: "mail.google.com", trustSignal: "Secure connection", done: true },
-      { timestamp: "0:28", label: "Saving drafts for your review...", done: false },
+      { timestamp: "0:02", label: "Opened Google Calendar to find today's meetings", done: true },
+      { timestamp: "0:06", label: "Found 3 meetings with attached Granola links", done: true },
+      { timestamp: "0:10", label: "Pulling notes and action items from Granola", done: true },
+      { timestamp: "0:16", label: "Extracting key decisions and follow-ups per meeting", done: true },
+      { timestamp: "0:22", label: "Matching attendees to Salesforce contacts", done: true },
+      { timestamp: "0:26", label: "Writing debrief doc in Google Docs...", done: false },
     ],
-    resultTitle: "Email Drafts Ready",
-    resultSummary: "I've drafted your emails based on the meeting notes and saved them for review. Each one includes personalized talking points and next steps.",
+    resultTitle: "Meeting Debrief Ready",
+    resultSummary: "I've compiled today's meetings into a single debrief with key takeaways, decisions made, and follow-up action items for each conversation.",
+    artifact: {
+      format: "document",
+      title: "Daily Meeting Debrief",
+      subtitle: "Google Docs · 3 meetings",
+      icon: "📄",
+      url: "docs.google.com/daily-meeting-debrief",
+    },
+  },
+};
+
+// ===== Follow-up task data (triggered from first-run result) =====
+
+export interface FollowUpSequence {
+  agentMessage: string;
+  subtask: string;
+  integrations: string[];
+  resultTitle: string;
+  resultSummary: string;
+  artifact: ResultArtifact;
+}
+
+export const followUpSequences: Record<string, FollowUpSequence> = {
+  research: {
+    agentMessage: "On it — searching LinkedIn for these founders now.",
+    subtask: "Looking up founders on LinkedIn",
+    integrations: ["LinkedIn"],
+    resultTitle: "LinkedIn Activity Summary",
+    resultSummary: "Found profiles for all 3 founders. Pulled recent posts, mutual connections, and engagement patterns. Two are actively posting about fundraising.",
+    artifact: {
+      format: "spreadsheet",
+      title: "Founder LinkedIn Profiles",
+      subtitle: "Google Sheets · 3 profiles, 24 data points",
+      icon: "📊",
+      url: "docs.google.com/spreadsheets/founder-linkedin",
+    },
+  },
+  crm: {
+    agentMessage: "Checking PitchBook for funding details now.",
+    subtask: "Cross-referencing with PitchBook",
+    integrations: ["PitchBook"],
+    resultTitle: "PitchBook Funding Analysis",
+    resultSummary: "Matched 8 of 12 records to PitchBook profiles. Found 3 with recent funding rounds and 2 with valuation changes in the last quarter.",
+    artifact: {
+      format: "spreadsheet",
+      title: "PitchBook Funding Cross-Reference",
+      subtitle: "Google Sheets · 8 matches, funding data",
+      icon: "📊",
+      url: "docs.google.com/spreadsheets/pitchbook-analysis",
+    },
+  },
+  email: {
+    agentMessage: "Sharing the debrief with attendees now.",
+    subtask: "Sending debrief via Google Docs",
+    integrations: ["Google Docs", "Gmail"],
+    resultTitle: "Debrief Shared",
+    resultSummary: "Shared the meeting debrief doc with all 3 meeting attendee groups. Each received a comment tagging their specific action items.",
+    artifact: {
+      format: "document",
+      title: "Shared Meeting Debrief",
+      subtitle: "Google Docs · shared with 8 attendees",
+      icon: "📄",
+      url: "docs.google.com/daily-meeting-debrief",
+    },
   },
 };
 

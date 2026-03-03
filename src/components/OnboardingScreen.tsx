@@ -15,7 +15,7 @@ const setupSteps = [
 ];
 
 /** Role options for dropdown */
-const roleOptions = [
+export const roleOptions = [
   { id: "vc", label: "VC / Investor" },
   { id: "sales", label: "Sales" },
   { id: "marketing", label: "Marketing" },
@@ -25,6 +25,18 @@ const roleOptions = [
   { id: "researcher", label: "Researcher" },
   { id: "student", label: "Student" },
   { id: "other", label: "Other" },
+];
+
+/** App options for multi-select */
+export const appOptions = [
+  { id: "gmail", label: "Gmail" },
+  { id: "linkedin", label: "LinkedIn" },
+  { id: "salesforce", label: "Salesforce" },
+  { id: "slack", label: "Slack" },
+  { id: "hubspot", label: "HubSpot" },
+  { id: "notion", label: "Notion" },
+  { id: "sheets", label: "Google Sheets" },
+  { id: "jira", label: "Jira" },
 ];
 
 /** Onboarding questions shown alongside setup progress */
@@ -67,6 +79,7 @@ export interface OnboardingProfile {
   role?: string;
   apps?: string[];
   handoff?: string;
+  customWorkflow?: string;
 }
 
 export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingProfile) => void }) {

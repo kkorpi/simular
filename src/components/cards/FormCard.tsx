@@ -165,7 +165,7 @@ export function FormCard({
           <div key={field.key}>
             <div className="flex items-center gap-1 mb-1">
               <label className="text-[12px] font-medium text-t2">{field.label}</label>
-              {field.required && <span className="text-[10px] text-r">*</span>}
+              {field.required && <span className="text-[10px] text-rd">*</span>}
             </div>
 
             {field.type === "text" && (
@@ -175,7 +175,7 @@ export function FormCard({
                 placeholder={field.placeholder}
                 onChange={(e) => updateValue(field.key, e.target.value)}
                 className={`w-full rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none placeholder:text-t4 transition-all focus:border-as ${
-                  errors[field.key] ? "border-r" : "border-b1"
+                  errors[field.key] ? "border-rd" : "border-b1"
                 }`}
               />
             )}
@@ -187,7 +187,7 @@ export function FormCard({
                 rows={field.rows ?? 3}
                 onChange={(e) => updateValue(field.key, e.target.value)}
                 className={`w-full resize-none rounded-md border bg-bg3 px-3 py-1.5 text-[12px] leading-[1.6] text-t1 outline-none placeholder:text-t4 transition-all focus:border-as ${
-                  errors[field.key] ? "border-r" : "border-b1"
+                  errors[field.key] ? "border-rd" : "border-b1"
                 }`}
               />
             )}
@@ -200,8 +200,8 @@ export function FormCard({
                   min={field.min}
                   max={field.max}
                   onChange={(e) => updateValue(field.key, Number(e.target.value))}
-                  className={`w-[100px] rounded-md border bg-bg3 px-3 py-1.5 text-right text-[12px] text-t1 outline-none transition-all focus:border-as ${
-                    errors[field.key] ? "border-r" : "border-b1"
+                  className={`w-[100px] rounded-md border bg-bg3 px-3 py-1.5 text-rdight text-[12px] text-t1 outline-none transition-all focus:border-as ${
+                    errors[field.key] ? "border-rd" : "border-b1"
                   }`}
                 />
                 {field.unit && <span className="text-[11px] text-t3">{field.unit}</span>}
@@ -214,7 +214,7 @@ export function FormCard({
                   type="button"
                   onClick={() => setOpenSelect(openSelect === field.key ? null : field.key)}
                   className={`flex w-full items-center justify-between rounded-md border bg-bg3 px-3 py-1.5 text-left text-[12px] text-t1 outline-none transition-all hover:border-b2 ${
-                    errors[field.key] ? "border-r" : "border-b1"
+                    errors[field.key] ? "border-rd" : "border-b1"
                   }`}
                 >
                   <span>{field.options.find((o) => o.value === values[field.key])?.label ?? values[field.key]}</span>
@@ -266,7 +266,7 @@ export function FormCard({
                 value={values[field.key] as string}
                 onChange={(e) => updateValue(field.key, e.target.value)}
                 className={`rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none transition-all focus:border-as ${
-                  errors[field.key] ? "border-r" : "border-b1"
+                  errors[field.key] ? "border-rd" : "border-b1"
                 }`}
               />
             )}
@@ -278,7 +278,7 @@ export function FormCard({
                   value={values[field.key + "_start"] as string}
                   onChange={(e) => updateValue(field.key + "_start", e.target.value)}
                   className={`rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none transition-all focus:border-as ${
-                    errors[field.key + "_start"] ? "border-r" : "border-b1"
+                    errors[field.key + "_start"] ? "border-rd" : "border-b1"
                   }`}
                 />
                 <span className="text-[11px] text-t4">to</span>
@@ -287,7 +287,7 @@ export function FormCard({
                   value={values[field.key + "_end"] as string}
                   onChange={(e) => updateValue(field.key + "_end", e.target.value)}
                   className={`rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none transition-all focus:border-as ${
-                    errors[field.key + "_end"] ? "border-r" : "border-b1"
+                    errors[field.key + "_end"] ? "border-rd" : "border-b1"
                   }`}
                 />
               </div>
@@ -315,7 +315,7 @@ export function FormCard({
                     onChange={(e) => setChipInput((prev) => ({ ...prev, [field.key]: e.target.value }))}
                     onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addChip(field.key); } }}
                     className={`flex-1 rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none placeholder:text-t4 transition-all focus:border-as ${
-                      errors[field.key] ? "border-r" : "border-b1"
+                      errors[field.key] ? "border-rd" : "border-b1"
                     }`}
                   />
                   <button
@@ -330,13 +330,13 @@ export function FormCard({
 
             {/* Error message */}
             {errors[field.key] && (
-              <div className="mt-0.5 text-[10px] text-r">{errors[field.key]}</div>
+              <div className="mt-0.5 text-[10px] text-rd">{errors[field.key]}</div>
             )}
             {errors[field.key + "_start"] && (
-              <div className="mt-0.5 text-[10px] text-r">{errors[field.key + "_start"]}</div>
+              <div className="mt-0.5 text-[10px] text-rd">{errors[field.key + "_start"]}</div>
             )}
             {errors[field.key + "_end"] && (
-              <div className="mt-0.5 text-[10px] text-r">{errors[field.key + "_end"]}</div>
+              <div className="mt-0.5 text-[10px] text-rd">{errors[field.key + "_end"]}</div>
             )}
             {/* Help text */}
             {field.helpText && !errors[field.key] && (

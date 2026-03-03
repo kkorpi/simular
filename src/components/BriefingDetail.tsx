@@ -104,8 +104,7 @@ export function BriefingDetail({ onBack }: { onBack: () => void }) {
                 key={i}
                 className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-xs text-t2 transition-all hover:bg-bg3"
               >
-                <div className="text-[13px]">{s.icon}</div>
-                <div>
+                  <div>
                   <div>{s.title}</div>
                   <div className="font-mono text-[10.5px] text-t4">{s.url}</div>
                 </div>

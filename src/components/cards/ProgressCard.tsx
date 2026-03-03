@@ -40,7 +40,7 @@ const statusIcon: Record<ProgressStepStatus, React.ReactNode> = {
     </svg>
   ),
   error: (
-    <svg className="h-3.5 w-3.5 text-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg className="h-3.5 w-3.5 text-rd" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10" />
       <line x1="15" y1="9" x2="9" y2="15" />
       <line x1="9" y1="9" x2="15" y2="15" />
@@ -52,7 +52,7 @@ const statusText: Record<ProgressStepStatus, string> = {
   pending: "text-t4",
   running: "text-t1 font-medium",
   done: "text-t3",
-  error: "text-r",
+  error: "text-rd",
 };
 
 /* ── Component ── */
@@ -130,7 +130,7 @@ export function ProgressCard({
                 {step.label}
               </div>
               {step.detail && (
-                <div className={`mt-0.5 text-[11px] ${step.status === "error" ? "text-r/70" : "text-t4"}`}>
+                <div className={`mt-0.5 text-[11px] ${step.status === "error" ? "text-rd/70" : "text-t4"}`}>
                   {step.detail}
                 </div>
               )}

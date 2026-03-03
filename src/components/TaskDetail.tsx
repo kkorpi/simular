@@ -3,6 +3,26 @@
 import { useState } from "react";
 import type { Task, ResultArtifact } from "@/data/mockData";
 
+/** Lucide icon for artifact format */
+function ArtifactIcon({ format }: { format: string }) {
+  const cls = "h-4 w-4 text-t3";
+  const props = { viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.5, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  switch (format) {
+    case "spreadsheet":
+      return <svg className={cls} {...props}><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="3" y1="15" x2="21" y2="15" /><line x1="9" y1="3" x2="9" y2="21" /><line x1="15" y1="3" x2="15" y2="21" /></svg>;
+    case "email":
+      return <svg className={cls} {...props}><rect x="2" y="4" width="20" height="16" rx="2" /><polyline points="22,7 12,13 2,7" /></svg>;
+    case "calendar":
+      return <svg className={cls} {...props}><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>;
+    case "briefing":
+      return <svg className={cls} {...props}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /><line x1="16" y1="13" x2="8" y2="13" /><line x1="16" y1="17" x2="8" y2="17" /></svg>;
+    case "code":
+      return <svg className={cls} {...props}><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>;
+    default:
+      return <svg className={cls} {...props}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>;
+  }
+}
+
 function StatusBadge({ status }: { status: Task["status"] }) {
   const styles = {
     running: "bg-gs text-gt",
@@ -24,17 +44,19 @@ function StatusBadge({ status }: { status: Task["status"] }) {
 }
 
 function FormatBadge({ format }: { format: ResultArtifact["format"] }) {
-  const config = {
+  const config: Record<string, { label: string; style: string }> = {
     text: { label: "Text", style: "bg-bg3 text-t3" },
     briefing: { label: "Briefing", style: "bg-[rgba(59,130,246,0.15)] text-[#60a5fa]" },
     document: { label: "Doc", style: "bg-[rgba(59,130,246,0.15)] text-[#60a5fa]" },
     spreadsheet: { label: "Sheet", style: "bg-[rgba(34,197,94,0.15)] text-[#4ade80]" },
     code: { label: "Code", style: "bg-[rgba(168,85,247,0.15)] text-[#c084fc]" },
     link: { label: "Link", style: "bg-[rgba(251,191,36,0.15)] text-[#fbbf24]" },
+    email: { label: "Email", style: "bg-[rgba(251,191,36,0.15)] text-[#fbbf24]" },
+    calendar: { label: "Calendar", style: "bg-[rgba(34,197,94,0.15)] text-[#4ade80]" },
   };
-  const c = config[format];
+  const c = config[format] ?? config.text;
   return (
-    <span className={`rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${c.style}`}>
+    <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${c.style}`}>
       {c.label}
     </span>
   );
@@ -53,7 +75,9 @@ function ArtifactCard({
     <div className="overflow-hidden rounded-md border border-b1">
       {/* Header row */}
       <div className="flex items-center gap-2.5 bg-bg3 px-3 py-2.5">
-        <span className="text-base">{artifact.icon}</span>
+        <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-bg3h">
+          <ArtifactIcon format={artifact.format} />
+        </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="truncate text-[12.5px] font-medium text-t1">
@@ -305,7 +329,9 @@ export function TaskDetail({
               Steps
             </div>
             <div className="flex flex-col gap-1">
-              {d.steps.map((step, i) => (
+              {d.steps.map((step, i) => {
+                const isActive = !step.done && task.status === "running" && d.steps!.findIndex((s) => !s.done) === i;
+                return (
                 <div key={i} className="flex items-center gap-2 py-0.5">
                   {step.done ? (
                     <svg
@@ -319,16 +345,21 @@ export function TaskDetail({
                     >
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
+                  ) : isActive ? (
+                    <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
+                      <div className="h-3 w-3 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+                    </div>
                   ) : (
                     <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
                       <div className="h-[5px] w-[5px] rounded-full bg-t4" />
                     </div>
                   )}
-                  <span className={`text-[12.5px] ${step.done ? "text-t2" : "text-t3"}`}>
+                  <span className={`text-[12.5px] ${step.done ? "text-t2" : isActive ? "text-t1 font-medium" : "text-t3"}`}>
                     {step.label}
                   </span>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -482,7 +513,7 @@ export function TaskDetail({
               </button>
             ) : d?.artifact?.url ? (
               <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
-                Open in {d.artifact.format === "code" ? "GitHub" : d.artifact.format === "spreadsheet" ? "Sheets" : d.artifact.format === "link" ? "browser" : "Docs"}
+                Open in {({ code: "GitHub", spreadsheet: "Sheets", link: "browser", email: "Gmail", calendar: "Calendar" } as Record<string, string>)[d.artifact.format] ?? "Docs"}
               </button>
             ) : (
               <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">

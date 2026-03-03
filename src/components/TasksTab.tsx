@@ -1,16 +1,25 @@
 import { TaskSection } from "./TaskSection";
 import { TaskItem } from "./TaskItem";
-import { activeTasks, recurringTasks, completedTasks, type Task, type TeachPhase } from "@/data/mockData";
+import { activeTasks as defaultActiveTasks, recurringTasks as defaultRecurringTasks, completedTasks as defaultCompletedTasks, type Task, type TeachPhase } from "@/data/mockData";
 
 export function TasksTab({
   onSelectTask,
   teachPhase = "idle",
   teachTaskName,
+  activeTasksOverride,
+  recurringTasksOverride,
+  completedTasksOverride,
 }: {
   onSelectTask: (task: Task) => void;
   teachPhase?: TeachPhase;
   teachTaskName?: string;
+  activeTasksOverride?: Task[];
+  recurringTasksOverride?: Task[];
+  completedTasksOverride?: Task[];
 }) {
+  const activeTasks = activeTasksOverride ?? defaultActiveTasks;
+  const recurringTasks = recurringTasksOverride ?? defaultRecurringTasks;
+  const completedTasks = completedTasksOverride ?? defaultCompletedTasks;
   const isTeachActive = teachPhase === "recording";
   const isTeachDone = teachPhase === "complete";
 

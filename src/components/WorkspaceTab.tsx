@@ -45,7 +45,7 @@ export function WorkspaceTab({ onFullView }: { onFullView: () => void }) {
       {/* Queue */}
       <div className="flex items-center gap-1.5 rounded-md bg-bg3h px-3 py-1.5 text-[10.5px] text-t3">
         <div className="h-1 w-1 shrink-0 rounded-full bg-am" />
-        Up next: Draft LP follow-up emails
+        Up next: Compile meeting debrief
       </div>
 
       {/* Status row */}

@@ -1,19 +1,31 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { Button } from "./ui/Button";
+import { WorkingIndicator } from "./WorkingIndicator";
 
 /* ── Section definitions ── */
 
-type Section = "colors" | "typography" | "icons" | "spacing" | "radius" | "shadows" | "animations";
+type Section = "colors" | "typography" | "icons" | "spacing" | "radius" | "shadows" | "animations" | "buttons" | "task-list" | "inputs" | "dropdowns" | "badges" | "status";
 
-const sections: { id: Section; label: string }[] = [
-  { id: "colors", label: "Colors" },
-  { id: "typography", label: "Typography" },
-  { id: "icons", label: "Icons" },
-  { id: "spacing", label: "Spacing" },
-  { id: "radius", label: "Radius" },
-  { id: "shadows", label: "Shadows" },
-  { id: "animations", label: "Animations" },
+type SectionEntry = { id: Section; label: string; group: "tokens" | "controls" };
+
+const sections: SectionEntry[] = [
+  // Tokens
+  { id: "colors", label: "Colors", group: "tokens" },
+  { id: "typography", label: "Typography", group: "tokens" },
+  { id: "icons", label: "Icons", group: "tokens" },
+  { id: "spacing", label: "Spacing", group: "tokens" },
+  { id: "radius", label: "Radius", group: "tokens" },
+  { id: "shadows", label: "Shadows", group: "tokens" },
+  { id: "animations", label: "Animations", group: "tokens" },
+  // Controls
+  { id: "buttons", label: "Buttons", group: "controls" },
+  { id: "task-list", label: "Task List", group: "controls" },
+  { id: "inputs", label: "Inputs & Toggles", group: "controls" },
+  { id: "dropdowns", label: "Dropdowns", group: "controls" },
+  { id: "badges", label: "Badges & Pills", group: "controls" },
+  { id: "status", label: "Status Indicators", group: "controls" },
 ];
 
 /* ── Color token groups ── */
@@ -80,6 +92,12 @@ const colorGroups: { label: string; tokens: { name: string; var: string }[] }[] 
       { name: "bl", var: "--bl" },
       { name: "bls", var: "--bls" },
       { name: "blt", var: "--blt" },
+    ],
+  },
+  {
+    label: "Red",
+    tokens: [
+      { name: "rd", var: "--r" },
     ],
   },
   {
@@ -372,6 +390,107 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
   const [resolvedColors, setResolvedColors] = useState<Record<string, string>>({});
   const [refreshKey, setRefreshKey] = useState(0);
 
+  // Controls state
+  const [buttonSize, setButtonSize] = useState<"sm" | "md">("md");
+  const [toggle1, setToggle1] = useState(true);
+  const [toggle2, setToggle2] = useState(false);
+  const [inputValue, setInputValue] = useState("Sequoia Scouts");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownValue, setDropdownValue] = useState("Claude 4.6 Opus");
+  const [freqDropdownOpen, setFreqDropdownOpen] = useState(false);
+  const [freqDropdownValue, setFreqDropdownValue] = useState("Every morning at 7am");
+  const [statusDone, setStatusDone] = useState(false);
+
+  // Date picker state
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(3); // April (0-indexed for display, but we'll use 1-indexed)
+  const [calendarYear, setCalendarYear] = useState(2026);
+  const [selectedDate, setSelectedDate] = useState<{ day: number; month: number; year: number }>({ day: 5, month: 3, year: 2026 });
+  const [rangeStart, setRangeStart] = useState<{ day: number; month: number; year: number }>({ day: 28, month: 4, year: 2026 });
+  const [rangeEnd, setRangeEnd] = useState<{ day: number; month: number; year: number }>({ day: 5, month: 5, year: 2026 });
+  const [rangeCalOpen, setRangeCalOpen] = useState<"start" | "end" | null>(null);
+  const [rangeCalMonth, setRangeCalMonth] = useState(4);
+  const [rangeCalYear, setRangeCalYear] = useState(2026);
+
+  // Calendar helpers
+  const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const dayNames = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+  function getDaysInMonth(month: number, year: number) {
+    return new Date(year, month, 0).getDate();
+  }
+  function getFirstDayOfMonth(month: number, year: number) {
+    return new Date(year, month - 1, 1).getDay();
+  }
+  function formatDate(d: { day: number; month: number; year: number }) {
+    return `${monthNames[d.month - 1].slice(0, 3)} ${d.day}, ${d.year}`;
+  }
+  function isSameDate(a: { day: number; month: number; year: number }, b: { day: number; month: number; year: number }) {
+    return a.day === b.day && a.month === b.month && a.year === b.year;
+  }
+  function isInRange(day: number, month: number, year: number) {
+    const d = new Date(year, month - 1, day).getTime();
+    const s = new Date(rangeStart.year, rangeStart.month - 1, rangeStart.day).getTime();
+    const e = new Date(rangeEnd.year, rangeEnd.month - 1, rangeEnd.day).getTime();
+    return d >= s && d <= e;
+  }
+  function isToday(day: number, month: number, year: number) {
+    const t = new Date();
+    return day === t.getDate() && month === t.getMonth() + 1 && year === t.getFullYear();
+  }
+
+  function CalendarGrid({ month, year, selected, onSelect, rangeMode }: {
+    month: number; year: number;
+    selected: { day: number; month: number; year: number };
+    onSelect: (day: number) => void;
+    rangeMode?: boolean;
+  }) {
+    const daysInMonth = getDaysInMonth(month, year);
+    const firstDay = getFirstDayOfMonth(month, year);
+    const cells: (number | null)[] = [];
+    for (let i = 0; i < firstDay; i++) cells.push(null);
+    for (let d = 1; d <= daysInMonth; d++) cells.push(d);
+
+    return (
+      <div className="grid grid-cols-7 gap-1">
+        {dayNames.map((d) => (
+          <div key={d} className="flex h-8 w-8 items-center justify-center text-[10px] font-medium text-t4">{d}</div>
+        ))}
+        {cells.map((day, i) => {
+          if (day === null) return <div key={`e-${i}`} className="h-8 w-8" />;
+          const sel = day === selected.day && month === selected.month && year === selected.year;
+          const today = isToday(day, month, year);
+          const inRange = rangeMode && isInRange(day, month, year);
+          return (
+            <button
+              key={day}
+              onClick={() => onSelect(day)}
+              className={`flex h-8 w-8 items-center justify-center rounded-md text-[12px] transition-colors
+                ${sel ? "bg-as text-white font-medium" : inRange ? "bg-as/15 text-t1" : today ? "border border-as/40 text-as" : "text-t2 hover:bg-bg3"}
+              `}
+            >
+              {day}
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
+  function CalendarNav({ month, year, onPrev, onNext }: { month: number; year: number; onPrev: () => void; onNext: () => void }) {
+    return (
+      <div className="flex items-center justify-between mb-3 px-1">
+        <button onClick={onPrev} className="flex h-7 w-7 items-center justify-center rounded-md text-t3 hover:bg-bg3 hover:text-t1 transition-colors">
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+        </button>
+        <span className="text-[13px] font-medium text-t1">{monthNames[month - 1]} {year}</span>
+        <button onClick={onNext} className="flex h-7 w-7 items-center justify-center rounded-md text-t3 hover:bg-bg3 hover:text-t1 transition-colors">
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+        </button>
+      </div>
+    );
+  }
+
   // Resolve all CSS variables on mount and when theme changes
   const resolveAll = useCallback(() => {
     const resolved: Record<string, string> = {};
@@ -429,18 +548,25 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
         {/* Section nav */}
         <div className="flex w-[200px] shrink-0 flex-col border-r border-b1 bg-bg2 overflow-y-auto max-md:w-full max-md:flex-row max-md:border-r-0 max-md:border-b max-md:overflow-y-visible max-md:overflow-x-auto max-md:shrink-0">
           <div className="py-4 max-md:py-0 max-md:flex max-md:items-stretch max-md:px-2 max-md:gap-0">
-            {sections.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => setActiveSection(s.id)}
-                className={`w-full px-5 py-2.5 text-left transition-all max-md:w-auto max-md:shrink-0 max-md:px-3 max-md:py-2.5 max-md:text-center max-md:rounded-md max-md:my-1.5 ${
-                  activeSection === s.id ? "bg-bg3" : "hover:bg-bg3/50"
-                }`}
-              >
-                <div className={`text-[13px] font-medium max-md:text-[12px] max-md:whitespace-nowrap ${activeSection === s.id ? "text-t1" : "text-t3"}`}>
-                  {s.label}
+            {(["tokens", "controls"] as const).map((group) => (
+              <div key={group}>
+                <div className="px-5 pb-1 pt-3 first:pt-0 max-md:hidden">
+                  <div className="text-[9px] font-semibold uppercase tracking-[0.08em] text-t4">{group}</div>
                 </div>
-              </button>
+                {sections.filter((s) => s.group === group).map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => setActiveSection(s.id)}
+                    className={`w-full px-5 py-2.5 text-left transition-all max-md:w-auto max-md:shrink-0 max-md:px-3 max-md:py-2.5 max-md:text-center max-md:rounded-md max-md:my-1.5 ${
+                      activeSection === s.id ? "bg-bg3" : "hover:bg-bg3/50"
+                    }`}
+                  >
+                    <div className={`text-[13px] font-medium max-md:text-[12px] max-md:whitespace-nowrap ${activeSection === s.id ? "text-t1" : "text-t3"}`}>
+                      {s.label}
+                    </div>
+                  </button>
+                ))}
+              </div>
             ))}
           </div>
         </div>
@@ -697,6 +823,508 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                   <div className="text-[12px] text-t3">
                     <div className="font-mono text-t4 text-[11px]">bg-black/65 backdrop-blur-[5px]</div>
                     <div className="mt-1">Used for modal backdrops</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Buttons ── */}
+          {activeSection === "buttons" && (
+            <div className="space-y-10">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Variants — {buttonSize === "sm" ? "Small" : "Medium"}</div>
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="text-[11px] text-t3 mr-2">Size</span>
+                  {(["sm", "md"] as const).map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setButtonSize(s)}
+                      className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition-all ${buttonSize === s ? "border-as bg-as/10 text-blt" : "border-b1 text-t3 hover:text-t2"}`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+                <div className="space-y-4">
+                  {(["primary", "outline", "ghost", "link", "danger"] as const).map((variant) => (
+                    <div key={variant} className="flex items-center gap-6 rounded-lg border border-b1 bg-bgcard px-5 py-4">
+                      <div className="w-[120px] shrink-0">
+                        <Button variant={variant} size={buttonSize}>
+                          {variant === "primary" ? "Confirm" : variant === "outline" ? "Edit" : variant === "ghost" ? "More" : variant === "link" ? (<>View details <svg className="inline h-3 w-3 ml-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg></>) : "Delete"}
+                        </Button>
+                      </div>
+                      <div>
+                        <div className="text-[12px] font-medium text-t1 capitalize">{variant}</div>
+                        <div className="text-[11px] text-t3 mt-0.5">
+                          {variant === "primary" ? "Primary CTAs — confirm, submit, approve" : variant === "outline" ? "Secondary actions — edit, change, alternate" : variant === "ghost" ? "Tertiary — more options, subtle actions" : variant === "link" ? "Inline — view details, learn more" : "Destructive — delete, remove, cancel"}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-4">With Icons</div>
+                <div className="flex flex-wrap gap-3">
+                  <Button variant="primary" size={buttonSize} icon={<svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}>Approve</Button>
+                  <Button variant="outline" size={buttonSize} icon={<svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" /><polyline points="15 3 21 3 21 9" /><line x1="10" y1="14" x2="21" y2="3" /></svg>}>Open in Docs</Button>
+                  <Button variant="ghost" size={buttonSize} icon={<svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /><circle cx="5" cy="12" r="1" /></svg>}>More</Button>
+                  <Button variant="danger" size={buttonSize} icon={<svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>}>Remove</Button>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-4">Disabled</div>
+                <div className="flex flex-wrap gap-3">
+                  <Button variant="primary" size={buttonSize} disabled>Disabled</Button>
+                  <Button variant="outline" size={buttonSize} disabled>Disabled</Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Task List ── */}
+          {activeSection === "task-list" && (
+            <div className="space-y-10">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Task Item States</div>
+                <div className="rounded-lg border border-b1 bg-bgcard overflow-hidden divide-y divide-b1">
+                  {/* Running */}
+                  <div className="flex items-start gap-3 px-4 py-3">
+                    <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-g animate-running-glow" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-t1">Research Sequoia Scouts portfolio</div>
+                      <div className="mt-0.5 text-[11px] text-t3">Started 2m ago</div>
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="rounded-full bg-[#0A66C2]/15 px-2 py-0.5 text-[9px] font-semibold text-[#0A66C2]">LinkedIn</span>
+                      <span className="rounded-full bg-[#0288D1]/15 px-2 py-0.5 text-[9px] font-semibold text-[#0288D1]">Crunchbase</span>
+                    </div>
+                  </div>
+
+                  {/* Queued */}
+                  <div className="flex items-start gap-3 px-4 py-3">
+                    <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-g opacity-40" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-t2">Draft LP update email</div>
+                      <div className="mt-0.5 text-[11px] text-t4">Queued</div>
+                    </div>
+                  </div>
+
+                  {/* Recurring */}
+                  <div className="flex items-start gap-3 px-4 py-3">
+                    <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-am" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-t2">Morning email digest</div>
+                      <div className="mt-0.5 text-[11px] text-t4">Every day at 7am</div>
+                    </div>
+                    <span className="rounded-full bg-bg3h px-2 py-0.5 text-[9px] font-medium text-t3 mt-0.5">Recurring</span>
+                  </div>
+
+                  {/* Completed */}
+                  <div className="flex items-start gap-3 px-4 py-3">
+                    <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-t4" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[13px] font-medium text-t3">Flight price check — SFO to LHR</div>
+                      <div className="mt-0.5 text-[11px] text-t4">Completed · 4h ago</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-4">Status Dots</div>
+                <div className="flex items-center gap-8">
+                  <div className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-g animate-running-glow" /><span className="text-[11px] text-t3">Running</span></div>
+                  <div className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-g opacity-40" /><span className="text-[11px] text-t3">Queued</span></div>
+                  <div className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-am" /><span className="text-[11px] text-t3">Recurring</span></div>
+                  <div className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-t4" /><span className="text-[11px] text-t3">Completed</span></div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-4">Integration Pills</div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full bg-[#0A66C2]/15 px-2.5 py-1 text-[10px] font-semibold text-[#0A66C2]">LinkedIn</span>
+                  <span className="rounded-full bg-[#00A1E0]/15 px-2.5 py-1 text-[10px] font-semibold text-[#00A1E0]">Salesforce</span>
+                  <span className="rounded-full bg-[#0288D1]/15 px-2.5 py-1 text-[10px] font-semibold text-[#0288D1]">Crunchbase</span>
+                  <span className="rounded-full bg-[#EA4335]/15 px-2.5 py-1 text-[10px] font-semibold text-[#EA4335]">Gmail</span>
+                  <span className="rounded-full bg-[#4285F4]/15 px-2.5 py-1 text-[10px] font-semibold text-[#4285F4]">Google Calendar</span>
+                  <span className="rounded-full bg-bg3h px-2.5 py-1 text-[10px] font-semibold text-t3">Notion</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Inputs & Toggles ── */}
+          {activeSection === "inputs" && (
+            <div className="space-y-10">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Toggle Switches</div>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between rounded-lg border border-b1 bg-bgcard px-5 py-4">
+                    <div>
+                      <div className="text-[12px] font-medium text-t1">Enable notifications</div>
+                      <div className="text-[11px] text-t3 mt-0.5">Receive push notifications for task updates</div>
+                    </div>
+                    <button onClick={() => setToggle1(!toggle1)} className={`relative h-[24px] w-[44px] rounded-full transition-all ${toggle1 ? "bg-t1" : "bg-b2"}`}>
+                      <div className={`absolute top-[2px] h-[20px] w-[20px] rounded-full bg-bg transition-all ${toggle1 ? "left-[22px]" : "left-[2px]"}`} />
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between rounded-lg border border-b1 bg-bgcard px-5 py-4">
+                    <div>
+                      <div className="text-[12px] font-medium text-t1">Dark mode</div>
+                      <div className="text-[11px] text-t3 mt-0.5">Use dark color scheme</div>
+                    </div>
+                    <button onClick={() => setToggle2(!toggle2)} className={`relative h-[24px] w-[44px] rounded-full transition-all ${toggle2 ? "bg-t1" : "bg-b2"}`}>
+                      <div className={`absolute top-[2px] h-[20px] w-[20px] rounded-full bg-bg transition-all ${toggle2 ? "left-[22px]" : "left-[2px]"}`} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Text Input</div>
+                <div className="space-y-4 max-w-[400px]">
+                  <div>
+                    <label className="text-[11px] font-medium text-t3 mb-1.5 block">Task name</label>
+                    <input
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      className="w-full rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 placeholder:text-t4 outline-none transition-all focus:border-as focus:ring-1 focus:ring-as/30"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-medium text-t3 mb-1.5 block">Description</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Describe what this task should do..."
+                      className="w-full rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 placeholder:text-t4 outline-none transition-all focus:border-as focus:ring-1 focus:ring-as/30 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-medium text-t3 mb-1.5 block">Price threshold</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        defaultValue={500}
+                        className="w-[100px] rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 outline-none transition-all focus:border-as focus:ring-1 focus:ring-as/30"
+                      />
+                      <span className="text-[12px] text-t3">USD</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-4">States</div>
+                <div className="space-y-2 text-[12px] text-t3">
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[120px] shrink-0">Default</span> <span>border-b1 bg-bg</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[120px] shrink-0">Focus</span> <span>border-as ring-1 ring-as/30</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[120px] shrink-0">Disabled</span> <span>opacity-40 cursor-not-allowed</span></div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Dropdowns ── */}
+          {activeSection === "dropdowns" && (
+            <div className="space-y-10">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Select Menu</div>
+                <div className="max-w-[300px]">
+                  <label className="text-[11px] font-medium text-t3 mb-1.5 block">Model</label>
+                  <div className="relative">
+                    <button
+                      onClick={() => { setDropdownOpen(!dropdownOpen); setFreqDropdownOpen(false); }}
+                      className="flex w-full items-center justify-between rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 transition-all hover:border-b2"
+                    >
+                      <span>{dropdownValue}</span>
+                      <svg className={`h-3.5 w-3.5 text-t3 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+                    </button>
+                    {dropdownOpen && (
+                      <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                        {["Claude 4.6 Opus", "Claude 4.6 Sonnet", "Claude 4.6 Haiku"].map((opt) => (
+                          <button
+                            key={opt}
+                            onClick={() => { setDropdownValue(opt); setDropdownOpen(false); }}
+                            className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors hover:bg-bg3 ${dropdownValue === opt ? "text-t1" : "text-t3"}`}
+                          >
+                            {dropdownValue === opt && (
+                              <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                            )}
+                            {dropdownValue !== opt && <span className="w-3" />}
+                            <span>{opt}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Frequency Selector</div>
+                <div className="max-w-[300px]">
+                  <label className="text-[11px] font-medium text-t3 mb-1.5 block">Schedule</label>
+                  <div className="relative">
+                    <button
+                      onClick={() => { setFreqDropdownOpen(!freqDropdownOpen); setDropdownOpen(false); }}
+                      className="flex w-full items-center justify-between rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 transition-all hover:border-b2"
+                    >
+                      <span>{freqDropdownValue}</span>
+                      <svg className={`h-3.5 w-3.5 text-t3 transition-transform ${freqDropdownOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
+                    </button>
+                    {freqDropdownOpen && (
+                      <div className="absolute left-0 right-0 top-full z-10 mt-1 rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                        {["Every morning at 7am", "Every Monday at 9am", "Every hour", "Once a day"].map((opt) => (
+                          <button
+                            key={opt}
+                            onClick={() => { setFreqDropdownValue(opt); setFreqDropdownOpen(false); }}
+                            className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors hover:bg-bg3 ${freqDropdownValue === opt ? "text-t1" : "text-t3"}`}
+                          >
+                            {freqDropdownValue === opt && (
+                              <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                            )}
+                            {freqDropdownValue !== opt && <span className="w-3" />}
+                            <span>{opt}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Date Picker</div>
+
+                {/* ── Date Range Picker ── */}
+                <div className="max-w-[500px]">
+                  <label className="text-[11px] font-medium text-t3 mb-1.5 block">Travel dates</label>
+                  <div className="flex items-center gap-2">
+                    {/* Start date trigger */}
+                    <div className="relative">
+                      <button
+                        onClick={() => { setRangeCalOpen(rangeCalOpen === "start" ? null : "start"); setRangeCalMonth(rangeStart.month); setRangeCalYear(rangeStart.year); }}
+                        className={`flex items-center gap-2 rounded-md border px-3 py-1.5 text-[12px] text-t1 outline-none transition-all ${rangeCalOpen === "start" ? "border-as bg-bg3" : "border-b1 bg-bg3 hover:border-b2"}`}
+                      >
+                        <svg className="h-3 w-3 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                        {formatDate(rangeStart)}
+                      </button>
+                      {rangeCalOpen === "start" && (
+                        <div className="absolute left-0 top-full mt-1 z-20 w-[280px] rounded-lg border border-b1 bg-bg2 p-4 shadow-lg">
+                          <CalendarNav
+                            month={rangeCalMonth} year={rangeCalYear}
+                            onPrev={() => { if (rangeCalMonth === 1) { setRangeCalMonth(12); setRangeCalYear(rangeCalYear - 1); } else setRangeCalMonth(rangeCalMonth - 1); }}
+                            onNext={() => { if (rangeCalMonth === 12) { setRangeCalMonth(1); setRangeCalYear(rangeCalYear + 1); } else setRangeCalMonth(rangeCalMonth + 1); }}
+                          />
+                          <CalendarGrid
+                            month={rangeCalMonth} year={rangeCalYear} selected={rangeStart} rangeMode
+                            onSelect={(day) => { setRangeStart({ day, month: rangeCalMonth, year: rangeCalYear }); setRangeCalOpen(null); }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-t4">to</span>
+                    {/* End date trigger */}
+                    <div className="relative">
+                      <button
+                        onClick={() => { setRangeCalOpen(rangeCalOpen === "end" ? null : "end"); setRangeCalMonth(rangeEnd.month); setRangeCalYear(rangeEnd.year); }}
+                        className={`flex items-center gap-2 rounded-md border px-3 py-1.5 text-[12px] text-t1 outline-none transition-all ${rangeCalOpen === "end" ? "border-as bg-bg3" : "border-b1 bg-bg3 hover:border-b2"}`}
+                      >
+                        <svg className="h-3 w-3 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                        {formatDate(rangeEnd)}
+                      </button>
+                      {rangeCalOpen === "end" && (
+                        <div className="absolute left-0 top-full mt-1 z-20 w-[280px] rounded-lg border border-b1 bg-bg2 p-4 shadow-lg">
+                          <CalendarNav
+                            month={rangeCalMonth} year={rangeCalYear}
+                            onPrev={() => { if (rangeCalMonth === 1) { setRangeCalMonth(12); setRangeCalYear(rangeCalYear - 1); } else setRangeCalMonth(rangeCalMonth - 1); }}
+                            onNext={() => { if (rangeCalMonth === 12) { setRangeCalMonth(1); setRangeCalYear(rangeCalYear + 1); } else setRangeCalMonth(rangeCalMonth + 1); }}
+                          />
+                          <CalendarGrid
+                            month={rangeCalMonth} year={rangeCalYear} selected={rangeEnd} rangeMode
+                            onSelect={(day) => { setRangeEnd({ day, month: rangeCalMonth, year: rangeCalYear }); setRangeCalOpen(null); }}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-2 text-[11px] text-t4">Custom date-range picker with calendar popover. Range days highlighted.</div>
+                </div>
+
+                {/* ── Single Date Picker ── */}
+                <div className="mt-6 max-w-[220px]">
+                  <label className="text-[11px] font-medium text-t3 mb-1.5 block">Single date</label>
+                  <div className="relative">
+                    <button
+                      onClick={() => { setCalendarOpen(!calendarOpen); setCalendarMonth(selectedDate.month); setCalendarYear(selectedDate.year); }}
+                      className={`flex w-full items-center gap-2 rounded-md border px-3 py-1.5 text-[12px] text-t1 outline-none transition-all ${calendarOpen ? "border-as bg-bg3" : "border-b1 bg-bg3 hover:border-b2"}`}
+                    >
+                      <svg className="h-3 w-3 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
+                      {formatDate(selectedDate)}
+                    </button>
+                    {calendarOpen && (
+                      <div className="absolute left-0 top-full mt-1 z-20 w-[280px] rounded-lg border border-b1 bg-bg2 p-4 shadow-lg">
+                        <CalendarNav
+                          month={calendarMonth} year={calendarYear}
+                          onPrev={() => { if (calendarMonth === 1) { setCalendarMonth(12); setCalendarYear(calendarYear - 1); } else setCalendarMonth(calendarMonth - 1); }}
+                          onNext={() => { if (calendarMonth === 12) { setCalendarMonth(1); setCalendarYear(calendarYear + 1); } else setCalendarMonth(calendarMonth + 1); }}
+                        />
+                        <CalendarGrid
+                          month={calendarMonth} year={calendarYear} selected={selectedDate}
+                          onSelect={(day) => { setSelectedDate({ day, month: calendarMonth, year: calendarYear }); setCalendarOpen(false); }}
+                        />
+                        <div className="mt-2 flex justify-between border-t border-b1 pt-2">
+                          <button
+                            onClick={() => { const t = new Date(); setSelectedDate({ day: t.getDate(), month: t.getMonth() + 1, year: t.getFullYear() }); setCalendarOpen(false); }}
+                            className="text-[10px] font-medium text-as hover:text-as/80 transition-colors"
+                          >
+                            Today
+                          </button>
+                          <button onClick={() => setCalendarOpen(false)} className="text-[10px] font-medium text-t4 hover:text-t2 transition-colors">
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-4">Anatomy</div>
+                <div className="space-y-2 text-[12px] text-t3">
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[140px] shrink-0">Trigger</span> <span>border-b1 bg-bg, chevron indicator</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[140px] shrink-0">Dropdown</span> <span>border-b1 bg-bg2 py-1 shadow-lg</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[140px] shrink-0">Active item</span> <span>Checkmark icon (text-g) + text-t1</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[140px] shrink-0">Inactive item</span> <span>text-t3 + spacer w-3</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[140px] shrink-0">Hover</span> <span>bg-bg3</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[140px] shrink-0">Date trigger</span> <span>border-b1 bg-bg3, calendar icon + formatted date</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[140px] shrink-0">Calendar popup</span> <span>border-b1 bg-bg2 p-3 shadow-lg rounded-lg</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[140px] shrink-0">Selected day</span> <span>bg-as text-white rounded-md</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[140px] shrink-0">Range day</span> <span>bg-as/15 text-t1</span></div>
+                  <div className="flex gap-2"><span className="font-mono text-t4 w-[140px] shrink-0">Today</span> <span>border border-as/40 text-as</span></div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Badges & Pills ── */}
+          {activeSection === "badges" && (
+            <div className="space-y-10">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Format Badges</div>
+                <div className="flex flex-wrap gap-3">
+                  <span className="rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider bg-[rgba(59,130,246,0.15)] text-[#60a5fa]">DOC</span>
+                  <span className="rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider bg-[rgba(34,197,94,0.15)] text-[#4ade80]">SHEET</span>
+                  <span className="rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider bg-[rgba(168,85,247,0.15)] text-[#c084fc]">CODE</span>
+                  <span className="rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider bg-[rgba(251,191,36,0.15)] text-[#fbbf24]">LINK</span>
+                  <span className="rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider bg-[rgba(251,191,36,0.15)] text-[#fbbf24]">EMAIL</span>
+                  <span className="rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider bg-[rgba(34,197,94,0.15)] text-[#4ade80]">CALENDAR</span>
+                </div>
+                <div className="mt-3 text-[11px] text-t4">Used in ArtifactLink rows to identify document type. Color-coded by category.</div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Status Badges</div>
+                <div className="flex flex-wrap gap-3">
+                  <span className="rounded-full bg-[rgba(245,158,11,0.15)] border border-[rgba(245,158,11,0.3)] px-2.5 py-1 text-[10px] font-semibold text-[#f59e0b]">Trial · 12 days left</span>
+                  <span className="rounded-full bg-gs px-2.5 py-1 text-[10px] font-semibold text-g">Connected</span>
+                  <span className="rounded-full bg-bg3h px-2.5 py-1 text-[10px] font-medium text-t3">Upgrade</span>
+                  <span className="rounded-full bg-bg3h px-2.5 py-1 text-[10px] font-medium text-t3">Done</span>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Choice Badges</div>
+                <div className="flex flex-wrap gap-3">
+                  <span className="rounded-full border border-[rgba(245,158,11,0.3)] bg-[rgba(245,158,11,0.08)] px-2.5 py-1 text-[10px] font-medium text-[#f59e0b]">Urgent</span>
+                  <span className="rounded-full border border-[rgba(59,130,246,0.3)] bg-[rgba(59,130,246,0.08)] px-2.5 py-1 text-[10px] font-medium text-[#60a5fa]">Review</span>
+                  <span className="rounded-full border border-b1 bg-bg3h px-2.5 py-1 text-[10px] font-medium text-t3">Low</span>
+                </div>
+                <div className="mt-3 text-[11px] text-t4">Used in ChoiceCard list layout to indicate priority or category.</div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">User Action Tag</div>
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex items-center rounded border border-b1 bg-bg3 px-1 py-px text-[9px] font-medium text-t3">You</span>
+                  <span className="text-[11px] text-t4">Shown inline in step logs when the user performed an action</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Status Indicators ── */}
+          {activeSection === "status" && (
+            <div className="space-y-10">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-4">WorkingIndicator Component</div>
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="text-[11px] text-t3 mr-2">Done</span>
+                  <button
+                    onClick={() => setStatusDone(!statusDone)}
+                    className={`relative h-[24px] w-[44px] rounded-full transition-all ${statusDone ? "bg-t1" : "bg-b2"}`}
+                  >
+                    <div className={`absolute top-[2px] h-[20px] w-[20px] rounded-full bg-bg transition-all ${statusDone ? "left-[22px]" : "left-[2px]"}`} />
+                  </button>
+                </div>
+                <div className="space-y-4">
+                  <div className="rounded-lg border border-b1 bg-bgcard px-5 py-4">
+                    <WorkingIndicator label="Researching Sequoia Scouts" done={statusDone} />
+                  </div>
+                  <div className="rounded-lg border border-b1 bg-bgcard px-5 py-4">
+                    <WorkingIndicator label="Compiling LP touchpoint report" done={statusDone} />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Step Log Dots</div>
+                <div className="space-y-3 pl-1">
+                  <div className="flex items-center gap-3">
+                    <div className="h-[7px] w-[7px] rounded-full bg-g" />
+                    <span className="text-[12px] text-t2">Completed step</span>
+                    <span className="text-[10px] font-mono text-t4">bg-g, 7×7</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="h-[7px] w-[7px] rounded-full bg-t4 animate-pulse-dot" />
+                    <span className="text-[12px] text-t3">Running step</span>
+                    <span className="text-[10px] font-mono text-t4">bg-t4, animate-pulse-dot</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Spinner</div>
+                <div className="flex items-center gap-6">
+                  <div className="h-[14px] w-[14px] rounded-full border-2 border-g/30 border-t-g animate-spin" />
+                  <div>
+                    <div className="text-[12px] font-medium text-t1">Subtask spinner</div>
+                    <div className="text-[11px] text-t3 mt-0.5">14×14, border-2 border-g/30 border-t-g, animate-spin</div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Shimmer Bar</div>
+                <div className="space-y-3">
+                  <div className="rounded-lg border border-b1 bg-bgcard overflow-hidden">
+                    <div className="h-1 w-full shimmer-bar bg-as/20" />
+                    <div className="px-5 py-3 text-[11px] text-t3">Indeterminate — active task</div>
+                  </div>
+                  <div className="rounded-lg border border-b1 bg-bgcard overflow-hidden">
+                    <div className="h-1 w-full bg-g" />
+                    <div className="px-5 py-3 text-[11px] text-t3">Complete — solid green</div>
+                  </div>
+                  <div className="rounded-lg border border-b1 bg-bgcard overflow-hidden">
+                    <div className="h-1 w-full bg-am" />
+                    <div className="px-5 py-3 text-[11px] text-t3">Error — solid amber</div>
                   </div>
                 </div>
               </div>

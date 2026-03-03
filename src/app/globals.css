@@ -16,7 +16,7 @@
   --b2: #3a3a40;
   --bf: #4a4a52;
   --t1: #e8e8eb;
-  --t2: #8e8e96;
+  --t2: #a8a8b0;
   --t3: #6a6a73;
   --t4: #4a4a52;
   --as: #346E96;
@@ -34,10 +34,11 @@
   --blt: #4a8db8;
   --lb: #e8e8eb;
   --lt: #18181b;
+  --r: #ef4444;
   --sc: 0 1px 3px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--b1);
   --card-shadow: none;
   --mg: radial-gradient(ellipse at 30% 0%, rgba(61, 214, 140, 0.06) 0%, transparent 50%);
-  --st: #8e8e96;
+  --st: #a8a8b0;
   --sb: #2e2e34;
   --thumb-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
 }
@@ -58,7 +59,7 @@
   --b2: #c4c4ca;
   --bf: #a0a0a8;
   --t1: #1a1a1e;
-  --t2: #52525a;
+  --t2: #3c3c44;
   --t3: #71717a;
   --t4: #a0a0a8;
   --as: #2c6084;
@@ -76,6 +77,7 @@
   --blt: #2c6084;
   --lb: #1a1a1e;
   --lt: #fff;
+  --r: #dc2626;
   --sc: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 1px var(--b1);
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   --mg: radial-gradient(ellipse at 30% 0%, rgba(24, 135, 90, 0.06) 0%, transparent 50%);
@@ -116,6 +118,7 @@
   --color-blt: var(--blt);
   --color-lb: var(--lb);
   --color-lt: var(--lt);
+  --color-rd: var(--r);
   --color-st: var(--st);
   --color-sb: var(--sb);
   --font-sans: var(--font-inter);
@@ -130,10 +133,17 @@ body {
   transition: background 0.2s, color 0.2s;
 }
 
+/* ===== JetBrains Mono — always 11px uppercase ===== */
+.font-mono:not(input):not(textarea) {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 /* ===== Animations ===== */
 @keyframes pulse-dot {
-  0%, 100% { box-shadow: 0 0 5px var(--pulse-glow, var(--gg)); }
-  50% { box-shadow: 0 0 12px var(--pulse-glow, var(--gg)); }
+  0%, 100% { box-shadow: 0 0 4px var(--pulse-glow, var(--gg)); }
+  50% { box-shadow: 0 0 8px var(--pulse-glow, var(--gg)); }
 }
 
 @keyframes working-dots {
@@ -142,7 +152,7 @@ body {
 }
 
 .animate-pulse-dot {
-  animation: pulse-dot 3s ease-in-out infinite;
+  animation: pulse-dot 5s ease-in-out infinite;
 }
 
 .animate-working-dot {
@@ -195,17 +205,17 @@ body {
 .shimmer-text {
   background: linear-gradient(
     90deg,
-    var(--t3) 0%,
-    var(--t3) 35%,
-    var(--g) 50%,
-    var(--t3) 65%,
-    var(--t3) 100%
+    var(--t4) 0%,
+    var(--t4) 30%,
+    var(--t1) 50%,
+    var(--t4) 70%,
+    var(--t4) 100%
   );
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: shimmer-text 3s ease-in-out infinite;
+  animation: shimmer-text 3.5s ease-in-out infinite;
 }
 
 /* ===== Shimmer Bar (indeterminate progress) ===== */
@@ -254,6 +264,15 @@ body {
   animation: fade-in 0.4s ease-out;
 }
 
+/* ===== Logo Fill (workspace loader) ===== */
+@keyframes logo-fill {
+  0% { clip-path: inset(100% 0 0 0); }
+  100% { clip-path: inset(0% 0 0 0); }
+}
+.animate-logo-fill {
+  animation: logo-fill 2.5s ease-in-out infinite alternate;
+}
+
 /* ===== Shake ===== */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
@@ -265,7 +284,7 @@ body {
 /* ===== Collapsible Section ===== */
 .collapsible {
   display: grid;
-  transition: grid-template-rows 0.2s ease-out, opacity 0.2s ease-out;
+  transition: grid-template-rows 0.3s ease-out, opacity 0.3s ease-out;
 }
 
 .collapsible[data-open="true"] {
@@ -298,6 +317,22 @@ body {
 
 .animate-step-log-enter {
   animation: step-log-enter 0.25s ease-out forwards;
+}
+
+/* Individual step row enter */
+@keyframes step-row-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-step-row-enter {
+  animation: step-row-enter 0.3s ease-out both;
 }
 
 /* ===== Scrollbar ===== */

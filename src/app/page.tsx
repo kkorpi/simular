@@ -5,7 +5,7 @@ import { TopBar } from "@/components/TopBar";
 import { ChatArea } from "@/components/ChatArea";
 import { RightPanel } from "@/components/RightPanel";
 import { FullWorkspaceView } from "@/components/FullWorkspaceView";
-import { ZeroState } from "@/components/ZeroState";
+// ZeroState removed — fresh state now lives inside ChatArea
 import { SettingsOverlay, type SettingsSection } from "@/components/SettingsOverlay";
 import { CardGallery } from "@/components/CardGallery";
 import { DesignSystem } from "@/components/DesignSystem";
@@ -22,6 +22,15 @@ const PIP_MAX_WIDTH = 520;
 const PIP_DEFAULT_WIDTH = 320;
 
 type AppScreen = "landing" | "waitlist-signup" | "signup-sso" | "signup-payment" | "onboarding" | "waitlist" | "main-app";
+
+/** Workspace setup step labels — shown as an inline indicator during onboarding */
+const SETUP_STEPS = [
+  "Setting up your workspace",
+  "Installing Chrome and apps",
+  "Configuring a secure environment",
+  "Preparing your coworker",
+];
+const SETUP_DURATIONS = [4000, 3500, 4000, 4500]; // ~16s total — slower per Peter's feedback
 
 export default function Home() {
   // ── Screen flow ──
@@ -55,12 +64,24 @@ export default function Home() {
   const [firstRunTask, setFirstRunTask] = useState<StarterTask | null>(null);
   const [firstRunDone, setFirstRunDone] = useState(false);
   const [firstRunRecurring, setFirstRunRecurring] = useState(false);
+  const [firstRunDetailOpen, setFirstRunDetailOpen] = useState(false);
   const [demoPickerOpen, setDemoPickerOpen] = useState(false);
   const [teachPhase, setTeachPhase] = useState<TeachPhase>("idle");
   const [teachTaskName, setTeachTaskName] = useState("");
   const [trialDaysLeft, setTrialDaysLeft] = useState(6);
   const [trialCancelled, setTrialCancelled] = useState(false);
   const [trialDialogOpen, setTrialDialogOpen] = useState(false);
+
+  // ── Onboarding-in-chat state ──
+  const [isOnboarding, setIsOnboarding] = useState(false);
+  const [workspaceSetupStep, setWorkspaceSetupStep] = useState(0);
+  const [workspaceSetupDone, setWorkspaceSetupDone] = useState(false);
+
+  // ── ChatArea remount key & auto-play ──
+  const [chatKey, setChatKey] = useState(0);
+  const [isAutoPlay, setIsAutoPlay] = useState(false);
+  const [autoStep, setAutoStep] = useState(-1);
+
   const [pipWidth, setPipWidth] = useState(PIP_DEFAULT_WIDTH);
   const pipDragging = useRef(false);
   const pipDragStartX = useRef(0);
@@ -81,6 +102,7 @@ export default function Home() {
       setUserProfile({ role: "vc" });
       setScreen("main-app");
       setActiveView("task-hover");
+      setIsAutoPlay(true);
     } else if (demo === "gallery") {
       setUserProfile({ role: "vc" });
       setScreen("main-app");
@@ -107,10 +129,16 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [demoPickerOpen]);
 
-  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "teach" | "trial" | "system" | "expired") => {
+  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "teach" | "trial" | "system" | "expired" | "onboarding") => {
     setDemoPickerOpen(false);
     setFirstRunTask(null);
+    setFirstRunDone(false);
+    setFirstRunRecurring(false);
+    setLinkedinConnected(false);
+    setWorkspaceConnecting(false);
     setWorkspaceOpen(false);
+    setWorkspaceMode("default");
+    setWorkspaceService("");
     setSettingsOpen(false);
     setCardGalleryOpen(false);
     setDesignSystemOpen(false);
@@ -118,6 +146,9 @@ export default function Home() {
     setTeachTaskName("");
     setTrialDialogOpen(false);
     setTrialCancelled(false);
+    setIsOnboarding(false);
+    setIsAutoPlay(false);
+    setShowNewTaskCard(false);
     if (mode === "landing") {
       setScreen("landing");
       return;
@@ -127,9 +158,12 @@ export default function Home() {
     if (mode === "fresh") {
       setTrialDaysLeft(6);
       setActiveView("zero-state");
+      setChatKey((k) => k + 1);
     } else if (mode === "active") {
       setTrialDaysLeft(6);
+      setIsAutoPlay(true);
       setActiveView("task-hover");
+      setChatKey((k) => k + 1);
     } else if (mode === "gallery") {
       setTrialDaysLeft(6);
       setCardGalleryOpen(true);
@@ -149,6 +183,14 @@ export default function Home() {
       setTrialDaysLeft(0);
       setTrialCancelled(true);
       setActiveView("task-hover");
+    } else if (mode === "onboarding") {
+      setTrialDaysLeft(6);
+      setUserProfile({});
+      setIsOnboarding(true);
+      setWorkspaceSetupStep(0);
+      setWorkspaceSetupDone(false);
+      setActiveView("zero-state");
+      setChatKey((k) => k + 1);
     }
   };
 
@@ -156,6 +198,19 @@ export default function Home() {
   useEffect(() => {
     if (seatsRemaining <= 0) setCapReached(true);
   }, [seatsRemaining]);
+
+  // ── Workspace setup progress (runs during onboarding-in-chat) ──
+  useEffect(() => {
+    if (!isOnboarding || workspaceSetupDone) return;
+    if (workspaceSetupStep >= SETUP_STEPS.length) {
+      setWorkspaceSetupDone(true);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setWorkspaceSetupStep((s) => s + 1);
+    }, SETUP_DURATIONS[workspaceSetupStep]);
+    return () => clearTimeout(timer);
+  }, [isOnboarding, workspaceSetupStep, workspaceSetupDone]);
 
   // ── Flow handlers ──
   const handleClaimSpot = (code: string) => {
@@ -230,7 +285,7 @@ export default function Home() {
     setTeachTaskName("");
   };
 
-  const showPip = panelCollapsed && activeView !== "zero-state";
+  const showPip = panelCollapsed && (activeView !== "zero-state" || isOnboarding || firstRunTask || workspaceConnecting);
 
   const handlePipResizeStart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -284,8 +339,9 @@ export default function Home() {
         <div className="flex flex-col gap-2">
           {([
             { mode: "landing" as const, label: "Landing page", desc: "Back to the gated signup flow", icon: "🏠" },
-            { mode: "fresh" as const, label: "First run", desc: "ZeroState — pick a starter task", icon: "🌱" },
-            { mode: "active" as const, label: "Active session", desc: "Full chat + tasks + workspace", icon: "💬" },
+            { mode: "onboarding" as const, label: "Onboarding flow", desc: "Landing → signup → in-chat onboarding", icon: "👋" },
+            { mode: "fresh" as const, label: "First run", desc: "Chat with greeting + starter tasks", icon: "🌱" },
+            { mode: "active" as const, label: "Active session", desc: "Auto-play returning user session", icon: "💬" },
             { mode: "gallery" as const, label: "Card gallery", desc: "Browse all 12 card components", icon: "🎴" },
             { mode: "system" as const, label: "Design system", desc: "Colors, type ramp, tokens", icon: "🎨" },
             { mode: "teach" as const, label: "Teach flow", desc: "Agent suggests showing it a custom task", icon: "📖" },
@@ -357,7 +413,13 @@ export default function Home() {
         <>
         {demoPicker}{demoHint}
         <SignupPayment
-          onSubmit={() => setScreen("onboarding")}
+          onSubmit={() => {
+            setIsOnboarding(true);
+            setWorkspaceSetupStep(0);
+            setWorkspaceSetupDone(false);
+            setActiveView("zero-state");
+            setScreen("main-app");
+          }}
           onBack={() => setScreen("signup-sso")}
         />
         </>
@@ -395,61 +457,87 @@ export default function Home() {
       return (
         <div className="flex h-screen flex-col">
           <TopBar
-            isZeroState={activeView === "zero-state"}
+            isZeroState={activeView === "zero-state" && !isOnboarding}
             onOpenSettings={() => setSettingsOpen(true)}
-            onGoHome={() => { setActiveView("zero-state"); setFirstRunTask(null); setTeachPhase("idle"); setTeachTaskName(""); }}
+            onGoHome={() => { setActiveView("zero-state"); setFirstRunTask(null); setTeachPhase("idle"); setTeachTaskName(""); setIsAutoPlay(false); setChatKey((k) => k + 1); }}
             onOpenSubscription={() => { setSettingsSection("subscription"); setSettingsOpen(true); }}
             onOpenCredits={() => { setSettingsSection("credits"); setSettingsOpen(true); }}
             onOpenPanel={() => setPanelCollapsed(false)}
             trialDaysLeft={trialDaysLeft}
+            workspaceSetupLabel={undefined}
           />
           <div className="flex flex-1 overflow-hidden">
-            {activeView === "zero-state" ? (
-              <ZeroState
-                onStartTask={handleStartTask}
-                onCreateOwn={() => setActiveView("task-hover")}
-                userRole={userProfile.role}
-              />
-            ) : (
-              <>
-                <ChatArea
-                  view={activeView}
-                  onOpenDetail={() => setActiveView("result-detail")}
-                  onViewActivityLog={() => { setWorkspaceMode("default"); setWorkspaceOpen(true); }}
-                  onOpenWorkspaceForLogin={handleOpenWorkspaceForLogin}
-                  onSlashCommand={handleSlashCommand}
-                  showNewTaskCard={showNewTaskCard}
-                  onCloseNewTask={() => setShowNewTaskCard(false)}
-                  linkedinConnected={linkedinConnected}
-                  firstRunTask={firstRunTask}
-                  onFirstRunDone={() => setFirstRunDone(true)}
-                  onFirstRunComplete={() => setFirstRunTask(null)}
-                  onFirstRunMakeRecurring={() => { setFirstRunRecurring(true); }}
-                  onFirstRunRemoveRecurring={() => { setFirstRunRecurring(false); }}
-                  teachPhase={teachPhase}
-                  teachTaskName={teachTaskName}
-                  onStartTeach={handleStartTeach}
-                  onStopTeach={handleStopTeach}
-                  onFinishTeach={handleFinishTeach}
-                  onOpenWorkspace={() => setWorkspaceOpen(true)}
-                  workspaceOpen={workspaceOpen}
-                />
-                <RightPanel
-                  view={activeView}
-                  onViewChange={setActiveView}
-                  onOpenWorkspace={() => setWorkspaceOpen(true)}
-                  collapsed={panelCollapsed}
-                  onToggleCollapse={() => setPanelCollapsed((c) => !c)}
-                  workspaceConnecting={workspaceConnecting}
-                  firstRunTask={firstRunTask}
-                  firstRunDone={firstRunDone}
-                  firstRunRecurring={firstRunRecurring}
-                  onFirstRunRemoveRecurring={() => setFirstRunRecurring(false)}
-                  teachPhase={teachPhase}
-                  teachTaskName={teachTaskName}
-                />
-              </>
-            )}
+            <ChatArea
+              key={chatKey}
+              view={activeView}
+              onOpenDetail={() => setFirstRunDetailOpen(true)}
+              onViewActivityLog={() => { setWorkspaceMode("default"); setWorkspaceOpen(true); }}
+              onOpenWorkspaceForLogin={handleOpenWorkspaceForLogin}
+              onSlashCommand={handleSlashCommand}
+              showNewTaskCard={showNewTaskCard}
+              onCloseNewTask={() => setShowNewTaskCard(false)}
+              linkedinConnected={linkedinConnected}
+              onLinkedinConnect={() => setLinkedinConnected(true)}
+              firstRunTask={firstRunTask}
+              onFirstRunDone={() => setFirstRunDone(true)}
+              onFirstRunComplete={() => setFirstRunTask(null)}
+              onFirstRunMakeRecurring={() => { setFirstRunRecurring(true); }}
+              onFirstRunRemoveRecurring={() => { setFirstRunRecurring(false); }}
+              teachPhase={teachPhase}
+              teachTaskName={teachTaskName}
+              onStartTeach={handleStartTeach}
+              onStopTeach={handleStopTeach}
+              onFinishTeach={handleFinishTeach}
+              onOpenWorkspace={() => setWorkspaceOpen(true)}
+              workspaceOpen={workspaceOpen}
+              isOnboarding={isOnboarding}
+              workspaceSetupDone={workspaceSetupDone}
+              workspaceSetupStep={workspaceSetupStep}
+              userRole={userProfile.role}
+              isAutoPlay={isAutoPlay}
+              onAutoStepChange={setAutoStep}
+              onStartTask={handleStartTask}
+              onOnboardingComplete={(profile, task) => {
+                setUserProfile(profile);
+                setIsOnboarding(false);
+                if (task) {
+                  handleStartTask(task);
+                } else if (profile.customWorkflow) {
+                  handleStartTask({
+                    id: "custom",
+                    title: profile.customWorkflow,
+                    description: "",
+                    trustLevel: "medium",
+                    trustLabel: "Supervised",
+                    icon: "custom",
+                    category: "research",
+                  });
+                } else {
+                  setActiveView("zero-state");
+                }
+              }}
+            />
+            <RightPanel
+              view={activeView}
+              onViewChange={setActiveView}
+              onOpenWorkspace={() => setWorkspaceOpen(true)}
+              collapsed={panelCollapsed}
+              onToggleCollapse={() => setPanelCollapsed((c) => !c)}
+              workspaceConnecting={workspaceConnecting}
+              firstRunTask={firstRunTask}
+              firstRunDone={firstRunDone}
+              firstRunRecurring={firstRunRecurring}
+              onFirstRunRemoveRecurring={() => setFirstRunRecurring(false)}
+              openFirstRunDetail={firstRunDetailOpen}
+              onCloseFirstRunDetail={() => setFirstRunDetailOpen(false)}
+              teachPhase={teachPhase}
+              teachTaskName={teachTaskName}
+              isOnboarding={isOnboarding}
+              workspaceSetupStep={workspaceSetupStep}
+              workspaceSetupDone={workspaceSetupDone}
+              isAutoPlay={isAutoPlay}
+              autoStep={autoStep}
+            />
           </div>
 
           {/* Floating PiP workspace when sidebar is collapsed (desktop only) */}
@@ -462,9 +550,9 @@ export default function Home() {
             {/* Header: task info + expand */}
             <div className="flex items-center gap-2 px-3 py-2">
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <div className={`h-1.5 w-1.5 shrink-0 rounded-full ${workspaceConnecting ? "bg-am animate-pulse" : "bg-g animate-running-glow"}`} />
+                <div className={`h-1.5 w-1.5 shrink-0 rounded-full ${workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? "bg-am animate-pulse" : "bg-g animate-running-glow"}`} />
                 <div className="truncate text-[11px] font-medium text-t1">
-                  {workspaceConnecting ? "Connecting to workspace..." : (firstRunTask?.title ?? "Research inbound founder")}
+                  {workspaceConnecting ? "Connecting to workspace..." : isOnboarding && !workspaceSetupDone ? "Setting up workspace..." : (firstRunTask?.title ?? "Research inbound founder")}
                 </div>
               </div>
               <button
@@ -484,17 +572,17 @@ export default function Home() {
             </div>
             {/* Screen preview */}
             <div
-              onClick={() => !workspaceConnecting && setWorkspaceOpen(true)}
-              className={`relative flex aspect-video items-center justify-center bg-bg3 transition-all ${workspaceConnecting ? "" : "cursor-pointer hover:brightness-110"}`}
+              onClick={() => !workspaceConnecting && !(isOnboarding && !workspaceSetupDone) && setWorkspaceOpen(true)}
+              className={`relative flex aspect-video items-center justify-center bg-bg3 transition-all ${workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? "" : "cursor-pointer hover:brightness-110"}`}
             >
-              {workspaceConnecting ? (
+              {workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? (
                 <div className="flex flex-col items-center gap-2 text-center">
                   <div className="flex gap-1">
                     <div className="h-1.5 w-1.5 rounded-full bg-am animate-bounce [animation-delay:0ms]" />
                     <div className="h-1.5 w-1.5 rounded-full bg-am animate-bounce [animation-delay:150ms]" />
                     <div className="h-1.5 w-1.5 rounded-full bg-am animate-bounce [animation-delay:300ms]" />
                   </div>
-                  <span className="text-[10px] text-t3">Connecting...</span>
+                  <span className="text-[10px] text-t3">{isOnboarding ? "Setting up..." : "Connecting..."}</span>
                 </div>
               ) : (
                 <>
@@ -541,7 +629,7 @@ export default function Home() {
             service={workspaceService}
             teachTaskName={teachTaskName || undefined}
             onDoneTeach={handleStopTeach}
-            instruction={workspaceMode === "login" ? `Sign in to ${workspaceService} so your coworker can continue the task. Your credentials stay private in your workspace.` : undefined}
+            instruction={undefined}
           />
           <SettingsOverlay
             open={settingsOpen}
