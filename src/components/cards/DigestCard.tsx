@@ -114,28 +114,33 @@ export function DigestCard({
           {showRuns ? "Hide runs" : `View all ${runCount} runs`}
         </button>
 
-        {showRuns && (
-          <div className="mt-2 flex flex-col gap-1">
-            {runs.map((run, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-2 rounded-md px-2 py-1.5 hover:bg-bg3"
-              >
+        <div
+          className="grid transition-[grid-template-rows] duration-200 ease-out"
+          style={{ gridTemplateRows: showRuns ? "1fr" : "0fr" }}
+        >
+          <div className="overflow-hidden">
+            <div className="pt-2 flex flex-col gap-1">
+              {runs.map((run, i) => (
                 <div
-                  className={`mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full ${
-                    run.hasActionItems ? "bg-am" : "bg-g"
-                  }`}
-                />
-                <div className="min-w-0 flex-1">
-                  <div className="text-[11.5px] font-medium text-t2">{run.date}</div>
-                  <div className="mt-0.5 text-[11.5px] leading-[1.5] text-t3">
-                    {run.summary}
+                  key={i}
+                  className="flex items-start gap-2 rounded-md px-2 py-1.5 hover:bg-bg3"
+                >
+                  <div
+                    className={`mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full ${
+                      run.hasActionItems ? "bg-am" : "bg-g"
+                    }`}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[11.5px] font-medium text-t2">{run.date}</div>
+                    <div className="mt-0.5 text-[11.5px] leading-[1.5] text-t3">
+                      {run.summary}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        )}
+        </div>
       </div>
 
       {/* View task detail link */}
