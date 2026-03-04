@@ -21,7 +21,8 @@ type SettingsSection =
   | "commands"
   | "skills"
   | "subscription"
-  | "credits";
+  | "credits"
+  | "about";
 
 const sections: { id: SettingsSection; label: string }[] = [
   { id: "appearance", label: "Appearance" },
@@ -30,6 +31,7 @@ const sections: { id: SettingsSection; label: string }[] = [
   { id: "skills", label: "Skills" },
   { id: "subscription", label: "Subscription" },
   { id: "credits", label: "Credits" },
+  { id: "about", label: "About" },
 ];
 
 export { type SettingsSection };
@@ -129,6 +131,7 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
             {active === "skills" && <SkillsSettings />}
             {active === "subscription" && <SubscriptionSettings trialDaysLeft={trialDaysLeft} trialCancelled={trialCancelled} onCancelTrial={onCancelTrial} onReactivateTrial={onReactivateTrial} />}
             {active === "credits" && <CreditsSettings />}
+            {active === "about" && <AboutSettings />}
           </div>
         </div>
       </div>
@@ -714,6 +717,96 @@ function CreditsSettings() {
         <button className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3">
           Buy credits
         </button>
+      </div>
+    </div>
+  );
+}
+
+/* ── About ── */
+function AboutSettings() {
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Simular</div>
+        <div className="mt-3 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] text-t3">Version</span>
+            <span className="text-[13px] font-medium text-t1">0.9.1-beta</span>
+          </div>
+          <div className="flex items-center justify-between">
+            <span className="text-[13px] text-t3">Build</span>
+            <span className="font-mono text-[12px] text-t3">2026.03.04</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="h-px bg-b1" />
+
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Legal</div>
+        <div className="mt-3 flex flex-col gap-2.5">
+          <a
+            href="https://simular.ai/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between text-[13px] text-t2 transition-colors hover:text-t1"
+          >
+            Privacy Policy
+            <svg className="h-3.5 w-3.5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </a>
+          <a
+            href="https://simular.ai/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between text-[13px] text-t2 transition-colors hover:text-t1"
+          >
+            Terms of Service
+            <svg className="h-3.5 w-3.5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div className="h-px bg-b1" />
+
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Support</div>
+        <div className="mt-3 flex flex-col gap-2.5">
+          <a
+            href="mailto:support@simular.ai"
+            className="flex items-center justify-between text-[13px] text-t2 transition-colors hover:text-t1"
+          >
+            support@simular.ai
+            <svg className="h-3.5 w-3.5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+          </a>
+          <a
+            href="https://simular.ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between text-[13px] text-t2 transition-colors hover:text-t1"
+          >
+            simular.ai
+            <svg className="h-3.5 w-3.5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
+              <polyline points="15 3 21 3 21 9" />
+              <line x1="10" y1="14" x2="21" y2="3" />
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div className="mt-2 text-[11px] text-t4">
+        &copy; 2026 Simular, Inc. All rights reserved.
       </div>
     </div>
   );

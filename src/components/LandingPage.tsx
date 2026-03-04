@@ -10,6 +10,7 @@ interface LandingPageProps {
   capReached: boolean;
   onClaimSpot: (code: string) => void;
   onGoToWaitlist: () => void;
+  onGoToLogin: () => void;
 }
 
 export function LandingPage({
@@ -18,6 +19,7 @@ export function LandingPage({
   capReached,
   onClaimSpot,
   onGoToWaitlist,
+  onGoToLogin,
 }: LandingPageProps) {
   const [code, setCode] = useState(initialCode);
   const [codeStatus, setCodeStatus] = useState<"idle" | "valid" | "invalid">("idle");
@@ -177,8 +179,16 @@ export function LandingPage({
           )}
         </div>
 
+        {/* Sign in link */}
+        <button
+          onClick={onGoToLogin}
+          className="mt-5 flex w-full items-center justify-center text-[13px] text-t3 transition-colors hover:text-t1"
+        >
+          Already have an account?&nbsp;<span className="font-medium">Sign in</span>
+        </button>
+
         {/* Trust signals */}
-        <div className="mt-6 flex items-center justify-center gap-4 text-[11px] text-t4">
+        <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-t4">
           <div className="flex items-center gap-1.5">
             <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" />

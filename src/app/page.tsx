@@ -40,6 +40,7 @@ export default function Home() {
   // ── Trial / seat state (mock) ──
   const [seatsRemaining, setSeatsRemaining] = useState(SEATS_REMAINING_INIT);
   const [capReached, setCapReached] = useState(false);
+  const [isReturningUser, setIsReturningUser] = useState(false);
   const [inviteCode, setInviteCode] = useState("");
   const [waitlistEmail, setWaitlistEmail] = useState("");
   const [waitlistPosition, setWaitlistPosition] = useState(0);
@@ -148,6 +149,7 @@ export default function Home() {
     setTrialCancelled(false);
     setIsOnboarding(false);
     setIsAutoPlay(false);
+    setIsReturningUser(false);
     setShowNewTaskCard(false);
     if (mode === "landing") {
       setCapReached(false);
@@ -389,6 +391,7 @@ export default function Home() {
           capReached={capReached}
           onClaimSpot={handleClaimSpot}
           onGoToWaitlist={() => setScreen("waitlist-signup")}
+          onGoToLogin={() => { setIsReturningUser(true); setScreen("signup-sso"); }}
         />
         </>
       );
@@ -411,8 +414,19 @@ export default function Home() {
         <>
         {demoPicker}{demoHint}
         <SignupSSO
-          onSignIn={() => setScreen("signup-payment")}
-          onBack={() => setScreen("landing")}
+          onSignIn={() => {
+            if (isReturningUser) {
+              setUserProfile({ role: "vc" });
+              setTrialDaysLeft(6);
+              setIsAutoPlay(true);
+              setActiveView("task-hover");
+              setChatKey((k) => k + 1);
+              setScreen("main-app");
+            } else {
+              setScreen("signup-payment");
+            }
+          }}
+          onBack={() => { setIsReturningUser(false); setScreen("landing"); }}
         />
         </>
       );

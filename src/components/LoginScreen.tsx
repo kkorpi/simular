@@ -86,7 +86,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
           </h1>
 
           <p className="mt-4 text-center text-[15px] leading-[1.7] text-t3">
-            Simular runs on a real machine, uses real apps, and does
+            Sai runs on a real machine, uses real apps, and does
             real work, even while you&apos;re away.
           </p>
 
