@@ -183,6 +183,7 @@ export function TaskDetail({
 }) {
   const d = task.detail;
   const [showAllRuns, setShowAllRuns] = useState(false);
+  const [expandedRun, setExpandedRun] = useState<number | null>(null);
   const [showFullResult, setShowFullResult] = useState(false);
   const hasRichResult = d?.resultType === "briefing";
 
@@ -425,25 +426,39 @@ export function TaskDetail({
             <div className="flex flex-col gap-px">
               {(showAllRuns ? d.runHistory : d.runHistory.slice(0, 3)).map(
                 (run, i) => (
-                  <div
+                  <button
                     key={i}
-                    className="flex items-start gap-2.5 rounded-md px-2.5 py-2 transition-all hover:bg-bg3"
+                    type="button"
+                    onClick={() => run.fullResult ? setExpandedRun(expandedRun === i ? null : i) : undefined}
+                    className={`flex flex-col rounded-md px-2.5 py-2 text-left transition-all hover:bg-bg3 ${run.fullResult ? "cursor-pointer" : "cursor-default"}`}
                   >
-                    <div className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-t4" />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[12px] font-medium text-t1">
-                          {run.date}
-                        </span>
-                        <span className="font-mono text-[10px] text-t4">
-                          {run.duration}
-                        </span>
-                      </div>
-                      <div className="mt-0.5 text-[12px] leading-[1.5] text-t3">
-                        {run.summary}
+                    <div className="flex items-start gap-2.5">
+                      <div className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${run.hasActionItems ? "bg-am" : "bg-g"}`} />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] font-medium text-t1">
+                            {run.date}
+                          </span>
+                          <span className="font-mono text-[10px] text-t4">
+                            {run.duration}
+                          </span>
+                          {run.fullResult && (
+                            <svg className={`h-2.5 w-2.5 text-t4 transition-transform ${expandedRun === i ? "rotate-90" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polyline points="9 18 15 12 9 6" />
+                            </svg>
+                          )}
+                        </div>
+                        <div className="mt-0.5 text-[12px] leading-[1.5] text-t3">
+                          {run.summary}
+                        </div>
                       </div>
                     </div>
-                  </div>
+                    {expandedRun === i && run.fullResult && (
+                      <div className="ml-[18px] mt-1.5 whitespace-pre-wrap rounded-md bg-bg3/50 px-3 py-2 text-[11.5px] leading-[1.6] text-t2">
+                        {run.fullResult}
+                      </div>
+                    )}
+                  </button>
                 )
               )}
             </div>

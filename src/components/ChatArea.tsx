@@ -10,6 +10,7 @@ import { DraftCard } from "./cards/DraftCard";
 import { ResultCard as NewResultCard } from "./cards/ResultCard";
 import { PromptCard } from "./cards/PromptCard";
 import { ChoiceCard } from "./cards/ChoiceCard";
+import { DigestCard } from "./cards/DigestCard";
 import { LoginRequestCard } from "./LoginRequestCard";
 
 import { runningTaskSteps, linkedinLoginSteps, linkedinDisambiguatedSteps, disambiguationProfiles, firstRunSequences, followUpSequences, teachRecordedSteps, starterTasks } from "@/data/mockData";
@@ -1213,12 +1214,44 @@ export function ChatArea({
           </div>
         )}
 
-        {/* Step 1: Deal sourcing digest + ResultCard */}
+        {/* Step 1: Email digest + Deal sourcing digest */}
         {show(1) && (
           <div className={fadeClass}>
             <AgentContinuation>
               <div className="text-sm leading-[1.6] text-t2">
-                Your <strong className="font-semibold text-t1">deal sourcing digest</strong> is ready. Three new deals worth reviewing this morning.
+                Here&apos;s what your recurring tasks caught while you were away.
+              </div>
+              <DigestCard
+                icon="📬"
+                title="Important email reminder"
+                runCount={10}
+                statLine="Scanned 300 emails across 10 runs · 42 important · 8 requiring action"
+                actionItems={[
+                  { text: "AT\u0026T past-due bill — $255.30", runDate: "Feb 28, 3:01 PM" },
+                  { text: "Lia Ng (ByteDance) AI research follow-up", runDate: "Mar 2, 3:02 PM" },
+                  { text: "Paper accepted — Agentic AI in the Wild (register by Mar 5)", runDate: "Feb 27, 3:01 PM" },
+                  { text: "Third Bridge paid consultation request", runDate: "Feb 27, 8:01 AM" },
+                ]}
+                runs={[
+                  { date: "Mar 3, 3:01 PM", summary: "3 important: Belmont Dojo reply, Mercury, university follow-up", hasActionItems: true },
+                  { date: "Mar 3, 8:01 AM", summary: "No emails requiring action — 28 marketing/promos filtered", hasActionItems: false },
+                  { date: "Mar 2, 3:02 PM", summary: "6 important, 2 requiring action: Lia Ng follow-up, contractor invoice", hasActionItems: true },
+                  { date: "Mar 2, 8:01 AM", summary: "4 potentially important, none requiring action", hasActionItems: false },
+                  { date: "Mar 1, 3:00 PM", summary: "3 noteworthy: Xfinity bill, AppleCare, standup notes", hasActionItems: false },
+                  { date: "Mar 1, 8:02 AM", summary: "3 important: Xfinity bill, AppleCare, meeting reschedule", hasActionItems: true },
+                  { date: "Feb 28, 3:01 PM", summary: "7 important, 2 requiring action: AT\u0026T $255.30, AppleCare renewal", hasActionItems: true },
+                  { date: "Feb 28, 8:01 AM", summary: "2 FYI-level: Robinhood statement, LinkedIn digest", hasActionItems: false },
+                  { date: "Feb 27, 3:01 PM", summary: "5 important, 1 action: paper accepted to workshop", hasActionItems: true },
+                  { date: "Feb 27, 8:01 AM", summary: "4 important, 1 action: Third Bridge consultation request", hasActionItems: true },
+                ]}
+                schedule={{
+                  schedule: "Runs twice daily at 8am and 3pm",
+                  onEdit: () => openSchedule("Important email reminder", "Every day at 8:00am and 3:00pm", "Tomorrow 8:00am"),
+                  onTurnOff: () => {},
+                }}
+              />
+              <div className="mt-3 text-sm leading-[1.6] text-t2">
+                Your <strong className="font-semibold text-t1">deal sourcing digest</strong> also ran — three new deals worth reviewing.
               </div>
               <NewResultCard
                 icon={<svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}

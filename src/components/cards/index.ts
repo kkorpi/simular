@@ -9,4 +9,5 @@ export { BatchReviewCard, type BatchReviewCardProps, type BatchItem, type BatchR
 export { FormCard, type FormCardProps, type FormField, type FormValues } from "./FormCard";
 export { ProgressCard, type ProgressCardProps, type ProgressStep, type ProgressStepStatus } from "./ProgressCard";
 export { ErrorCard, type ErrorCardProps, type ErrorType } from "./ErrorCard";
+export { DigestCard, type DigestCardProps, type DigestRun, type DigestActionItem } from "./DigestCard";
 export type { CardAction } from "./types";

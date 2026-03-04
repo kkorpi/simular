@@ -9,6 +9,8 @@ export interface RunHistoryEntry {
   date: string;
   duration: string;
   summary: string;
+  fullResult?: string;
+  hasActionItems?: boolean;
 }
 
 export type ResultFormat = "text" | "briefing" | "document" | "spreadsheet" | "code" | "link" | "email" | "calendar";
@@ -209,6 +211,38 @@ export const recurringTasks: Task[] = [
         { date: "Feb 3 8:01am", duration: "2m 08s", summary: "2 P1 LPs overdue. 1 event invite, 1 content share suggested." },
         { date: "Jan 27 8:00am", duration: "1m 58s", summary: "All P1 LPs within cadence. 1 P2 approaching 60 days." },
         { date: "Jan 20 8:01am", duration: "2m 22s", summary: "3 P1 LPs overdue. Suggested dinner invitation to close gaps." },
+      ],
+    },
+  },
+  {
+    id: "10",
+    name: "Important email reminder",
+    status: "recurring",
+    subtitle: "Twice daily - 8am & 3pm",
+    time: "8:00a",
+    integrations: ["Gmail"],
+    skills: ["Research"],
+    thumbEmoji: "📬",
+    thumbLabel: "Last run - today 3:01pm",
+    thumbSite: "gmail.com",
+    thumbStatus: "Gmail\nEmail scan",
+    detail: {
+      description: "Scans your 30 most recent unread Gmail messages, filters out promotions, marketing, and newsletters, and surfaces important emails that need your attention or a reply.",
+      schedule: "Every day at 8:00am and 3:00pm",
+      lastRun: "Today 3:01pm",
+      nextRun: "Tomorrow 8:00am",
+      result: "Scanned 30 unread emails, found 3 important: a USSD Belmont Dojo message requiring a reply about Spring Break plans, a Mercury notification, and a university follow-up.",
+      runHistory: [
+        { date: "Mar 3, 3:01 PM", duration: "1m 42s", summary: "Scanned 30 of 201 unread. 3 important: USSD Belmont Dojo reply, Mercury notification, university follow-up.", hasActionItems: true, fullResult: "Scanned 30 of 201 unread Gmail messages from the past 24 hours and identified 3 important emails:\n\n1. USSD Belmont Dojo — reply needed about Spring Break plans\n2. Mercury — account notification, review recommended\n3. Stanford AI Lab — follow-up on collaboration discussion\n\n27 messages filtered as promotional, marketing, or newsletters." },
+        { date: "Mar 3, 8:01 AM", duration: "1m 38s", summary: "Scanned 30 of 201 unread. No emails requiring action — 28 marketing/promos, 1 university newsletter, 1 FYI notification.", fullResult: "Scanned 30 of your 201 unread Gmail messages for the afternoon run (past 8 hours) and found no emails requiring action or a response — 28 were marketing/promotions/newsletters, 1 was university newsletter, 1 was FYI-level notification." },
+        { date: "Mar 2, 3:02 PM", duration: "1m 45s", summary: "Scanned 30 of 201 unread. 6 important, 2 requiring action: Lia Ng (ByteDance) AI research follow-up, invoice from contractor.", hasActionItems: true, fullResult: "Scanned 30 unread emails from the past 24 hours and identified 6 important ones worth your attention: 2 require action (Lia Ng from ByteDance following up on an AI research collab, and an overdue invoice from a contractor), 4 are FYI-level." },
+        { date: "Mar 2, 8:01 AM", duration: "1m 33s", summary: "Scanned 30 of 201 unread. 4 potentially important, none requiring immediate action.", fullResult: "Scanned 30 unread Gmail messages from the past 24 hours and identified 4 potentially important emails while filtering out 26 promotional, marketing, and newsletter messages. None required immediate action." },
+        { date: "Mar 1, 3:00 PM", duration: "1m 40s", summary: "Scanned 30 of 201 unread. 3 noteworthy: Xfinity bill, AppleCare renewal, team standup notes.", fullResult: "Scanned 30 of 201 unread emails from the past 24 hours in your Gmail and identified 3 noteworthy ones: an Xfinity bill of $89.99 due Mar 10, an AppleCare renewal reminder, and team standup notes from yesterday." },
+        { date: "Mar 1, 8:02 AM", duration: "1m 36s", summary: "Scanned 30 of 201 unread. 3 important: Xfinity bill past-due, AppleCare, and a meeting reschedule.", hasActionItems: true, fullResult: "Scanned 30 of 201 unread emails from the past 24 hours, filtered out 27 promotional/marketing/newsletter messages, and identified 3 noteworthy emails: an Xfinity bill, an AppleCare+ renewal, and a meeting reschedule request from a portfolio company founder." },
+        { date: "Feb 28, 3:01 PM", duration: "1m 44s", summary: "Scanned 30 of 201 unread. 7 important, 2 requiring action: AT&T past-due bill $255.30, AppleCare+ renewal.", hasActionItems: true, fullResult: "Scanned 30 of 201 unread emails and identified 7 important ones: 2 requiring action (AT&T past-due bill of $255.30 and AppleCare+ renewal decision needed), 5 FYI-level items." },
+        { date: "Feb 28, 8:01 AM", duration: "1m 31s", summary: "Scanned 30 unread. 2 FYI-level: Robinhood interest statement, LinkedIn weekly digest.", fullResult: "Scanned 30 unread Gmail messages and found that none required immediate action or a response. Only 2 were flagged as FYI-level notices (a Robinhood interest statement and LinkedIn weekly digest)." },
+        { date: "Feb 27, 3:01 PM", duration: "1m 39s", summary: "Scanned 30 of 201 unread. 5 important, 1 requiring action: paper accepted to Agentic AI in the Wild workshop.", hasActionItems: true, fullResult: "Scanned 30 of 201 unread emails and identified 5 important ones: 1 requiring action (your paper was accepted to the Agentic AI in the Wild workshop — registration deadline Mar 5), 4 FYI." },
+        { date: "Feb 27, 8:01 AM", duration: "1m 35s", summary: "Scanned 30 of 201 unread. 4 important, 1 requiring action: Third Bridge consultation request via LinkedIn.", hasActionItems: true, fullResult: "Scanned 30 of 201 unread emails and identified 4 important ones: 1 requiring action (a paid consultation request from Third Bridge about CUA expertise via LinkedIn), 1 time-sensitive newsletter, 2 FYI." },
       ],
     },
   },
