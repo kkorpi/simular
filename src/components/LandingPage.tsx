@@ -157,24 +157,24 @@ export function LandingPage({
           ) : (
             <>
               {/* Cap reached */}
-              <div className="flex items-center gap-3 rounded-lg border border-b1 bg-bg3 px-4 py-4">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-am/10">
-                  <svg className="h-4 w-4 text-am" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="8" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
+              <div className="text-center">
+                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-as/10">
+                  <svg className="h-5 w-5 text-as" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .962L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z" />
                   </svg>
                 </div>
-                <div>
-                  <div className="text-[14px] font-medium text-t1">All {SEATS_TOTAL} spots claimed</div>
-                  <div className="text-[12px] text-t3">Join the waitlist to get notified when seats open</div>
-                </div>
+                <h3 className="mt-4 text-[16px] font-semibold text-t1">
+                  All spots are spoken for
+                </h3>
+                <p className="mt-2 text-[13px] leading-[1.6] text-t3">
+                  We&apos;re blown away by the demand. More invite codes are on the way&nbsp;&mdash; join the waitlist and we&apos;ll send yours as soon as they drop.
+                </p>
               </div>
 
               {/* Waitlist button */}
               <button
                 onClick={onGoToWaitlist}
-                className="mt-5 flex h-12 w-full items-center justify-center rounded-md bg-as text-[15px] font-medium text-white transition-all hover:bg-as2"
+                className="mt-6 flex h-12 w-full items-center justify-center rounded-md bg-as text-[15px] font-medium text-white transition-all hover:bg-as2"
               >
                 Join the waitlist
               </button>

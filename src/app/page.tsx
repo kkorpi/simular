@@ -129,7 +129,7 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [demoPickerOpen]);
 
-  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "teach" | "trial" | "system" | "expired" | "onboarding") => {
+  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "landing-cap" | "teach" | "trial" | "system" | "expired" | "onboarding") => {
     setDemoPickerOpen(false);
     setFirstRunTask(null);
     setFirstRunDone(false);
@@ -150,6 +150,14 @@ export default function Home() {
     setIsAutoPlay(false);
     setShowNewTaskCard(false);
     if (mode === "landing") {
+      setCapReached(false);
+      setSeatsRemaining(SEATS_REMAINING_INIT);
+      setScreen("landing");
+      return;
+    }
+    if (mode === "landing-cap") {
+      setCapReached(true);
+      setSeatsRemaining(0);
       setScreen("landing");
       return;
     }
@@ -338,7 +346,8 @@ export default function Home() {
         <div className="mb-4 text-[11px] text-t3">Jump to any state. <span className="font-mono text-t4">Cmd+Shift+D</span></div>
         <div className="flex flex-col gap-2">
           {([
-            { mode: "landing" as const, label: "Landing page", desc: "Back to the gated signup flow", icon: "🏠" },
+            { mode: "landing" as const, label: "Landing page", desc: "Invite code entry", icon: "🏠" },
+            { mode: "landing-cap" as const, label: "Landing (sold out)", desc: "All codes claimed — waitlist CTA", icon: "✨" },
             { mode: "onboarding" as const, label: "Onboarding flow", desc: "Landing → signup → in-chat onboarding", icon: "👋" },
             { mode: "fresh" as const, label: "First run", desc: "Chat with greeting + starter tasks", icon: "🌱" },
             { mode: "active" as const, label: "Active session", desc: "Auto-play returning user session", icon: "💬" },
