@@ -65,21 +65,28 @@ export function DigestCard({
           <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.05em] text-am">
             Needs attention ({actionItems.length})
           </div>
-          <div className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-2.5">
             {actionItems.map((item, i) => (
               <div key={i} className="flex items-start gap-2">
                 <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-am" />
-                <div className="min-w-0 flex-1 text-[12.5px] leading-[1.5] text-t1">
-                  {item.text}
-                  <span className="ml-1.5 text-[11px] text-t4">{item.runDate}</span>
-                  {item.action && (
-                    <button
-                      onClick={item.action.onClick}
-                      className="ml-1.5 inline-flex text-[11px] font-medium text-blt transition-colors hover:underline"
-                    >
-                      {item.action.label} →
-                    </button>
-                  )}
+                <div className="min-w-0 flex-1">
+                  <div className="text-[12.5px] leading-[1.5] text-t1">
+                    {item.text}
+                  </div>
+                  <div className="mt-0.5 flex items-center gap-2">
+                    <span className="text-[11px] text-t4">{item.runDate}</span>
+                    {item.action && (
+                      <button
+                        onClick={item.action.onClick}
+                        className="flex items-center gap-0.5 text-[11.5px] font-medium text-blt transition-colors hover:underline"
+                      >
+                        {item.action.label}
+                        <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="9 18 15 12 9 6" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

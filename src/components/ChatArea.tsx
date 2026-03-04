@@ -1234,10 +1234,10 @@ export function ChatArea({
                 runCount={10}
                 statLine="Scanned 300 emails across 10 runs · 42 important · 8 requiring action"
                 actionItems={[
-                  { text: "AT&T past-due bill — $255.30", runDate: "Feb 28, 3:01 PM", action: { label: "View bill", onClick: () => {} } },
-                  { text: "Lia Ng (ByteDance) AI research follow-up", runDate: "Mar 2, 3:02 PM" },
-                  { text: "Paper accepted — Agentic AI in the Wild (register by Mar 5)", runDate: "Feb 27, 3:01 PM" },
-                  { text: "Third Bridge paid consultation request", runDate: "Feb 27, 8:01 AM" },
+                  { text: "AT&T past-due bill — $255.30", runDate: "Feb 28, 3:01 PM", action: { label: "Pay bill", onClick: () => {} } },
+                  { text: "Lia Ng (ByteDance) AI research follow-up", runDate: "Mar 2, 3:02 PM", action: { label: "Draft reply", onClick: () => {} } },
+                  { text: "Paper accepted — Agentic AI in the Wild (register by Mar 5)", runDate: "Feb 27, 3:01 PM", action: { label: "Register", onClick: () => {} } },
+                  { text: "Third Bridge paid consultation request", runDate: "Feb 27, 8:01 AM", action: { label: "Review", onClick: () => {} } },
                 ]}
                 runs={[
                   { date: "Mar 3, 3:01 PM", summary: "3 important: Belmont Dojo reply, Mercury, university follow-up", hasActionItems: true },
