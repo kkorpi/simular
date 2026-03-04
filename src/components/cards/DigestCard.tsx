@@ -13,6 +13,7 @@ export interface DigestRun {
 export interface DigestActionItem {
   text: string;
   runDate: string;
+  action?: { label: string; onClick: () => void };
 }
 
 export interface DigestCardProps {
@@ -71,6 +72,14 @@ export function DigestCard({
                 <div className="min-w-0 flex-1 text-[12.5px] leading-[1.5] text-t1">
                   {item.text}
                   <span className="ml-1.5 text-[11px] text-t4">{item.runDate}</span>
+                  {item.action && (
+                    <button
+                      onClick={item.action.onClick}
+                      className="ml-1.5 inline-flex text-[11px] font-medium text-blt transition-colors hover:underline"
+                    >
+                      {item.action.label} →
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

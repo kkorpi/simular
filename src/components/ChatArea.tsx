@@ -1234,7 +1234,7 @@ export function ChatArea({
                 runCount={10}
                 statLine="Scanned 300 emails across 10 runs · 42 important · 8 requiring action"
                 actionItems={[
-                  { text: "AT\u0026T past-due bill — $255.30", runDate: "Feb 28, 3:01 PM" },
+                  { text: "AT&T past-due bill — $255.30", runDate: "Feb 28, 3:01 PM", action: { label: "View bill", onClick: () => {} } },
                   { text: "Lia Ng (ByteDance) AI research follow-up", runDate: "Mar 2, 3:02 PM" },
                   { text: "Paper accepted — Agentic AI in the Wild (register by Mar 5)", runDate: "Feb 27, 3:01 PM" },
                   { text: "Third Bridge paid consultation request", runDate: "Feb 27, 8:01 AM" },
