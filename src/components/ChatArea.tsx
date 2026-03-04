@@ -1222,7 +1222,14 @@ export function ChatArea({
                 Here&apos;s what your recurring tasks caught while you were away.
               </div>
               <DigestCard
-                icon="📬"
+                icon={
+                  <svg className="h-3.5 w-3.5 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="17 1 21 5 17 9" />
+                    <path d="M3 11V9a4 4 0 014-4h14" />
+                    <polyline points="7 23 3 19 7 15" />
+                    <path d="M21 13v2a4 4 0 01-4 4H3" />
+                  </svg>
+                }
                 title="Important email reminder"
                 runCount={10}
                 statLine="Scanned 300 emails across 10 runs · 42 important · 8 requiring action"
