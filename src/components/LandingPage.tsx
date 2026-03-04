@@ -158,12 +158,7 @@ export function LandingPage({
             <>
               {/* Cap reached */}
               <div className="text-center">
-                <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-as/10">
-                  <svg className="h-5 w-5 text-as" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .962 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .962L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.962 0z" />
-                  </svg>
-                </div>
-                <h3 className="mt-4 text-[16px] font-semibold text-t1">
+                <h3 className="text-[16px] font-semibold text-t1">
                   All spots are spoken for
                 </h3>
                 <p className="mt-2 text-[13px] leading-[1.6] text-t3">
