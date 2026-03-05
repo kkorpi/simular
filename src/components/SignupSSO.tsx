@@ -19,18 +19,6 @@ export function SignupSSO({ onSignIn, onBack }: SignupSSOProps) {
           <SimularLogo size={40} />
         </div>
 
-        {/* Step indicator */}
-        <div className="mb-8 flex justify-center gap-2">
-          {[0, 1, 2].map((i) => (
-            <div
-              key={i}
-              className={`h-1.5 w-1.5 rounded-full ${
-                i === 0 ? "bg-as" : i === 1 ? "bg-blt animate-pulse" : "bg-bg3"
-              }`}
-            />
-          ))}
-        </div>
-
         <h2 className="text-center text-[22px] font-semibold text-t1">
           Create your account
         </h2>
