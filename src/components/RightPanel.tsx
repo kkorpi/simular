@@ -157,6 +157,8 @@ export function RightPanel({
   onFirstRunRemoveRecurring,
   openFirstRunDetail = false,
   onCloseFirstRunDetail,
+  openTaskId = null,
+  onClearOpenTaskId,
   teachPhase = "idle",
   teachTaskName,
   isOnboarding = false,
@@ -178,6 +180,9 @@ export function RightPanel({
   /** When true, auto-select the first-run task in the TaskDetail slide-over */
   openFirstRunDetail?: boolean;
   onCloseFirstRunDetail?: () => void;
+  /** When set, auto-select a task by ID in the TaskDetail slide-over */
+  openTaskId?: string | null;
+  onClearOpenTaskId?: () => void;
   teachPhase?: TeachPhase;
   teachTaskName?: string;
   /** True during onboarding — show workspace setup progress */
@@ -204,6 +209,15 @@ export function RightPanel({
       setSelectedTask(task);
     }
   }, [openFirstRunDetail, firstRunTask, firstRunDone, firstRunRecurring]);
+
+  // Auto-select a task by ID (e.g. from digest card "View report")
+  useEffect(() => {
+    if (!openTaskId) return;
+    const allTasks = [...defaultRecurringTasks, ...defaultActiveTasks, ...defaultCompletedTasks];
+    const found = allTasks.find((t) => t.id === openTaskId);
+    if (found) setSelectedTask(found);
+    onClearOpenTaskId?.();
+  }, [openTaskId, onClearOpenTaskId]);
 
   const minWidth = view === "result-detail" ? 440 : 280;
   const maxWidth = 720;

@@ -214,6 +214,7 @@ function FirstRunResult({
 export function ChatArea({
   view,
   onOpenDetail,
+  onOpenTaskById,
   onViewActivityLog,
   onOpenWorkspaceForLogin,
   onSlashCommand,
@@ -244,6 +245,7 @@ export function ChatArea({
 }: {
   view: ViewState;
   onOpenDetail: () => void;
+  onOpenTaskById?: (taskId: string) => void;
   onViewActivityLog?: () => void;
   onOpenWorkspaceForLogin?: (service: string) => void;
   onSlashCommand?: (command: string) => void;
@@ -1251,7 +1253,7 @@ export function ChatArea({
                   { date: "Feb 27, 3:01 PM", summary: "5 important, 1 action: paper accepted to workshop", hasActionItems: true },
                   { date: "Feb 27, 8:01 AM", summary: "4 important, 1 action: Third Bridge consultation request", hasActionItems: true },
                 ]}
-                onViewTask={onOpenDetail}
+                onViewTask={() => onOpenTaskById?.("10")}
                 schedule={{
                   schedule: "Runs twice daily at 8am and 3pm",
                   onEdit: () => openSchedule("Important email reminder", "Every day at 8:00am and 3:00pm", "Tomorrow 8:00am"),

@@ -66,6 +66,7 @@ export default function Home() {
   const [firstRunDone, setFirstRunDone] = useState(false);
   const [firstRunRecurring, setFirstRunRecurring] = useState(false);
   const [firstRunDetailOpen, setFirstRunDetailOpen] = useState(false);
+  const [openTaskId, setOpenTaskId] = useState<string | null>(null);
   const [demoPickerOpen, setDemoPickerOpen] = useState(false);
   const [teachPhase, setTeachPhase] = useState<TeachPhase>("idle");
   const [teachTaskName, setTeachTaskName] = useState("");
@@ -494,6 +495,7 @@ export default function Home() {
               key={chatKey}
               view={activeView}
               onOpenDetail={() => setFirstRunDetailOpen(true)}
+              onOpenTaskById={(id) => setOpenTaskId(id)}
               onViewActivityLog={() => { setWorkspaceMode("default"); setWorkspaceOpen(true); }}
               onOpenWorkspaceForLogin={handleOpenWorkspaceForLogin}
               onSlashCommand={handleSlashCommand}
@@ -553,6 +555,8 @@ export default function Home() {
               onFirstRunRemoveRecurring={() => setFirstRunRecurring(false)}
               openFirstRunDetail={firstRunDetailOpen}
               onCloseFirstRunDetail={() => setFirstRunDetailOpen(false)}
+              openTaskId={openTaskId}
+              onClearOpenTaskId={() => setOpenTaskId(null)}
               teachPhase={teachPhase}
               teachTaskName={teachTaskName}
               isOnboarding={isOnboarding}
