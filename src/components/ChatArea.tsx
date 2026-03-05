@@ -1277,7 +1277,7 @@ export function ChatArea({
                 }}
                 accent="green"
                 actions={[
-                  { label: "View report", style: "primary", onClick: onOpenDetail },
+                  { label: "View details", style: "primary", onClick: () => onOpenTaskById?.("3") },
                   {
                     label: "Open in Sheets",
                     style: "outline",
@@ -1396,7 +1396,7 @@ export function ChatArea({
                   view === "result-detail"
                     ? [{ label: "\u2190 Viewing", style: "primary", onClick: () => {} }]
                     : [
-                        { label: "View details", style: "primary", onClick: onOpenDetail },
+                        { label: "View details", style: "primary", onClick: () => onOpenTaskById?.("6") },
                         {
                           label: "Open in Docs",
                           style: "outline",
@@ -1437,7 +1437,7 @@ export function ChatArea({
                 }}
                 accent="green"
                 actions={[
-                  { label: "View details", style: "primary", onClick: onOpenDetail },
+                  { label: "View details", style: "primary", onClick: () => onOpenTaskById?.("5") },
                   {
                     label: "Open in Sheets",
                     style: "outline",
