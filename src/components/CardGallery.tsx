@@ -9,6 +9,7 @@ import {
   BatchReviewCard,
   FormCard,
   ErrorCard,
+  DigestCard,
   type ResultBody,
   type ChoiceOption,
   type DraftField,
@@ -23,12 +24,13 @@ import type { RunningStep } from "@/data/mockData";
 
 /* ── Card type definitions ── */
 
-type CardType = "result" | "draft" | "choice" | "prompt" | "batch" | "form" | "progress" | "error" | "notification" | "destructive" | "comparison" | "login";
+type CardType = "result" | "digest" | "draft" | "choice" | "prompt" | "batch" | "form" | "progress" | "error" | "notification" | "destructive" | "comparison" | "login";
 
 type GalleryEntry = { id: CardType; label: string; description: string; scenario: string };
 
 const cardTypes: GalleryEntry[] = [
   { id: "result", label: "Result Card", description: "Agent delivers output", scenario: "Task completes and agent presents findings — research summaries, reports, compiled data. Supports prose, highlights, key-value, table, and section layouts." },
+  { id: "digest", label: "Digest Card", description: "Recurring task roll-up", scenario: "User returns and multiple runs of a recurring task have completed — email monitoring, deal sourcing, price tracking. Rolls up runs into one card with stats, action items, and expandable run history." },
   { id: "notification", label: "Notification", description: "Async status update", scenario: "A recurring or background task fires while the user is away — price drops, overdue reminders, daily digests. Urgency levels drive visual weight." },
   { id: "draft", label: "Draft Card", description: "Review before sending", scenario: "Agent drafts something that needs human approval before sending — emails, social comments, bookings, calendar invites. User can edit inline." },
   { id: "choice", label: "Choice Card", description: "Pick from options", scenario: "Agent needs the user to disambiguate — multiple matching profiles, email triage priority, calendar selection. Cards, list, and pills layouts." },
@@ -749,6 +751,47 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
                 />
               )}
 
+              {/* Digest */}
+              {activeCard === "digest" && (
+                <DigestCard
+                  icon={
+                    <svg className="h-3.5 w-3.5 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="17 1 21 5 17 9" />
+                      <path d="M3 11V9a4 4 0 014-4h14" />
+                      <polyline points="7 23 3 19 7 15" />
+                      <path d="M21 13v2a4 4 0 01-4 4H3" />
+                    </svg>
+                  }
+                  title="Important email reminder"
+                  runCount={10}
+                  statLine="Scanned 300 emails across 10 runs · 42 important · 8 requiring action"
+                  actionItems={[
+                    { text: "AT&T past-due bill — $255.30", runDate: "Feb 28, 3:01 PM", action: { label: "Pay bill", onClick: () => {} } },
+                    { text: "Lia Ng (ByteDance) AI research follow-up", runDate: "Mar 2, 3:02 PM", action: { label: "Draft reply", onClick: () => {} } },
+                    { text: "Paper accepted — Agentic AI in the Wild (register by Mar 5)", runDate: "Feb 27, 3:01 PM", action: { label: "Register", onClick: () => {} } },
+                    { text: "Third Bridge paid consultation request", runDate: "Feb 27, 8:01 AM", action: { label: "Review", onClick: () => {} } },
+                  ]}
+                  runs={[
+                    { date: "Mar 3, 3:01 PM", summary: "3 important: Belmont Dojo reply, Mercury, university follow-up", hasActionItems: true },
+                    { date: "Mar 3, 8:01 AM", summary: "No emails requiring action — 28 marketing/promos filtered", hasActionItems: false },
+                    { date: "Mar 2, 3:02 PM", summary: "6 important, 2 requiring action: Lia Ng follow-up, contractor invoice", hasActionItems: true },
+                    { date: "Mar 2, 8:01 AM", summary: "4 potentially important, none requiring action", hasActionItems: false },
+                    { date: "Mar 1, 3:00 PM", summary: "3 noteworthy: Xfinity bill, AppleCare, standup notes", hasActionItems: false },
+                    { date: "Mar 1, 8:02 AM", summary: "3 important: Xfinity bill, AppleCare, meeting reschedule", hasActionItems: true },
+                    { date: "Feb 28, 3:01 PM", summary: "7 important, 2 requiring action: AT&T $255.30, AppleCare renewal", hasActionItems: true },
+                    { date: "Feb 28, 8:01 AM", summary: "2 FYI-level: Robinhood statement, LinkedIn digest", hasActionItems: false },
+                    { date: "Feb 27, 3:01 PM", summary: "5 important, 1 action: paper accepted to workshop", hasActionItems: true },
+                    { date: "Feb 27, 8:01 AM", summary: "4 important, 1 action: Third Bridge consultation request", hasActionItems: true },
+                  ]}
+                  onViewTask={() => {}}
+                  schedule={{
+                    schedule: "Runs twice daily at 8am and 3pm",
+                    onEdit: () => {},
+                    onTurnOff: () => {},
+                  }}
+                />
+              )}
+
             </div>
           </div>
 
@@ -928,6 +971,12 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
                   <ControlRow label="Reset">
                     <ResetButton onClick={() => setBatchKey((k) => k + 1)}>Reset review</ResetButton>
                   </ControlRow>
+                </div>
+              )}
+
+              {activeCard === "digest" && (
+                <div className="flex flex-col gap-4">
+                  <div className="text-[12px] text-t3">Expand the run list and action items to explore. No configurable options yet.</div>
                 </div>
               )}
             </div>
