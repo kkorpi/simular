@@ -783,7 +783,6 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
                     { date: "Feb 27, 3:01 PM", summary: "5 important, 1 action: paper accepted to workshop", hasActionItems: true },
                     { date: "Feb 27, 8:01 AM", summary: "4 important, 1 action: Third Bridge consultation request", hasActionItems: true },
                   ]}
-                  onViewTask={() => {}}
                   schedule={{
                     schedule: "Runs twice daily at 8am and 3pm",
                     onEdit: () => {},
