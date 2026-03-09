@@ -53,11 +53,13 @@ export function RunningTaskDetail({
 
   return (
     <div className="mt-2 overflow-hidden">
-      {/* Subtask indicators */}
+      {/* Subtask indicators — show current step label when running */}
       <div className="flex flex-col gap-3.5 pb-2">
-        {subtasks.map((label, i) => (
-          <WorkingIndicator key={i} label={label} done={done} />
-        ))}
+        {subtasks.map((fallbackLabel, i) => {
+          const currentStep = !done ? steps.find((s) => !s.done) : undefined;
+          const label = currentStep ? currentStep.label.replace(/\.{2,}$/, "") : fallbackLabel;
+          return <WorkingIndicator key={i} label={label} done={done} />;
+        })}
       </div>
 
       {/* Summary + Toggle */}
