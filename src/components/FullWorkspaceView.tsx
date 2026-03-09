@@ -8,6 +8,11 @@ type Corner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 const PADDING = 16;
 const TOP_PADDING = 56; // Clear the floating controls pill
 
+/** Steps window — show this many at a time, scroll the rest */
+const STEP_VISIBLE = 3;
+const STEP_ROW_H = 32; // approximate height per step row
+const STEP_WINDOW_H = STEP_VISIBLE * STEP_ROW_H;
+
 function getCornerPosition(corner: Corner, container: DOMRect, panel: DOMRect) {
   switch (corner) {
     case "top-left":
@@ -55,6 +60,8 @@ export function FullWorkspaceView({
   onDoneTeach?: () => void;
 }) {
   const [stepsVisible, setStepsVisible] = useState(true);
+  const [showAllSteps, setShowAllSteps] = useState(false);
+  const stepsScrollRef = useRef<HTMLDivElement>(null);
   const [loginSuccess, setLoginSuccess] = useState(false);
   const [countdown, setCountdown] = useState(5);
 
@@ -100,6 +107,17 @@ export function FullWorkspaceView({
     : mode === "login"
       ? (loginSuccess ? loginSuccessSteps : loginSteps)
       : workspaceSteps;
+
+  const stepsOverflow = activeSteps.length > STEP_VISIBLE;
+  const completedStepCount = activeSteps.filter((s) => s.status === "done").length;
+
+  // Auto-scroll to keep active/newest steps in view
+  useEffect(() => {
+    if (!showAllSteps && stepsScrollRef.current) {
+      stepsScrollRef.current.scrollTo({ top: stepsScrollRef.current.scrollHeight, behavior: "smooth" });
+    }
+  }, [completedStepCount, showAllSteps]);
+
   const [dragging, setDragging] = useState(false);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
 
@@ -477,43 +495,71 @@ export function FullWorkspaceView({
               </svg>
             </button>
           </div>
-          <div className="flex flex-col gap-0.5 px-3.5 pb-3">
-            {activeSteps.map((step, i) => (
-              <div
-                key={i}
-                className={`flex items-center gap-2.5 rounded-md px-1.5 py-1.5 ${
-                  step.status === "pending" ? "opacity-40" : ""
-                }`}
-              >
-                {step.status === "done" ? (
-                  <svg className={`h-3.5 w-3.5 shrink-0 ${mode === "teach" ? "text-violet-500" : "text-g"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                ) : step.status === "active" ? (
-                  <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
-                    <div
-                      className={`h-[7px] w-[7px] rounded-full animate-pulse-dot ${mode === "teach" ? "bg-violet-500" : "bg-g"}`}
-                      style={mode === "teach" ? { "--pulse-glow": "rgba(139, 92, 246, 0.5)" } as React.CSSProperties : undefined}
-                    />
+          <div className="relative px-3.5 pb-1">
+            {/* Top gradient mask — visible when windowed and scrolled content above */}
+            <div
+              className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-7 rounded-t-lg bg-gradient-to-b from-[rgba(var(--bg2-rgb,30,30,30),0.9)] to-transparent transition-opacity duration-200 ${
+                stepsOverflow && !showAllSteps ? "opacity-100" : "opacity-0"
+              }`}
+            />
+
+            {/* Step window — fixed height showing STEP_VISIBLE rows, expands on "View all" */}
+            <div
+              ref={stepsScrollRef}
+              className="overflow-hidden transition-[max-height] duration-300 ease-out"
+              style={{
+                maxHeight: showAllSteps ? `${activeSteps.length * STEP_ROW_H + 8}px` : `${STEP_WINDOW_H}px`,
+              }}
+            >
+              <div className="flex flex-col gap-0.5">
+                {activeSteps.map((step, i) => (
+                  <div
+                    key={i}
+                    className={`flex items-center gap-2.5 rounded-md px-1.5 py-1.5 ${
+                      step.status === "pending" ? "opacity-40" : ""
+                    }`}
+                  >
+                    {step.status === "done" ? (
+                      <svg className={`h-3.5 w-3.5 shrink-0 ${mode === "teach" ? "text-violet-500" : "text-g"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    ) : step.status === "active" ? (
+                      <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
+                        <div
+                          className={`h-[7px] w-[7px] rounded-full animate-pulse-dot ${mode === "teach" ? "bg-violet-500" : "bg-g"}`}
+                          style={mode === "teach" ? { "--pulse-glow": "rgba(139, 92, 246, 0.5)" } as React.CSSProperties : undefined}
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
+                        <div className="h-[5px] w-[5px] rounded-full bg-t4" />
+                      </div>
+                    )}
+                    <span
+                      className={`text-[11.5px] leading-snug ${
+                        step.status === "done"
+                          ? "text-t3"
+                          : step.status === "active"
+                            ? "text-t1 font-medium"
+                            : "text-t4"
+                      }`}
+                    >
+                      {step.label}
+                    </span>
                   </div>
-                ) : (
-                  <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
-                    <div className="h-[5px] w-[5px] rounded-full bg-t4" />
-                  </div>
-                )}
-                <span
-                  className={`text-[11.5px] leading-snug ${
-                    step.status === "done"
-                      ? "text-t3"
-                      : step.status === "active"
-                        ? "text-t1 font-medium"
-                        : "text-t4"
-                  }`}
-                >
-                  {step.label}
-                </span>
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* View all / Show less toggle */}
+            {stepsOverflow && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setShowAllSteps((v) => !v); }}
+                className="py-1.5 text-[11px] font-medium text-t4 transition-colors hover:text-t3"
+              >
+                {showAllSteps ? "Show less" : `View all ${activeSteps.length} steps`}
+              </button>
+            )}
           </div>
         </div>
       </div>
