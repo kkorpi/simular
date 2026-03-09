@@ -9,7 +9,7 @@ const PADDING = 16;
 const TOP_PADDING = 56; // Clear the floating controls pill
 
 /** Steps window — show this many at a time, scroll the rest */
-const STEP_VISIBLE = 3;
+const STEP_VISIBLE = 4;
 const STEP_ROW_H = 32; // approximate height per step row
 const STEP_WINDOW_H = STEP_VISIBLE * STEP_ROW_H;
 
@@ -108,7 +108,9 @@ export function FullWorkspaceView({
       ? (loginSuccess ? loginSuccessSteps : loginSteps)
       : workspaceSteps;
 
-  const stepsOverflow = activeSteps.length > STEP_VISIBLE;
+  // Only show done + active steps (we don't know future steps)
+  const visibleSteps = activeSteps.filter((s) => s.status === "done" || s.status === "active");
+  const stepsOverflow = visibleSteps.length > STEP_VISIBLE;
   const completedStepCount = activeSteps.filter((s) => s.status === "done").length;
 
   // Auto-scroll to keep active/newest steps in view
@@ -498,7 +500,7 @@ export function FullWorkspaceView({
           <div className="relative px-3.5 pb-1">
             {/* Top gradient mask — visible when windowed and scrolled content above */}
             <div
-              className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-7 rounded-t-lg bg-gradient-to-b from-[rgba(var(--bg2-rgb,30,30,30),0.9)] to-transparent transition-opacity duration-200 ${
+              className={`pointer-events-none absolute inset-x-0 top-0 z-10 h-7 rounded-t-lg bg-gradient-to-b from-bg2 to-transparent transition-opacity duration-200 ${
                 stepsOverflow && !showAllSteps ? "opacity-100" : "opacity-0"
               }`}
             />
@@ -506,13 +508,13 @@ export function FullWorkspaceView({
             {/* Step window — fixed height showing STEP_VISIBLE rows, expands on "View all" */}
             <div
               ref={stepsScrollRef}
-              className="overflow-hidden transition-[max-height] duration-300 ease-out"
+              className={`overflow-hidden transition-[max-height] duration-300 ease-out ${!showAllSteps ? "flex flex-col justify-end" : ""}`}
               style={{
-                maxHeight: showAllSteps ? `${activeSteps.length * STEP_ROW_H + 8}px` : `${STEP_WINDOW_H}px`,
+                maxHeight: showAllSteps ? `${visibleSteps.length * 60}px` : `${STEP_WINDOW_H}px`,
               }}
             >
               <div className="flex flex-col gap-0.5">
-                {activeSteps.map((step, i) => (
+                {visibleSteps.map((step, i) => (
                   <div
                     key={i}
                     className={`flex items-center gap-2.5 rounded-md px-1.5 py-1.5 ${
@@ -557,7 +559,7 @@ export function FullWorkspaceView({
                 onClick={(e) => { e.stopPropagation(); setShowAllSteps((v) => !v); }}
                 className="py-1.5 text-[11px] font-medium text-t4 transition-colors hover:text-t3"
               >
-                {showAllSteps ? "Show less" : `View all ${activeSteps.length} steps`}
+                {showAllSteps ? "Show less" : "View all steps"}
               </button>
             )}
           </div>

@@ -496,8 +496,11 @@ export const workspaceSteps: WorkspaceStep[] = [
   { label: "Opened founder's LinkedIn profile", status: "done" },
   { label: "Pulled background, experience, and notable followers", status: "done" },
   { label: "Cross-referenced X profile for recent posts", status: "done" },
-  { label: "Checking company website and product", status: "active" },
-  { label: "Mapping to Salesforce deal record", status: "pending" },
+  { label: "Checked company website and product page", status: "done" },
+  { label: "Reviewed recent funding rounds and investors", status: "done" },
+  { label: "Matched to Salesforce deal record", status: "done" },
+  { label: "Drafting research brief for CRM", status: "active" },
+  { label: "Send summary to Slack channel", status: "pending" },
 ];
 
 export const linkedinLoginSteps: RunningStep[] = [
