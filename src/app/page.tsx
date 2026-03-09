@@ -32,9 +32,28 @@ const SETUP_STEPS = [
 ];
 const SETUP_DURATIONS = [4000, 3500, 4000, 4500]; // ~16s total — slower per Peter's feedback
 
+const VALID_SCREENS = new Set<AppScreen>(["landing", "waitlist-signup", "signup-sso", "signup-payment", "onboarding", "waitlist", "main-app"]);
+const VALID_VIEWS = new Set<ViewState>(["zero-state", "task-hover", "result-detail"]);
+
+function parseHash(): { screen: AppScreen; view?: ViewState; overlay?: string } {
+  if (typeof window === "undefined") return { screen: "landing" };
+  const raw = window.location.hash.replace(/^#\/?/, "");
+  if (!raw) return { screen: "landing" };
+  const parts = raw.split("/");
+  const s = parts[0] as AppScreen;
+  if (!VALID_SCREENS.has(s)) return { screen: "landing" };
+  const v = parts[1] as ViewState | undefined;
+  return {
+    screen: s,
+    view: v && VALID_VIEWS.has(v) ? v : undefined,
+    overlay: parts[1] === "card-gallery" || parts[1] === "design-system" || parts[1] === "workspace" ? parts[1] : undefined,
+  };
+}
+
 export default function Home() {
-  // ── Screen flow ──
-  const [screen, setScreen] = useState<AppScreen>("landing");
+  // ── Screen flow (with hash deep-link) ──
+  const initial = parseHash();
+  const [screen, setScreen] = useState<AppScreen>(initial.screen);
   const [userProfile, setUserProfile] = useState<OnboardingProfile>({});
 
   // ── Trial / seat state (mock) ──
@@ -46,7 +65,7 @@ export default function Home() {
   const [waitlistPosition, setWaitlistPosition] = useState(0);
 
   // ── Main app state ──
-  const [activeView, setActiveView] = useState<ViewState>("zero-state");
+  const [activeView, setActiveView] = useState<ViewState>(initial.view ?? "zero-state");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSection, setSettingsSection] = useState<SettingsSection | undefined>(undefined);
   const [cardGalleryOpen, setCardGalleryOpen] = useState(false);
@@ -115,6 +134,26 @@ export default function Home() {
       setDesignSystemOpen(true);
     }
   }, []);
+
+  // ── Hash deep-link: apply overlay on mount, sync hash on changes ──
+  useEffect(() => {
+    const h = parseHash();
+    if (h.overlay === "card-gallery") setCardGalleryOpen(true);
+    else if (h.overlay === "design-system") setDesignSystemOpen(true);
+    else if (h.overlay === "workspace") setWorkspaceOpen(true);
+    // For main-app, auto-set profile so it renders
+    if (h.screen === "main-app") setUserProfile((p) => p.role ? p : { ...p, role: "vc" });
+  }, []);
+
+  // Sync hash when screen or view changes
+  useEffect(() => {
+    const base = screen;
+    const sub = screen === "main-app" && activeView !== "zero-state" ? `/${activeView}` : "";
+    const newHash = `#${base}${sub}`;
+    if (window.location.hash !== newHash) {
+      window.history.replaceState(null, "", newHash);
+    }
+  }, [screen, activeView]);
 
   // ── Cmd+Shift+D → demo mode picker ──
   useEffect(() => {
