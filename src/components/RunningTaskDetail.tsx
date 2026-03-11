@@ -83,7 +83,7 @@ export function RunningTaskDetail({
         </button>
         <span className={`text-[11px] text-t4 transition-opacity duration-200 ${expanded ? "opacity-0" : "opacity-100"}`}>
           {done
-            ? `${completedCount} steps · ${elapsedLabel}`
+            ? `Complete · ${completedCount} steps · ${elapsedLabel}`
             : `Working · ${elapsedLabel}`}
         </span>
       </div>

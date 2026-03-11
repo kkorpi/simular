@@ -21,7 +21,7 @@ export function WorkingIndicator({ label, done }: { label: string; done?: boolea
   return (
     <div className="flex items-center">
       {done ? (
-        <div className="mr-2 h-[7px] w-[7px] shrink-0 rounded-full bg-t4" />
+        <svg className="mr-1.5 h-3.5 w-3.5 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
       ) : (
         <div className="mr-2 h-[14px] w-[14px] shrink-0 rounded-full border-2 border-g/30 border-t-g animate-spin" />
       )}
