@@ -590,13 +590,14 @@ export default function Home() {
 
     case "main-app":
       return (
-        <div className="flex h-screen flex-col">
+        <div className="flex h-dvh flex-col">
           <TopBar
             isZeroState={activeView === "zero-state" && !isOnboarding}
             onOpenSettings={() => setSettingsOpen(true)}
             onGoHome={() => { setActiveView("zero-state"); setFirstRunTask(null); setTeachPhase("idle"); setTeachTaskName(""); setIsAutoPlay(false); setChatKey((k) => k + 1); }}
             onOpenSubscription={() => { setSettingsSection("subscription"); setSettingsOpen(true); }}
             onOpenCredits={() => { setSettingsSection("credits"); setSettingsOpen(true); }}
+            onOpenDemoPicker={() => setDemoPickerOpen(true)}
             onOpenPanel={() => setPanelCollapsed(false)}
             trialDaysLeft={trialDaysLeft}
             workspaceSetupLabel={undefined}
@@ -974,7 +975,7 @@ export default function Home() {
             </div>
           )}
 
-          {demoPicker}{demoHint}
+          {demoPicker}
         </div>
       );
   }

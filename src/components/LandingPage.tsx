@@ -61,7 +61,7 @@ export function LandingPage({
   };
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center bg-bg px-8">
+    <div className="flex h-dvh flex-col items-center justify-center bg-bg px-8">
       <div className="w-full max-w-[480px]">
         {/* Logo */}
         <div className="flex justify-center">

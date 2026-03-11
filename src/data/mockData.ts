@@ -919,6 +919,7 @@ export interface FollowUpSequence {
   agentMessage: string;
   subtask: string;
   integrations: string[];
+  steps: { label: string; done: boolean }[];
   resultTitle: string;
   resultSummary: string;
   artifact: ResultArtifact;
@@ -929,6 +930,12 @@ export const followUpSequences: Record<string, FollowUpSequence> = {
     agentMessage: "On it — searching LinkedIn for these founders now.",
     subtask: "Looking up founders on LinkedIn",
     integrations: ["LinkedIn"],
+    steps: [
+      { label: "Searched LinkedIn for founder profiles", done: true },
+      { label: "Pulled recent posts and engagement data", done: true },
+      { label: "Extracted mutual connections", done: true },
+      { label: "Compiled activity summary", done: true },
+    ],
     resultTitle: "LinkedIn Activity Summary",
     resultSummary: "Found profiles for all 3 founders. Pulled recent posts, mutual connections, and engagement patterns. Two are actively posting about fundraising.",
     artifact: {
@@ -943,6 +950,12 @@ export const followUpSequences: Record<string, FollowUpSequence> = {
     agentMessage: "Checking PitchBook for funding details now.",
     subtask: "Cross-referencing with PitchBook",
     integrations: ["PitchBook"],
+    steps: [
+      { label: "Opened PitchBook and searched deal records", done: true },
+      { label: "Matched 8 of 12 records to profiles", done: true },
+      { label: "Pulled recent funding rounds and valuations", done: true },
+      { label: "Compiled funding analysis", done: true },
+    ],
     resultTitle: "PitchBook Funding Analysis",
     resultSummary: "Matched 8 of 12 records to PitchBook profiles. Found 3 with recent funding rounds and 2 with valuation changes in the last quarter.",
     artifact: {
@@ -957,6 +970,12 @@ export const followUpSequences: Record<string, FollowUpSequence> = {
     agentMessage: "Sharing the debrief with attendees now.",
     subtask: "Sending debrief via Google Docs",
     integrations: ["Google Docs", "Gmail"],
+    steps: [
+      { label: "Opened meeting debrief in Google Docs", done: true },
+      { label: "Tagged action items for each attendee", done: true },
+      { label: "Shared doc with 8 attendees via Gmail", done: true },
+      { label: "Sent notification emails", done: true },
+    ],
     resultTitle: "Debrief Shared",
     resultSummary: "Shared the meeting debrief doc with all 3 meeting attendee groups. Each received a comment tagging their specific action items.",
     artifact: {

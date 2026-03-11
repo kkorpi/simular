@@ -72,7 +72,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
   }, [visiblePoints]);
 
   return (
-    <div className="flex h-screen bg-bg1">
+    <div className="flex h-dvh bg-bg1">
       {/* Left: value prop */}
       <div className="hidden flex-1 flex-col items-center justify-center px-16 lg:flex xl:px-24">
         <div className="w-full max-w-[480px]">

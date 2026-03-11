@@ -6,20 +6,20 @@ interface AvatarMenuProps {
   open: boolean;
   onClose: () => void;
   onOpenSettings: () => void;
-  onOpenSubscription?: () => void;
   onOpenCredits?: () => void;
+  onOpenDemoPicker?: () => void;
 }
 
-export function AvatarMenu({ open, onClose, onOpenSettings, onOpenSubscription, onOpenCredits }: AvatarMenuProps) {
+export function AvatarMenu({ open, onClose, onOpenSettings, onOpenCredits, onOpenDemoPicker }: AvatarMenuProps) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) return;
-    const handle = (e: MouseEvent) => {
+    const handle = (e: PointerEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) onClose();
     };
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
+    document.addEventListener("pointerdown", handle);
+    return () => document.removeEventListener("pointerdown", handle);
   }, [open, onClose]);
 
   if (!open) return null;
@@ -46,19 +46,6 @@ export function AvatarMenu({ open, onClose, onOpenSettings, onOpenSubscription, 
 
       {/* Menu items */}
       <div className="py-1.5">
-        <MenuItem
-          icon={
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="2" />
-              <path d="M7 15h0M2 9.5h20" />
-            </svg>
-          }
-          label="Subscription"
-          onClick={() => {
-            onClose();
-            onOpenSubscription?.();
-          }}
-        />
         <MenuItem
           icon={
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -91,16 +78,23 @@ export function AvatarMenu({ open, onClose, onOpenSettings, onOpenSubscription, 
 
       <div className="h-px bg-b1" />
 
+      {/* Demo picker */}
       <div className="py-1.5">
         <MenuItem
           icon={
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
+              <rect x="2" y="3" width="20" height="14" rx="2" />
+              <line x1="8" y1="21" x2="16" y2="21" />
+              <line x1="12" y1="17" x2="12" y2="21" />
             </svg>
           }
-          label="Log out"
+          label="Demo picker"
+          trailing="⌘⇧D"
+          trailingBadge
+          onClick={() => {
+            onClose();
+            onOpenDemoPicker?.();
+          }}
         />
       </div>
     </div>
@@ -111,11 +105,13 @@ function MenuItem({
   icon,
   label,
   trailing,
+  trailingBadge,
   onClick,
 }: {
   icon: React.ReactNode;
   label: string;
   trailing?: string;
+  trailingBadge?: boolean;
   onClick?: () => void;
 }) {
   return (
@@ -126,7 +122,11 @@ function MenuItem({
       <span className="text-t3">{icon}</span>
       <span className="flex-1 text-left">{label}</span>
       {trailing && (
-        <span className="text-[12px] text-t3">{trailing}</span>
+        trailingBadge ? (
+          <span className="rounded border border-b1 bg-bg3 px-1.5 py-0.5 text-[11px] text-t3">{trailing}</span>
+        ) : (
+          <span className="text-[11px] text-t3">{trailing}</span>
+        )
       )}
     </button>
   );

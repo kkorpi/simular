@@ -7,9 +7,9 @@ import { TaskSection } from "./TaskSection";
 import { TaskItem } from "./TaskItem";
 import { BriefingDetail } from "./BriefingDetail";
 import { TaskDetail } from "./TaskDetail";
-import { ScheduleModal } from "./ScheduleModal";
+import { TaskSettingsPanel } from "./TaskSettingsPanel";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { firstRunSequences, activeTasks as defaultActiveTasks, recurringTasks as defaultRecurringTasks, completedTasks as defaultCompletedTasks } from "@/data/mockData";
+import { firstRunSequences, followUpSequences, activeTasks as defaultActiveTasks, recurringTasks as defaultRecurringTasks, completedTasks as defaultCompletedTasks } from "@/data/mockData";
 import type { ViewState, Task, StarterTask, TeachPhase } from "@/data/mockData";
 
 const SETUP_STEPS = [
@@ -210,7 +210,7 @@ export function RightPanel({
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [panelWidth, setPanelWidth] = useState(470);
   const [isDragging, setIsDragging] = useState(false);
-  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Auto-select first-run task when "View details" clicked in chat
   useEffect(() => {
@@ -231,10 +231,30 @@ export function RightPanel({
   // Auto-select a task by ID (e.g. from digest card "View report")
   useEffect(() => {
     if (!openTaskId) return;
-    const allTasks = [...defaultRecurringTasks, ...defaultActiveTasks, ...defaultCompletedTasks];
-    const found = allTasks.find((t) => t.id === openTaskId);
-    if (found) setSelectedTask(found);
+    if (openTaskId === "follow-up" && firstRunTask) {
+      const fuSeq = followUpSequences[firstRunTask.category] ?? followUpSequences.research;
+      setSelectedTask({
+        id: "follow-up",
+        name: fuSeq.resultTitle,
+        status: "completed",
+        subtitle: "Completed",
+        time: "Just now",
+        integrations: fuSeq.integrations,
+        detail: {
+          description: fuSeq.agentMessage,
+          duration: "18s",
+          result: fuSeq.resultSummary,
+          artifact: fuSeq.artifact,
+          steps: fuSeq.steps.map(s => ({ label: s.label, done: true })),
+        },
+      });
+    } else {
+      const allTasks = [...defaultRecurringTasks, ...defaultActiveTasks, ...defaultCompletedTasks];
+      const found = allTasks.find((t) => t.id === openTaskId);
+      if (found) setSelectedTask(found);
+    }
     onClearOpenTaskId?.();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [openTaskId, onClearOpenTaskId]);
 
   const minWidth = view === "result-detail" ? 440 : 280;
@@ -624,7 +644,7 @@ export function RightPanel({
           <>
             <TaskDetail
               task={selectedTask}
-              onBack={() => { handleSelectTask(null); onCloseFirstRunDetail?.(); }}
+              onBack={() => { handleSelectTask(null); setSettingsOpen(false); onCloseFirstRunDetail?.(); }}
               onViewResult={
                 selectedTask.detail?.resultType === "briefing"
                   ? () => {
@@ -634,9 +654,9 @@ export function RightPanel({
                   : undefined
               }
               onOpenWorkspace={onOpenWorkspace}
-              onEditSchedule={
-                selectedTask.status === "recurring"
-                  ? () => setScheduleOpen(true)
+              onOpenSettings={
+                selectedTask.status === "recurring" || selectedTask.status === "completed"
+                  ? () => setSettingsOpen(true)
                   : undefined
               }
               onDisable={
@@ -648,13 +668,20 @@ export function RightPanel({
                   : undefined
               }
             />
-            <ScheduleModal
-              open={scheduleOpen}
-              onClose={() => setScheduleOpen(false)}
-              taskName={selectedTask.name}
-              currentSchedule={selectedTask.detail?.schedule}
-              nextRun={selectedTask.detail?.nextRun}
-            />
+            {/* Drill-in: task settings */}
+            <div
+              className={`absolute inset-0 z-20 flex flex-col bg-bg2 transition-transform duration-200 ease-out ${
+                settingsOpen ? "translate-x-0" : "translate-x-full"
+              }`}
+            >
+              {settingsOpen && (
+                <TaskSettingsPanel
+                  task={selectedTask}
+                  editable={selectedTask.status === "recurring" || selectedTask.status === "completed"}
+                  onBack={() => setSettingsOpen(false)}
+                />
+              )}
+            </div>
           </>
         )}
       </div>

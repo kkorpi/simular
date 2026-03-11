@@ -10,6 +10,7 @@ export function TopBar({
   onGoHome,
   onOpenSubscription,
   onOpenCredits,
+  onOpenDemoPicker,
   onOpenPanel,
   trialDaysLeft = 6,
   workspaceSetupLabel,
@@ -19,6 +20,7 @@ export function TopBar({
   onGoHome?: () => void;
   onOpenSubscription?: () => void;
   onOpenCredits?: () => void;
+  onOpenDemoPicker?: () => void;
   onOpenPanel?: () => void;
   trialDaysLeft?: number;
   /** Shown during onboarding while workspace is setting up */
@@ -27,7 +29,7 @@ export function TopBar({
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="relative flex h-[50px] shrink-0 items-center border-b border-b1 px-5">
+    <div className="relative z-30 flex h-[50px] shrink-0 items-center border-b border-b1 px-5">
       {/* Left: logo + name (clickable → zero state) */}
       <button
         onClick={onGoHome}
@@ -89,8 +91,8 @@ export function TopBar({
             open={menuOpen}
             onClose={() => setMenuOpen(false)}
             onOpenSettings={() => onOpenSettings?.()}
-            onOpenSubscription={() => onOpenSubscription?.()}
             onOpenCredits={() => onOpenCredits?.()}
+            onOpenDemoPicker={() => onOpenDemoPicker?.()}
           />
         </div>
       </div>

@@ -46,35 +46,13 @@ function ArtifactIcon({ format }: { format: string }) {
 }
 
 /** Format badge — colored per type, used in both chat and detail views */
-function FormatBadge({ format }: { format: string }) {
-  const config: Record<string, { label: string; style: string }> = {
-    text: { label: "Text", style: "bg-bg3 text-t3" },
-    briefing: { label: "Briefing", style: "bg-[rgba(59,130,246,0.15)] text-[#60a5fa]" },
-    document: { label: "Doc", style: "bg-[rgba(59,130,246,0.15)] text-[#60a5fa]" },
-    spreadsheet: { label: "Sheet", style: "bg-[rgba(34,197,94,0.15)] text-[#4ade80]" },
-    code: { label: "Code", style: "bg-[rgba(168,85,247,0.15)] text-[#c084fc]" },
-    link: { label: "Link", style: "bg-[rgba(251,191,36,0.15)] text-[#fbbf24]" },
-    email: { label: "Email", style: "bg-[rgba(251,191,36,0.15)] text-[#fbbf24]" },
-    calendar: { label: "Calendar", style: "bg-[rgba(34,197,94,0.15)] text-[#4ade80]" },
-  };
-  const c = config[format] ?? config.text;
-  return (
-    <span className={`shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider ${c.style}`}>
-      {c.label}
-    </span>
-  );
-}
-
-/** Clickable artifact reference — shows icon, title, subtitle, format badge */
+/** Clickable artifact reference — shows icon, title, subtitle */
 function ArtifactLink({ artifact }: { artifact: ResultArtifact }) {
   return (
     <button className="mt-3 flex w-full items-center gap-2.5 rounded-md border border-b1 bg-bg3h/50 px-3 py-2.5 text-left transition-all hover:bg-bg3h hover:border-b2">
       <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-bg3h"><ArtifactIcon format={artifact.format} /></div>
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
-          <span className="truncate text-[12.5px] font-medium text-t1">{artifact.title}</span>
-          <FormatBadge format={artifact.format} />
-        </div>
+        <div className="truncate text-[12.5px] font-medium text-t1">{artifact.title}</div>
         {artifact.subtitle && (
           <div className="mt-0.5 text-[11px] text-t3">{artifact.subtitle}</div>
         )}
@@ -716,7 +694,7 @@ export function ChatArea({
   return (
     <div className="relative flex min-w-0 flex-1 flex-col">
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
-        <div className={`mx-auto flex min-h-full max-w-[800px] flex-col gap-8 px-8 max-md:px-4 pt-5 ${authInputService ? "pb-72 max-md:pb-64" : "pb-28 max-md:pb-24"}`}>
+        <div className={`mx-auto flex min-h-full max-w-[800px] flex-col gap-8 px-8 max-md:px-4 pt-5 ${authInputService ? "pb-72 max-md:pb-64" : "pb-36 max-md:pb-32"}`}>
 
         {/* Spacer — pushes messages to bottom when they don't fill viewport */}
         <div className="flex-1" />
@@ -984,6 +962,7 @@ export function ChatArea({
                     </div>
                   </AgentMessage>
 
+                  {/* Native app download card — hidden until app is available
                   <PromptCard
                     variant="compact"
                     icon={
@@ -997,7 +976,7 @@ export function ChatArea({
                       { label: "Send me the link", style: "primary", onClick: () => {} },
                       { label: "Maybe later", style: "outline", onClick: () => {} },
                     ]}
-                  />
+                  /> */}
                 </div>
               </div>
             </div>
@@ -1037,22 +1016,19 @@ export function ChatArea({
                   const fuSeq = followUpSequences[firstRunTask.category] ?? followUpSequences.research;
                   return (
                     <>
-                      {/* Agent acknowledges — running state fades out on completion */}
+                      {/* Agent acknowledges — running state stays visible, shows completed */}
                       <AgentMessage>
                         <div className="text-sm leading-[1.6] text-t2">
                           {fuSeq.agentMessage}
                         </div>
-                        <div className="collapsible" data-open={!followUpDone}>
-                          <div>
-                            <div className={`mt-3 transition-opacity duration-500 ease-out ${followUpExiting ? "opacity-0" : "opacity-100"}`}>
-                              <RunningTaskDetail
-                                steps={[{ timestamp: "0:02", label: fuSeq.subtask + "...", done: false }]}
-                                subtasks={[fuSeq.subtask]}
-                                done={false}
-                              />
-                            </div>
-                          </div>
-                        </div>
+                        <RunningTaskDetail
+                          steps={followUpDone
+                            ? fuSeq.steps.map(s => ({ ...s, done: true }))
+                            : [{ label: fuSeq.steps[0]?.label || fuSeq.subtask, done: false }]
+                          }
+                          subtasks={[fuSeq.subtask]}
+                          done={followUpDone}
+                        />
                       </AgentMessage>
 
                       {/* Follow-up result — fades in */}
@@ -1081,7 +1057,7 @@ export function ChatArea({
                                 </>
                               ) }}
                               actions={[
-                                { label: "View details", style: "primary", onClick: onOpenDetail },
+                                { label: "View details", style: "primary", onClick: () => onOpenTaskById?.("follow-up") },
                                 {
                                   label: `Open in ${openInLabel(fuSeq.artifact.format)}`,
                                   style: "outline",
@@ -1617,7 +1593,7 @@ export function ChatArea({
       </div>
 
       {/* New task input / Auth input takeover */}
-      <div className={`absolute bottom-0 left-0 right-0 z-10 mx-auto w-full max-w-[800px] px-6 max-md:px-3 pb-4 pt-8 bg-gradient-to-t from-bg from-60% to-transparent`}>
+      <div className={`absolute bottom-0 left-0 right-0 z-10 mx-auto w-full max-w-[800px] px-6 max-md:px-3 pb-4 pt-8 bg-gradient-to-t from-bg from-60% to-transparent pointer-events-none [&>*]:pointer-events-auto`}>
         {showNewTaskCard && (
           <NewTaskCard
             onClose={() => onCloseNewTask?.()}

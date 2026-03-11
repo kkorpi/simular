@@ -59,7 +59,7 @@ interface WaitlistConfirmationProps {
 
 export function WaitlistConfirmation({ email, position }: WaitlistConfirmationProps) {
   return (
-    <div className="flex h-screen flex-col items-center justify-center bg-bg px-8">
+    <div className="flex h-dvh flex-col items-center justify-center bg-bg px-8">
       <div className="w-full max-w-[540px]">
         {/* Logo */}
         <div className="mb-10 flex justify-center">
