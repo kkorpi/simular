@@ -30,7 +30,6 @@ type SettingsSection =
   | "appearance"
   | "workspace"
   | "services"
-  | "commands"
   | "skills"
   | "subscription"
   | "credits"
@@ -40,7 +39,6 @@ const sections: { id: SettingsSection; label: string }[] = [
   { id: "appearance", label: "Appearance" },
   { id: "workspace", label: "Workspace" },
   { id: "services", label: "Connected Services" },
-  { id: "commands", label: "Commands" },
   { id: "skills", label: "Skills" },
   { id: "subscription", label: "Subscription" },
   { id: "credits", label: "Credits" },
@@ -141,7 +139,7 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
             {active === "appearance" && <AppearanceSettings />}
             {active === "workspace" && <WorkspaceSettings />}
             {active === "services" && <ConnectedServicesSettings services={connectedServices} onDisconnect={onDisconnectService} onDisconnectAll={onDisconnectAllServices} onConnectService={onConnectService} />}
-            {active === "commands" && <PlaceholderSection label="Commands" />}
+
             {active === "skills" && <SkillsSettings />}
             {active === "subscription" && <SubscriptionSettings trialDaysLeft={trialDaysLeft} trialCancelled={trialCancelled} onCancelTrial={onCancelTrial} onReactivateTrial={onReactivateTrial} />}
             {active === "credits" && <CreditsSettings />}
@@ -263,65 +261,6 @@ function WorkspaceSettings() {
           </SettingRow>
         </div>
       </div>
-
-      <div className="h-px bg-b1" />
-
-      {/* Integrations */}
-      <div>
-        <div className="flex items-center gap-2">
-          <div className="text-[14px] font-semibold text-t1">Integrations</div>
-          <HintIcon />
-        </div>
-        <div className="mt-4 flex flex-col gap-3">
-          <IntegrationRow
-            name="Gmail"
-            description="Read, draft, and send emails"
-            connected
-          />
-          <IntegrationRow
-            name="Calendar"
-            description="View and manage events"
-            connected
-          />
-          <IntegrationRow
-            name="Google Docs"
-            description="Create and edit documents"
-            connected
-          />
-          <IntegrationRow
-            name="Sheets"
-            description="Read and write spreadsheets"
-            connected
-          />
-          <IntegrationRow
-            name="LinkedIn"
-            description="Browse profiles and company pages"
-            connected
-          />
-          <IntegrationRow
-            name="Salesforce"
-            description="Access CRM records and deal pipeline"
-            connected
-          />
-          <IntegrationRow
-            name="Crunchbase"
-            description="Search funding rounds and company data"
-          />
-          <IntegrationRow
-            name="Granola"
-            description="Pull meeting notes and transcripts"
-            connected
-          />
-          <IntegrationRow
-            name="Slack"
-            description="Send and read messages"
-          />
-          <IntegrationRow
-            name="Notion"
-            description="Read and write workspace pages"
-          />
-        </div>
-      </div>
     </div>
   );
 }
@@ -346,32 +285,6 @@ function SettingRow({
   );
 }
 
-function IntegrationRow({
-  name,
-  description,
-  connected,
-}: {
-  name: string;
-  description: string;
-  connected?: boolean;
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className={`h-2 w-2 rounded-full ${connected ? "bg-g" : "bg-t4"}`} />
-      <div className="flex-1">
-        <span className="text-[13px] font-medium text-t1">{name}</span>
-        <span className="ml-2 text-[12px] text-t3">{description}</span>
-      </div>
-      {connected ? (
-        <span className="px-3 py-1.5 text-[12px] font-medium text-t3">Connected</span>
-      ) : (
-        <button className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3 hover:text-t1">
-          Connect
-        </button>
-      )}
-    </div>
-  );
-}
 
 function HintIcon() {
   return (
@@ -464,8 +377,8 @@ function ConnectedServicesSettings({
       {services.length > 0 ? (
         <div className="flex flex-col gap-3">
           {services.map((svc) => (
-            <div key={svc.id} className="flex items-center gap-3 rounded-lg border border-b1 bg-bg3/50 px-4 py-3">
-              <div className="h-2 w-2 shrink-0 rounded-full bg-g" />
+            <div key={svc.id} className="flex items-start gap-3 rounded-lg border border-b1 bg-bg3/50 px-4 py-3">
+              <div className="mt-[7px] h-2 w-2 shrink-0 rounded-full bg-g" />
               <div className="min-w-0 flex-1">
                 <div className="text-[13px] font-medium text-t1">{svc.name}</div>
                 <div className="mt-0.5 text-[11px] text-t3">
@@ -615,9 +528,9 @@ function ConnectedServicesSettings({
       ) : null}
 
       {/* Trust signal */}
-      <div className="flex items-center gap-2 text-[11.5px] text-t3">
+      <div className="flex items-start gap-2 text-[11.5px] text-t3">
         <svg
-          className="h-3.5 w-3.5 shrink-0 text-g"
+          className="mt-px h-3.5 w-3.5 shrink-0 text-g"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"

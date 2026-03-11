@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { Task, ResultArtifact } from "@/data/mockData";
+import { TaskConfigSection } from "./TaskConfigSection";
 
 /** Lucide icon for artifact format */
 function ArtifactIcon({ format }: { format: string }) {
@@ -173,6 +174,7 @@ export function TaskDetail({
   onOpenWorkspace,
   onEditSchedule,
   onDisable,
+  onConfigChange,
 }: {
   task: Task;
   onBack: () => void;
@@ -180,12 +182,15 @@ export function TaskDetail({
   onOpenWorkspace?: () => void;
   onEditSchedule?: () => void;
   onDisable?: () => void;
+  onConfigChange?: (updates: Partial<Pick<Task, "skills" | "integrations"> & { maxDuration?: string; autonomousActions?: string }>) => void;
 }) {
   const d = task.detail;
   const [showAllRuns, setShowAllRuns] = useState(false);
   const [expandedRun, setExpandedRun] = useState<number | null>(null);
   const [showFullResult, setShowFullResult] = useState(false);
+  const [hasConfigChanges, setHasConfigChanges] = useState(false);
   const hasRichResult = d?.resultType === "briefing";
+  const isEditable = task.status === "recurring" || task.status === "completed";
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
@@ -282,7 +287,7 @@ export function TaskDetail({
           </div>
         )}
 
-        {/* Integrations & Skills */}
+        {/* Integrations & Skills (quick glance) */}
         {(task.integrations?.length || task.skills?.length) && (
           <div className="mb-4 flex flex-wrap gap-1.5">
             {task.integrations?.map((name) => (
@@ -297,6 +302,16 @@ export function TaskDetail({
             ))}
           </div>
         )}
+
+        {/* Configuration (collapsible) */}
+        <TaskConfigSection
+          task={task}
+          editable={isEditable}
+          onChange={(updates) => {
+            setHasConfigChanges(true);
+            onConfigChange?.(updates);
+          }}
+        />
 
         {/* Schedule (recurring) */}
         {d?.schedule && (
@@ -500,6 +515,14 @@ export function TaskDetail({
         )}
         {task.status === "recurring" && (
           <>
+            {hasConfigChanges && (
+              <button
+                onClick={() => setHasConfigChanges(false)}
+                className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110"
+              >
+                Save
+              </button>
+            )}
             <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
               Run now
             </button>
@@ -535,8 +558,8 @@ export function TaskDetail({
                 View in chat
               </button>
             )}
-            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
-              Run again
+            <button className={`rounded-md px-3 py-1.5 text-[12px] font-medium transition-all ${hasConfigChanges ? "bg-ab text-abt hover:brightness-110" : "border border-b1 bg-transparent text-t2 hover:bg-bg3h hover:text-t1"}`}>
+              {hasConfigChanges ? "Run with changes" : "Run again"}
             </button>
           </>
         )}

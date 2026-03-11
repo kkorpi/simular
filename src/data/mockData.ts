@@ -39,7 +39,22 @@ export interface TaskDetail {
   nextRun?: string;
   queuePosition?: number;
   runHistory?: RunHistoryEntry[];
+  maxDuration?: string;
+  autonomousActions?: string;
 }
+
+export const AVAILABLE_SKILLS = [
+  "Research",
+  "Writing",
+  "Data Analysis",
+  "Scheduling",
+  "Code",
+  "Image Analysis",
+];
+
+export const DURATION_OPTIONS = ["5 min", "15 min", "30 min", "1 hr", "No limit"];
+
+export const AUTONOMY_LEVELS = ["Off", "Low", "Medium", "High"] as const;
 
 export interface Task {
   id: string;
@@ -83,6 +98,8 @@ export const activeTasks: Task[] = [
     detail: {
       description: "Reviewing inbound deal from Daniel Park. Checking LinkedIn, X, and company website to build a founder profile and map to existing Salesforce records.",
       duration: "2:18 elapsed",
+      maxDuration: "15 min",
+      autonomousActions: "Medium",
       steps: [
         { label: "Opened founder's LinkedIn profile", done: true },
         { label: "Pulled background, experience, and notable followers", done: true },
@@ -107,6 +124,8 @@ export const activeTasks: Task[] = [
     detail: {
       description: "After today's LP meetings, pull Granola notes, draft personalized thank-you emails including attendee emails and colleague CCs.",
       queuePosition: 1,
+      maxDuration: "15 min",
+      autonomousActions: "Low",
     },
   },
 ];
@@ -126,6 +145,8 @@ export const recurringTasks: Task[] = [
     thumbStatus: "Crunchbase\nDeal search",
     detail: {
       description: "Scans Crunchbase, TechCrunch, and X for new funding rounds, product launches, and key hires in healthcare AI and vertical AI. Tags by investment criteria relevance.",
+      maxDuration: "15 min",
+      autonomousActions: "High",
       schedule: "Every day at 7:00am",
       lastRun: "Today 7:04am",
       nextRun: "Tomorrow 7:00am",
@@ -161,6 +182,8 @@ export const recurringTasks: Task[] = [
     thumbStatus: "Salesforce\nLP profile",
     detail: {
       description: "48 hours before any LP meeting on your calendar, pulls the Salesforce LP profile and recent notes, then drafts a prep email using your standard template.",
+      maxDuration: "15 min",
+      autonomousActions: "Medium",
       schedule: "48 hours before each LP meeting",
       lastRun: "Today 9:30am (Sequoia Scouts)",
       nextRun: "Tomorrow 2:00pm (Accel Partners)",
@@ -194,6 +217,8 @@ export const recurringTasks: Task[] = [
     thumbStatus: "Salesforce\nLP touchpoints",
     detail: {
       description: "Checks Salesforce, your calendar, and email to verify you're hitting your P1 LP touchpoint goals (once every 60 days). Suggests content shares and event invites to maintain cadence.",
+      maxDuration: "15 min",
+      autonomousActions: "Medium",
       schedule: "Every Monday at 8:00am",
       lastRun: "Monday 8:02am",
       nextRun: "Next Monday 8:00am",
@@ -228,6 +253,8 @@ export const recurringTasks: Task[] = [
     thumbStatus: "Gmail\nEmail scan",
     detail: {
       description: "Scans your 30 most recent unread Gmail messages, filters out promotions, marketing, and newsletters, and surfaces important emails that need your attention or a reply.",
+      maxDuration: "5 min",
+      autonomousActions: "High",
       schedule: "Every day at 8:00am and 3:00pm",
       lastRun: "Today 3:01pm",
       nextRun: "Tomorrow 8:00am",
@@ -264,6 +291,8 @@ export const completedTasks: Task[] = [
     detail: {
       description: "Pulled Salesforce profile for Sequoia Scouts, reviewed recent notes and touchpoints, and drafted a prep email for Thursday's meeting.",
       duration: "2m 48s",
+      maxDuration: "15 min",
+      autonomousActions: "Medium",
       result: "LP meeting prep complete. Sequoia Scouts: $2.5B AUM, last touchpoint 45 days ago. Key contact: Ravi Gupta. Prep email drafted with 4 talking points.",
       resultType: "briefing",
       artifact: {
@@ -296,6 +325,8 @@ export const completedTasks: Task[] = [
     detail: {
       description: "Pulled Granola notes from yesterday's CalPERS meeting, extracted key discussion points and action items, saved to Salesforce, and drafted a team summary email.",
       duration: "3m 22s",
+      maxDuration: "15 min",
+      autonomousActions: "Low",
       result: "Notes processed. 5 action items extracted, saved to Salesforce CalPERS record. Team email drafted with meeting summary and next steps.",
       artifact: {
         format: "document",
@@ -329,6 +360,8 @@ export const completedTasks: Task[] = [
     detail: {
       description: "Deep research on Abridge and founder Shiv Rao. Pulled LinkedIn profiles, X posts, Crunchbase data, press coverage, and customer reviews. Checked Salesforce for existing deal history.",
       duration: "4m 15s",
+      maxDuration: "15 min",
+      autonomousActions: "Medium",
       result: "Founder one-pager complete. Shiv Rao (MD, ex-cardiologist). Abridge at $500M+ valuation, 150+ health system customers. Strong product-market fit in clinical AI. Previously in Salesforce as Stage 2.",
       artifact: {
         format: "document",
@@ -363,6 +396,8 @@ export const completedTasks: Task[] = [
     detail: {
       description: "Reviewed all Granola notes from yesterday's LP meetings. Drafted personalized thank-you emails for each LP, including attendee emails and colleague CCs.",
       duration: "5m 30s",
+      maxDuration: "15 min",
+      autonomousActions: "Low",
       result: "3 thank-you emails drafted. Personalized for GIC, Tiger Global, and Wellington. Each includes meeting highlights and next steps. Ready for review in Gmail drafts.",
       artifact: {
         format: "email",
