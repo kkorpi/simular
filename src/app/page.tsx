@@ -6,7 +6,7 @@ import { ChatArea } from "@/components/ChatArea";
 import { RightPanel } from "@/components/RightPanel";
 import { FullWorkspaceView } from "@/components/FullWorkspaceView";
 // ZeroState removed — fresh state now lives inside ChatArea
-import { SettingsOverlay, type SettingsSection } from "@/components/SettingsOverlay";
+import { SettingsOverlay, type SettingsSection, type ConnectedServiceInfo } from "@/components/SettingsOverlay";
 import { CardGallery } from "@/components/CardGallery";
 import { DesignSystem } from "@/components/DesignSystem";
 import { LandingPage } from "@/components/LandingPage";
@@ -70,6 +70,7 @@ export default function Home() {
   const [activeView, setActiveView] = useState<ViewState>(initial.view ?? "zero-state");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSection, setSettingsSection] = useState<SettingsSection | undefined>(undefined);
+  const [connectedServices, setConnectedServices] = useState<ConnectedServiceInfo[]>([]);
   const [cardGalleryOpen, setCardGalleryOpen] = useState(false);
   const [designSystemOpen, setDesignSystemOpen] = useState(false);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
@@ -316,6 +317,10 @@ export default function Home() {
     setTimeout(() => {
       setAuthPhase(null);
       setLinkedinConnected(true);
+      setConnectedServices((prev) => {
+        if (prev.some((s) => s.id === serviceId)) return prev;
+        return [...prev, { id: serviceId, name: serviceId.charAt(0).toUpperCase() + serviceId.slice(1), connectedAt: new Date() }];
+      });
     }, 2000);
   };
 
@@ -354,7 +359,7 @@ export default function Home() {
   };
 
   const handleOpenSettingsServices = () => {
-    setSettingsSection("workspace");
+    setSettingsSection("services");
     setSettingsOpen(true);
   };
 
@@ -786,6 +791,16 @@ export default function Home() {
             trialCancelled={trialCancelled}
             onCancelTrial={() => setTrialCancelled(true)}
             onReactivateTrial={() => setTrialCancelled(false)}
+            connectedServices={connectedServices}
+            onDisconnectService={(id) => setConnectedServices((prev) => prev.filter((s) => s.id !== id))}
+            onDisconnectAllServices={() => setConnectedServices([])}
+            onConnectService={(id, values) => {
+              setConnectedServices((prev) => {
+                if (prev.some((s) => s.id === id)) return prev;
+                const svc = getService(id);
+                return [...prev, { id, name: svc.name, connectedAt: new Date() }];
+              });
+            }}
           />
           <CardGallery
             open={cardGalleryOpen}
