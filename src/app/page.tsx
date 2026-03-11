@@ -15,6 +15,8 @@ import { SignupPayment } from "@/components/SignupPayment";
 import { WaitlistSignup } from "@/components/WaitlistSignup";
 import { WaitlistConfirmation } from "@/components/WaitlistConfirmation";
 import { OnboardingScreen, type OnboardingProfile } from "@/components/OnboardingScreen";
+import type { AuthInputState } from "@/components/AuthInput";
+import { getService } from "@/data/serviceRegistry";
 import { SEATS_REMAINING_INIT, TEACH_TASK_NAME, type ViewState, type StarterTask, type TeachPhase } from "@/data/mockData";
 
 const PIP_MIN_WIDTH = 200;
@@ -81,6 +83,13 @@ export default function Home() {
   const [showNewTaskCard, setShowNewTaskCard] = useState(false);
   const [linkedinConnected, setLinkedinConnected] = useState(false);
   const [workspaceConnecting, setWorkspaceConnecting] = useState(false);
+
+  // ── Auth input takeover state ──
+  const [authInputService, setAuthInputService] = useState<string | undefined>();
+  const [authInputState, setAuthInputState] = useState<AuthInputState | undefined>();
+  const [authInputError, setAuthInputError] = useState<string | undefined>();
+  const [authPhase, setAuthPhase] = useState<"waiting" | "signing-in" | null>(null);
+
   const [firstRunTask, setFirstRunTask] = useState<StarterTask | null>(null);
   const [firstRunDone, setFirstRunDone] = useState(false);
   const [firstRunRecurring, setFirstRunRecurring] = useState(false);
@@ -102,6 +111,7 @@ export default function Home() {
   const [chatKey, setChatKey] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(false);
   const [autoStep, setAutoStep] = useState(-1);
+  const [firstRunStep, setFirstRunStep] = useState(0);
 
   const [pipWidth, setPipWidth] = useState(PIP_DEFAULT_WIDTH);
   const pipDragging = useRef(false);
@@ -177,6 +187,10 @@ export default function Home() {
     setFirstRunRecurring(false);
     setLinkedinConnected(false);
     setWorkspaceConnecting(false);
+    setAuthInputService(undefined);
+    setAuthInputState(undefined);
+    setAuthInputError(undefined);
+    setAuthPhase(null);
     setWorkspaceOpen(false);
     setWorkspaceMode("default");
     setWorkspaceService("");
@@ -286,9 +300,62 @@ export default function Home() {
   };
 
   const handleOpenWorkspaceForLogin = (service: string) => {
+    // Open AuthInput takeover instead of FullWorkspaceView
+    setAuthInputService(service.toLowerCase());
+    setAuthInputState("pending");
+    setAuthInputError(undefined);
+    setAuthPhase("waiting");
+  };
+
+  const handleAuthSubmit = (values: Record<string, string>) => {
+    const serviceId = authInputService || "linkedin";
+    setAuthInputService(undefined);
+    setAuthInputState(undefined);
+    setAuthPhase("signing-in");
+    // Simulate auth — in real app this calls backend
+    setTimeout(() => {
+      setAuthPhase(null);
+      setLinkedinConnected(true);
+    }, 2000);
+  };
+
+  const handleAuthSkip = () => {
+    setAuthInputService(undefined);
+    setAuthInputState(undefined);
+    setAuthInputError(undefined);
+    setAuthPhase(null);
+  };
+
+  const handleAuthManualSignIn = () => {
+    const service = authInputService || "";
+    setAuthInputService(undefined);
+    setAuthInputState(undefined);
+    setAuthPhase(null);
     setWorkspaceMode("login");
-    setWorkspaceService(service);
+    const serviceNames: Record<string, string> = { linkedin: "LinkedIn", gmail: "Gmail", salesforce: "Salesforce" };
+    setWorkspaceService(serviceNames[service] ?? service.charAt(0).toUpperCase() + service.slice(1));
     setWorkspaceOpen(true);
+  };
+
+  const handleAuth2FASubmit = (code: string) => {
+    setAuthInputService(undefined);
+    setAuthInputState(undefined);
+    setAuthPhase("signing-in");
+    setTimeout(() => {
+      setAuthPhase(null);
+      setLinkedinConnected(true);
+    }, 1500);
+  };
+
+  const handleAuth2FACancel = () => {
+    setAuthInputService(undefined);
+    setAuthInputState(undefined);
+    setAuthPhase(null);
+  };
+
+  const handleOpenSettingsServices = () => {
+    setSettingsSection("workspace");
+    setSettingsOpen(true);
   };
 
   const handleSlashCommand = (command: string) => {
@@ -560,7 +627,18 @@ export default function Home() {
               userRole={userProfile.role}
               isAutoPlay={isAutoPlay}
               onAutoStepChange={setAutoStep}
+              onFirstRunStepChange={setFirstRunStep}
               onStartTask={handleStartTask}
+              authInputService={authInputService}
+              authInputState={authInputState}
+              authInputError={authInputError}
+              onAuthSubmit={handleAuthSubmit}
+              onAuthSkip={handleAuthSkip}
+              onAuthManualSignIn={handleAuthManualSignIn}
+              onAuth2FASubmit={handleAuth2FASubmit}
+              onAuth2FACancel={handleAuth2FACancel}
+              authPhase={authPhase}
+              onOpenSettingsServices={handleOpenSettingsServices}
               onOnboardingComplete={(profile, task) => {
                 setUserProfile(profile);
                 setIsOnboarding(false);
@@ -603,6 +681,7 @@ export default function Home() {
               workspaceSetupDone={workspaceSetupDone}
               isAutoPlay={isAutoPlay}
               autoStep={autoStep}
+              firstRunStep={firstRunStep}
             />
           </div>
 

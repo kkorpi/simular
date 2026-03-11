@@ -503,6 +503,12 @@ export const workspaceSteps: WorkspaceStep[] = [
   { label: "Send summary to Slack channel", status: "pending" },
 ];
 
+export const linkedinPreLoginSteps: RunningStep[] = [
+  { timestamp: "0:01", label: "Opened Chrome", done: true },
+  { timestamp: "0:03", label: "Navigated to linkedin.com/login", site: "linkedin.com", done: true },
+  { timestamp: "0:05", label: "Signing in to LinkedIn...", done: false },
+];
+
 export const linkedinLoginSteps: RunningStep[] = [
   { timestamp: "0:01", label: "Opened Chrome", done: true },
   { timestamp: "0:03", label: "Navigated to linkedin.com/login", site: "linkedin.com", done: true },
@@ -808,6 +814,7 @@ export const firstRunSequences: Record<string, FirstRunSequence> = {
     integrations: ["LinkedIn", "Crunchbase", "X"],
     steps: [
       { timestamp: "0:02", label: "Opened Chrome and navigated to LinkedIn", done: true },
+      { timestamp: "0:03", label: "Detected sign-in required", done: true },
       { timestamp: "0:04", label: "Searching background on LinkedIn and Crunchbase", done: true },
       { timestamp: "0:10", label: "Pulled founder work history and education", done: true },
       { timestamp: "0:15", label: "Extracted mutual connections and endorsements", done: true },

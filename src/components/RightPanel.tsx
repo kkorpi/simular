@@ -31,7 +31,7 @@ const INTEGRATION_URLS: Record<string, string> = {
 };
 
 /** Build a Task object for the first-run task based on its current state */
-function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean): Task {
+function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean, stepProgress = 0): Task {
   const seq = firstRunSequences[task.category] ?? firstRunSequences.research;
 
   if (recurring) {
@@ -59,6 +59,14 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean)
     };
   }
 
+  // When running, only show steps up to stepProgress, with last one not done
+  const visibleSteps = done
+    ? seq.steps.map((s) => ({ label: s.label, done: true }))
+    : seq.steps.slice(0, stepProgress).map((s, i) => ({
+        label: s.label,
+        done: i < stepProgress - 1, // all done except the last visible one
+      }));
+
   return {
     id: "first-run",
     name: task.title,
@@ -70,11 +78,8 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean)
     thumbStatus: seq.subtask,
     detail: {
       description: task.description,
-      duration: done ? "Just now" : "Running",
-      steps: seq.steps.map((s, i) => ({
-        label: s.label,
-        done: done ? true : i < seq.steps.length - 1,
-      })),
+      duration: done ? "28s" : undefined,
+      steps: visibleSteps,
       ...(done ? { result: seq.resultSummary, artifact: seq.artifact } : {}),
     },
   };
@@ -84,14 +89,16 @@ function FirstRunTaskList({
   firstRunTask,
   firstRunDone,
   firstRunRecurring,
+  firstRunStep,
   onSelectTask,
 }: {
   firstRunTask: StarterTask;
   firstRunDone: boolean;
   firstRunRecurring: boolean;
+  firstRunStep: number;
   onSelectTask: (task: Task) => void;
 }) {
-  const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring);
+  const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring, firstRunStep);
   const seq = firstRunSequences[firstRunTask.category] ?? firstRunSequences.research;
   const completedTask: Task = {
     id: "first-run-completed",
@@ -166,6 +173,7 @@ export function RightPanel({
   workspaceSetupDone = false,
   isAutoPlay = false,
   autoStep = -1,
+  firstRunStep = 0,
 }: {
   view: ViewState;
   onViewChange: (v: ViewState) => void;
@@ -195,6 +203,8 @@ export function RightPanel({
   isAutoPlay?: boolean;
   /** Current auto-play step — used to derive dynamic task list */
   autoStep?: number;
+  /** Current first-run step from ChatArea — syncs step progress in task detail */
+  firstRunStep?: number;
 }) {
   const isMobile = useIsMobile();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -205,10 +215,18 @@ export function RightPanel({
   // Auto-select first-run task when "View details" clicked in chat
   useEffect(() => {
     if (openFirstRunDetail && firstRunTask) {
-      const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring);
+      const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring, firstRunStep);
       setSelectedTask(task);
     }
-  }, [openFirstRunDetail, firstRunTask, firstRunDone, firstRunRecurring]);
+  }, [openFirstRunDetail, firstRunTask, firstRunDone, firstRunRecurring, firstRunStep]);
+
+  // Keep selectedTask in sync when it's the first-run task and step/done state changes
+  useEffect(() => {
+    if (!selectedTask || !firstRunTask) return;
+    if (selectedTask.id !== "first-run" && selectedTask.id !== "first-run-recurring") return;
+    const updated = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring, firstRunStep);
+    setSelectedTask(updated);
+  }, [firstRunStep, firstRunDone, firstRunRecurring, firstRunTask]);
 
   // Auto-select a task by ID (e.g. from digest card "View report")
   useEffect(() => {
@@ -581,6 +599,7 @@ export function RightPanel({
             firstRunTask={firstRunTask}
             firstRunDone={firstRunDone}
             firstRunRecurring={firstRunRecurring}
+            firstRunStep={firstRunStep}
             onSelectTask={handleSelectTask}
           />
         ) : (

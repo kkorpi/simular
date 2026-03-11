@@ -13,6 +13,8 @@ interface RunningTaskDetailProps {
   initialExpanded?: boolean;
   /** Mark the task as complete (subtask shows as static text) */
   done?: boolean;
+  /** Auth phase — shows lock icon + "Waiting for credentials" label */
+  authPhase?: "waiting" | "signing-in" | null;
 }
 
 function parseTimestamp(ts: string): number {
@@ -32,6 +34,7 @@ export function RunningTaskDetail({
   onViewActivityLog,
   initialExpanded = false,
   done = false,
+  authPhase,
 }: RunningTaskDetailProps) {
   const [expanded, setExpanded] = useState(done ? initialExpanded : false);
   const [showAll, setShowAll] = useState(false);
@@ -56,9 +59,12 @@ export function RunningTaskDetail({
       {/* Subtask indicators — show current step label when running */}
       <div className="flex flex-col gap-3.5 pb-2">
         {subtasks.map((fallbackLabel, i) => {
+          const isAuthWaiting = authPhase === "waiting";
           const currentStep = !done ? steps.find((s) => !s.done) : undefined;
-          const label = currentStep ? currentStep.label.replace(/\.{2,}$/, "") : fallbackLabel;
-          return <WorkingIndicator key={i} label={label} done={done} />;
+          const label = isAuthWaiting
+            ? "Waiting for LinkedIn credentials"
+            : currentStep ? currentStep.label.replace(/\.{2,}$/, "") : fallbackLabel;
+          return <WorkingIndicator key={i} label={label} done={done} authWaiting={isAuthWaiting} />;
         })}
       </div>
 

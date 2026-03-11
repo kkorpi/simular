@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 
-export function WorkingIndicator({ label, done }: { label: string; done?: boolean }) {
+export function WorkingIndicator({ label, done, authWaiting }: { label: string; done?: boolean; authWaiting?: boolean }) {
   const [displayLabel, setDisplayLabel] = useState(label);
   const [fading, setFading] = useState(false);
   const pendingLabel = useRef(label);
@@ -22,6 +22,11 @@ export function WorkingIndicator({ label, done }: { label: string; done?: boolea
     <div className="flex items-center">
       {done ? (
         <svg className="mr-1.5 h-3.5 w-3.5 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+      ) : authWaiting ? (
+        <svg className="mr-1.5 h-3.5 w-3.5 shrink-0 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2" />
+          <path d="M7 11V7a5 5 0 0110 0v4" />
+        </svg>
       ) : (
         <div className="mr-2 h-[14px] w-[14px] shrink-0 rounded-full border-2 border-g/30 border-t-g animate-spin" />
       )}

@@ -12,8 +12,9 @@ import { PromptCard } from "./cards/PromptCard";
 import { ChoiceCard } from "./cards/ChoiceCard";
 import { DigestCard } from "./cards/DigestCard";
 import { LoginRequestCard } from "./LoginRequestCard";
+import { AuthInput, type AuthInputState } from "./AuthInput";
 
-import { runningTaskSteps, linkedinLoginSteps, linkedinDisambiguatedSteps, disambiguationProfiles, firstRunSequences, followUpSequences, teachRecordedSteps, starterTasks } from "@/data/mockData";
+import { runningTaskSteps, linkedinPreLoginSteps, linkedinLoginSteps, linkedinDisambiguatedSteps, disambiguationProfiles, firstRunSequences, followUpSequences, teachRecordedSteps, starterTasks } from "@/data/mockData";
 import type { ViewState, LinkedInProfile, StarterTask, TeachPhase, RunningStep, ResultArtifact } from "@/data/mockData";
 import { roleOptions, appOptions, type OnboardingProfile } from "./OnboardingScreen";
 import { SimularLogo } from "./SimularLogo";
@@ -242,6 +243,17 @@ export function ChatArea({
   onStartTask,
   onLinkedinConnect,
   onAutoStepChange,
+  onFirstRunStepChange,
+  authInputService,
+  authInputState,
+  authInputError,
+  onAuthSubmit,
+  onAuthSkip,
+  onAuthManualSignIn,
+  onAuth2FASubmit,
+  onAuth2FACancel,
+  authPhase,
+  onOpenSettingsServices,
 }: {
   view: ViewState;
   onOpenDetail: () => void;
@@ -282,6 +294,21 @@ export function ChatArea({
   onLinkedinConnect?: () => void;
   /** Called when autoStep changes so parent can sync right panel */
   onAutoStepChange?: (step: number) => void;
+  /** Called when firstRunStep changes so right panel can sync step progress */
+  onFirstRunStepChange?: (step: number) => void;
+  /** Auth input takeover state — when set, AuthInput replaces TaskInput */
+  authInputService?: string;
+  authInputState?: AuthInputState;
+  authInputError?: string;
+  onAuthSubmit?: (values: Record<string, string>) => void;
+  onAuthSkip?: () => void;
+  onAuthManualSignIn?: () => void;
+  onAuth2FASubmit?: (code: string) => void;
+  onAuth2FACancel?: () => void;
+  /** Current auth sub-phase for lock icon in RunningTaskDetail */
+  authPhase?: "waiting" | "signing-in" | null;
+  /** Opens Settings > Connected Services */
+  onOpenSettingsServices?: () => void;
 }) {
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [scheduleTask, setScheduleTask] = useState({
@@ -292,7 +319,7 @@ export function ChatArea({
   const [selectedProfile, setSelectedProfile] = useState<LinkedInProfile | null>(null);
   const [showDisambig, setShowDisambig] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [showLoginCard, setShowLoginCard] = useState(false);
+  // showLoginCard removed — first-run uses inline gate, auto-play auto-connects
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // ── Onboarding-in-chat state ──
@@ -387,6 +414,11 @@ export function ChatArea({
 
   const seq = firstRunTask ? (firstRunSequences[firstRunTask.category] ?? firstRunSequences.research) : null;
 
+  // Login gate: pause step animation after 1 step for LinkedIn sign-in
+  const FIRST_RUN_LOGIN_GATE = 2;
+  const linkedinConnectedRef = useRef(linkedinConnected);
+  useEffect(() => { linkedinConnectedRef.current = linkedinConnected; }, [linkedinConnected]);
+
   // Animate steps appearing one by one when firstRunTask is set
   useEffect(() => {
     if (!firstRunTask || !seq) return;
@@ -414,6 +446,10 @@ export function ChatArea({
             setTimeout(() => setFirstRunShowResult(true), 400);
           }, 500); // allow fade-out to complete
         }, 800);
+      } else if (step === FIRST_RUN_LOGIN_GATE && !linkedinConnectedRef.current) {
+        // Pause for LinkedIn sign-in — trigger AuthInput overlay, resume effect will continue
+        onOpenWorkspaceForLogin?.("LinkedIn");
+        return;
       } else {
         // Vary timing to feel organic: 1.5–3s per step
         const delay = 1500 + Math.random() * 1500;
@@ -429,6 +465,50 @@ export function ChatArea({
       if (firstRunTimerRef.current) clearTimeout(firstRunTimerRef.current);
     };
   }, [firstRunTask, seq]);
+
+  // Resume first-run animation after LinkedIn sign-in
+  useEffect(() => {
+    if (!linkedinConnected || !firstRunTask || !seq || firstRunDone) return;
+    if (firstRunStep !== FIRST_RUN_LOGIN_GATE) return;
+
+    let step = firstRunStep;
+    const totalSteps = seq.steps.length;
+
+    const advance = () => {
+      step++;
+      setFirstRunStep(step);
+      if (step >= totalSteps) {
+        setTimeout(() => {
+          setFirstRunExiting(true);
+          setTimeout(() => {
+            setFirstRunDone(true);
+            onFirstRunDone?.();
+            setTimeout(() => setFirstRunShowResult(true), 400);
+          }, 500);
+        }, 800);
+      } else {
+        const delay = 1500 + Math.random() * 1500;
+        firstRunTimerRef.current = setTimeout(advance, delay);
+      }
+    };
+
+    // Resume after short delay (account for LoginRequestCard success animation)
+    const timer = setTimeout(advance, 4000);
+    firstRunTimerRef.current = timer;
+    return () => clearTimeout(timer);
+  }, [linkedinConnected, firstRunStep]);
+
+  // Notify parent of firstRunStep changes so RightPanel can sync
+  useEffect(() => {
+    onFirstRunStepChange?.(firstRunStep);
+  }, [firstRunStep]);
+
+  // Auto-scroll to keep content visible when auth overlay appears
+  useEffect(() => {
+    if (authInputService) {
+      setTimeout(() => scrollToBottom(), 150);
+    }
+  }, [authInputService]);
 
   // Scroll to bottom as first-run progresses
   useEffect(() => {
@@ -611,16 +691,11 @@ export function ChatArea({
   const show = (step: number) => !isAutoPlay || autoStep >= step;
   const fadeClass = isAutoPlay ? "animate-fade-in" : "";
 
-  // Show login card after delay when step 9 fires (SAI navigates to LinkedIn, hits sign-in wall)
+  // Auto-play: auto-connect LinkedIn after delay when step 9 fires
   useEffect(() => {
-    const step9Visible = isAutoPlay ? autoStep >= 9 : show(9);
-    if (!step9Visible || linkedinConnected) {
-      if (!step9Visible) setShowLoginCard(false);
-      return;
-    }
+    if (!isAutoPlay || autoStep < 9 || linkedinConnected) return;
     const timer = setTimeout(() => {
-      setShowLoginCard(true);
-      scrollToBottom();
+      onLinkedinConnect?.();
     }, 3000);
     return () => clearTimeout(timer);
   }, [isAutoPlay, autoStep, linkedinConnected]);
@@ -641,7 +716,7 @@ export function ChatArea({
   return (
     <div className="relative flex min-w-0 flex-1 flex-col">
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
-        <div className="mx-auto flex min-h-full max-w-[800px] flex-col gap-8 px-8 max-md:px-4 pt-5 pb-28 max-md:pb-24">
+        <div className={`mx-auto flex min-h-full max-w-[800px] flex-col gap-8 px-8 max-md:px-4 pt-5 ${authInputService ? "pb-72 max-md:pb-64" : "pb-28 max-md:pb-24"}`}>
 
         {/* Spacer — pushes messages to bottom when they don't fill viewport */}
         <div className="flex-1" />
@@ -893,8 +968,11 @@ export function ChatArea({
                 subtasks={[seq.subtask]}
                 onViewActivityLog={onViewActivityLog}
                 done={firstRunDone}
+                authPhase={firstRunStep === FIRST_RUN_LOGIN_GATE && !linkedinConnected ? authPhase : null}
               />
             </AgentMessage>
+
+            {/* Auth overlay is triggered via onOpenWorkspaceForLogin — shown at bottom replacing TaskInput */}
 
             {/* "I'll let you know" + mobile upsell — opacity fades, then height collapses */}
             <div className="collapsible" data-open={!firstRunDone}>
@@ -1472,23 +1550,12 @@ export function ChatArea({
                 On it — let me check your LinkedIn profile viewers.
               </div>
               <RunningTaskDetail
-                steps={selectedProfile ? linkedinDisambiguatedSteps : linkedinLoginSteps}
+                steps={selectedProfile ? linkedinDisambiguatedSteps : linkedinConnected ? linkedinLoginSteps : linkedinPreLoginSteps}
                 subtasks={["Checking LinkedIn profile viewers"]}
                 onViewActivityLog={onViewActivityLog}
                 done={showDisambig}
               />
             </AgentMessage>
-
-            {/* Login card appears mid-task when SAI hits the sign-in wall */}
-            {showLoginCard && (
-              <AgentMessage>
-                <LoginRequestCard
-                  service="LinkedIn"
-                  onLogin={() => onOpenWorkspaceForLogin?.("LinkedIn")}
-                  connected={linkedinConnected}
-                />
-              </AgentMessage>
-            )}
 
             {/* ── Profile disambiguation ── */}
             {showDisambig && (
@@ -1549,15 +1616,29 @@ export function ChatArea({
         </div>
       </div>
 
-      {/* New task input */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 mx-auto w-full max-w-[800px] px-6 max-md:px-3 pb-4 pt-8 bg-gradient-to-t from-bg from-60% to-transparent">
+      {/* New task input / Auth input takeover */}
+      <div className={`absolute bottom-0 left-0 right-0 z-10 mx-auto w-full max-w-[800px] px-6 max-md:px-3 pb-4 pt-8 bg-gradient-to-t from-bg from-60% to-transparent`}>
         {showNewTaskCard && (
           <NewTaskCard
             onClose={() => onCloseNewTask?.()}
             onCreate={() => onCloseNewTask?.()}
           />
         )}
-        <TaskInput onSlashCommand={onSlashCommand} onSend={handleChatSend} prefillText={autoPlayPrefill} />
+        {authInputService && authInputState ? (
+          <AuthInput
+            serviceId={authInputService}
+            state={authInputState}
+            errorMessage={authInputError}
+            onSubmit={(values) => onAuthSubmit?.(values)}
+            onSkip={onAuthSkip}
+            onManualSignIn={onAuthManualSignIn}
+            onSubmit2FA={(code) => onAuth2FASubmit?.(code)}
+            onCancel2FA={onAuth2FACancel}
+            onOpenSettings={onOpenSettingsServices}
+          />
+        ) : (
+          <TaskInput onSlashCommand={onSlashCommand} onSend={handleChatSend} prefillText={autoPlayPrefill} />
+        )}
       </div>
 
       <ScheduleModal
