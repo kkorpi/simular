@@ -309,12 +309,13 @@ export function ChatArea({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // ── Onboarding-in-chat state ──
-  // Phase: 0 = greeting+role, 1 = apps, 2 = starter tasks
+  // Phase: 0 = greeting+role, 1 = apps, 2 = handoff, 3 = starter tasks
   const [obPhase, setObPhase] = useState(0);
   const [obRole, setObRole] = useState<string | undefined>();
   const [obRoleOther, setObRoleOther] = useState("");
   const [obApps, setObApps] = useState<string[]>([]);
   const [obAppOther, setObAppOther] = useState("");
+  const [obHandoff, setObHandoff] = useState<string | undefined>();
   const [obCompleted, setObCompleted] = useState(false);
   const [obExiting, setObExiting] = useState(false);
   const [userText, setUserText] = useState<string | null>(null);
@@ -325,7 +326,7 @@ export function ChatArea({
   // Build role-filtered starter tasks for onboarding phase 2
   // Keep tasks populated during exit animation (obExiting) until obCompleted unmounts
   const obTasks = (() => {
-    if ((!isOnboarding && !obExiting) || obPhase < 2) return [];
+    if ((!isOnboarding && !obExiting) || obPhase < 3) return [];
     const roleFiltered = starterTasks.filter((t) => t.roles?.includes(obRole ?? ""));
     const general = starterTasks.filter((t) => !t.roles);
     return (roleFiltered.length > 0 ? roleFiltered : general).slice(0, 3);
@@ -344,7 +345,7 @@ export function ChatArea({
     setTimeout(() => {
       setObCompleted(true);
       onOnboardingComplete?.(
-        { role: obRole, apps: obApps.length > 0 ? obApps : undefined },
+        { role: obRole, apps: obApps.length > 0 ? obApps : undefined, handoff: obHandoff },
         task,
       );
     }, 400);
@@ -364,11 +365,11 @@ export function ChatArea({
       return;
     }
 
-    if (isOnboarding && obPhase >= 2) {
+    if (isOnboarding && obPhase >= 3) {
       setObCompleted(true);
       setUserText(text);
       onOnboardingComplete?.(
-        { role: obRole, apps: obApps.length > 0 ? obApps : undefined, customWorkflow: text },
+        { role: obRole, apps: obApps.length > 0 ? obApps : undefined, handoff: obHandoff, customWorkflow: text },
       );
     }
   };
@@ -906,8 +907,53 @@ export function ChatArea({
               </AgentMessage>
             )}
 
-            {/* Phase 2: Starter tasks inline */}
-            {obPhase >= 2 && !obCompleted && (
+            {/* Phase 2: Handoff — what kind of work to hand off */}
+            {obPhase >= 2 && (
+              <AgentMessage>
+                <div className="text-sm leading-[1.6] text-t2">
+                  Nice — what kind of work do you want to hand off first?
+                </div>
+                <div className="mt-4 rounded-lg border border-b1 bg-bgcard p-4">
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { id: "research", label: "Research" },
+                      { id: "email", label: "Email triage" },
+                      { id: "crm", label: "CRM updates" },
+                      { id: "meeting-prep", label: "Meeting prep" },
+                      { id: "reporting", label: "Reporting" },
+                    ].map((h) => (
+                      <button
+                        key={h.id}
+                        onClick={() => {
+                          setObHandoff(h.id);
+                          if (obPhase === 2) setTimeout(() => setObPhase(3), 300);
+                        }}
+                        className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-all ${
+                          obHandoff === h.id
+                            ? "border-as/50 bg-as/10 text-blt"
+                            : obPhase > 2
+                              ? "border-b1 bg-bg3/50 text-t4 hover:border-b2 hover:bg-bg3h cursor-pointer"
+                              : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h"
+                        }`}
+                      >
+                        {h.label}
+                      </button>
+                    ))}
+                  </div>
+                  {obPhase === 2 && (
+                    <button
+                      onClick={() => setObPhase(3)}
+                      className="mt-3 text-[12px] font-medium text-t4 transition-colors hover:text-t3"
+                    >
+                      Skip →
+                    </button>
+                  )}
+                </div>
+              </AgentMessage>
+            )}
+
+            {/* Phase 3: Starter tasks inline */}
+            {obPhase >= 3 && !obCompleted && (
               <div className={`flex flex-col gap-8 transition-opacity duration-400 ease-out ${obExiting ? "opacity-0" : "opacity-100"}`}>
                 <AgentMessage>
                   <div className="text-sm leading-[1.6] text-t2 animate-fade-in">
