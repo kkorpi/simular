@@ -92,6 +92,16 @@ function UserMessage({ children }: { children: React.ReactNode }) {
   );
 }
 
+function TaskCompleteDivider() {
+  return (
+    <div className="flex items-center gap-2 py-1">
+      <div className="h-px flex-1 bg-b1" />
+      <span className="text-[10px] text-t4">task complete</span>
+      <div className="h-px flex-1 bg-b1" />
+    </div>
+  );
+}
+
 /** Map task category to a line icon */
 const SETUP_STEPS = [
   "Setting up your workspace",
@@ -129,12 +139,7 @@ function FirstRunResult({
 
   return (
     <>
-      {/* Non-blocking divider */}
-      <div className="flex items-center gap-2 py-1">
-        <div className="h-px flex-1 bg-b1" />
-        <span className="text-[10px] text-t4">task complete</span>
-        <div className="h-px flex-1 bg-b1" />
-      </div>
+      <TaskCompleteDivider />
 
       <AgentMessage>
         <div className="text-sm leading-[1.6] text-t2 mb-3">
@@ -146,7 +151,7 @@ function FirstRunResult({
               <polyline points="20 6 9 17 4 12" />
             </svg>
           }
-          title={seq.resultTitle}
+          title={taskTitle}
           body={{ type: "prose", text: (
             <>
               {seq.resultSummary}
@@ -205,6 +210,7 @@ export function ChatArea({
   onFirstRunComplete,
   onFirstRunMakeRecurring,
   onFirstRunRemoveRecurring,
+  onFollowUpDone: onFollowUpDoneCallback,
   teachPhase = "idle",
   teachTaskName = "",
   onStartTeach,
@@ -247,6 +253,8 @@ export function ChatArea({
   onFirstRunComplete?: () => void;
   onFirstRunMakeRecurring?: () => void;
   onFirstRunRemoveRecurring?: () => void;
+  /** Called when the follow-up task finishes — lets parent sync sidebar */
+  onFollowUpDone?: () => void;
   teachPhase?: TeachPhase;
   teachTaskName?: string;
   onStartTeach?: () => void;
@@ -378,6 +386,7 @@ export function ChatArea({
   const [firstRunDone, setFirstRunDone] = useState(false);
   const [firstRunExiting, setFirstRunExiting] = useState(false);
   const [firstRunShowResult, setFirstRunShowResult] = useState(false);
+  const [firstRunCollapsibleHidden, setFirstRunCollapsibleHidden] = useState(false);
   const firstRunTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // ── Follow-up task state (triggered by clicking follow-up PromptCard) ──
@@ -420,6 +429,7 @@ export function ChatArea({
           setFirstRunExiting(true); // start fade-out
           setTimeout(() => {
             setFirstRunDone(true);
+            setFirstRunCollapsibleHidden(true);
             onFirstRunDone?.();
             setTimeout(() => setFirstRunShowResult(true), 400);
           }, 500); // allow fade-out to complete
@@ -460,6 +470,7 @@ export function ChatArea({
           setFirstRunExiting(true);
           setTimeout(() => {
             setFirstRunDone(true);
+            setFirstRunCollapsibleHidden(true);
             onFirstRunDone?.();
             setTimeout(() => setFirstRunShowResult(true), 400);
           }, 500);
@@ -506,6 +517,7 @@ export function ChatArea({
       setFollowUpExiting(true); // start fade-out
       setTimeout(() => {
         setFollowUpDone(true);
+        onFollowUpDoneCallback?.();
         // Scroll to show the result
         const el = scrollContainerRef.current;
         if (el) setTimeout(() => el.scrollTo({ top: el.scrollHeight, behavior: "smooth" }), 100);
@@ -627,7 +639,7 @@ export function ChatArea({
   // Delay (ms) before each SAI step fires (relative to previous step)
   const STEP_DELAYS: Record<number, number> = {
     0: 400, 1: 1400, 2: 1400,
-    4: 1200, 6: 1200, 7: 3800, 8: 1400,
+    4: 1200, 6: 1200, 7: 3800, 8: 2800,
   };
 
   const scrollToBottom = () => {
@@ -953,33 +965,19 @@ export function ChatArea({
             {/* Auth overlay is triggered via onOpenWorkspaceForLogin — shown at bottom replacing TaskInput */}
 
             {/* "I'll let you know" + mobile upsell — opacity fades, then height collapses */}
-            <div className="collapsible" data-open={!firstRunDone}>
-              <div>
-                <div className={`flex flex-col gap-8 transition-opacity duration-500 ease-out ${firstRunExiting ? "opacity-0" : "opacity-100"}`}>
-                  <AgentMessage>
-                    <div className="text-sm leading-[1.6] text-t2">
-                      I&apos;ll let you know when this is ready — you can keep chatting or close this tab.
-                    </div>
-                  </AgentMessage>
-
-                  {/* Native app download card — hidden until app is available
-                  <PromptCard
-                    variant="compact"
-                    icon={
-                      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-                        <line x1="12" y1="18" x2="12.01" y2="18" />
-                      </svg>
-                    }
-                    message={<><strong>Get updates on mobile.</strong> I&apos;ll ping you when this task is done.</>}
-                    actions={[
-                      { label: "Send me the link", style: "primary", onClick: () => {} },
-                      { label: "Maybe later", style: "outline", onClick: () => {} },
-                    ]}
-                  /> */}
+            {!firstRunCollapsibleHidden && (
+              <div className="collapsible" data-open={!firstRunDone}>
+                <div>
+                  <div className={`flex flex-col gap-8 transition-opacity duration-500 ease-out ${firstRunExiting ? "opacity-0" : "opacity-100"}`}>
+                    <AgentMessage>
+                      <div className="text-sm leading-[1.6] text-t2">
+                        I&apos;ll let you know when this is ready — you can keep chatting or close this tab.
+                      </div>
+                    </AgentMessage>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {firstRunShowResult && (
               <div className="flex flex-col gap-8 animate-fade-in">
@@ -1034,11 +1032,7 @@ export function ChatArea({
                       {/* Follow-up result — fades in */}
                       {followUpDone && (
                         <div className="flex flex-col gap-8 animate-fade-in">
-                          <div className="flex items-center gap-2 py-1">
-                            <div className="h-px flex-1 bg-b1" />
-                            <span className="text-[10px] text-t4">task complete</span>
-                            <div className="h-px flex-1 bg-b1" />
-                          </div>
+                          <TaskCompleteDivider />
                           <AgentMessage>
                             <div className="text-sm leading-[1.6] text-t2 mb-3">
                               Done — here&apos;s what I found:
@@ -1413,25 +1407,21 @@ export function ChatArea({
           </div>
         )}
 
-        {/* Step 6: Running task 2 + divider */}
+        {/* Step 6: Sai acknowledges LP request, queues it behind Sequoia */}
         {show(6) && (view === "task-hover" || isAutoPlay) && (
           <div className={fadeClass}>
             <AgentMessage>
               <div className="text-sm leading-[1.6] text-t2">
-                On it, I&apos;ll check your LP touchpoints while the briefing runs.
+                Sure, I&apos;ll check that once the Sequoia briefing is ready.
               </div>
-              <RunningTaskDetail
-                steps={[]}
-                subtasks={["Checking Salesforce LP records"]}
-                done={isAutoPlay && autoStep >= 8}
-              />
             </AgentMessage>
           </div>
         )}
 
-        {/* Step 7: Briefing result ResultCard */}
+        {/* Step 7: Sequoia completes → result card, then Salesforce task starts */}
         {show(7) && (
-          <div className={fadeClass}>
+          <div className={`flex flex-col gap-8 ${fadeClass}`}>
+            <TaskCompleteDivider />
             <AgentMessage>
               <div className="text-sm leading-[1.6] text-t2 mb-3">
                 Here&apos;s your Sequoia Scouts LP prep.
@@ -1467,12 +1457,25 @@ export function ChatArea({
                 }
               />
             </AgentMessage>
+            {(view === "task-hover" || isAutoPlay) && (
+              <AgentMessage>
+                <div className="text-sm leading-[1.6] text-t2">
+                  Now checking your LP touchpoints.
+                </div>
+                <RunningTaskDetail
+                  steps={[]}
+                  subtasks={["Checking Salesforce LP records"]}
+                  done={isAutoPlay && autoStep >= 8}
+                />
+              </AgentMessage>
+            )}
           </div>
         )}
 
-        {/* Step 8: LP touchpoint report + recurring PromptCard */}
+        {/* Step 8: LP touchpoint report complete */}
         {show(8) && (
-          <div className={fadeClass}>
+          <div className={`flex flex-col gap-8 ${fadeClass}`}>
+            <TaskCompleteDivider />
             <AgentMessage>
               <div className="text-sm leading-[1.6] text-t2 mb-3">
                 Here&apos;s your LP touchpoint report. A few relationships need attention.

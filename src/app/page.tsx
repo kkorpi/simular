@@ -93,6 +93,7 @@ export default function Home() {
 
   const [firstRunTask, setFirstRunTask] = useState<StarterTask | null>(null);
   const [firstRunDone, setFirstRunDone] = useState(false);
+  const [followUpDone, setFollowUpDone] = useState(false);
   const [firstRunRecurring, setFirstRunRecurring] = useState(false);
   const [firstRunDetailOpen, setFirstRunDetailOpen] = useState(false);
   const [openTaskId, setOpenTaskId] = useState<string | null>(null);
@@ -620,6 +621,7 @@ export default function Home() {
               onFirstRunComplete={() => setFirstRunTask(null)}
               onFirstRunMakeRecurring={() => { setFirstRunRecurring(true); }}
               onFirstRunRemoveRecurring={() => { setFirstRunRecurring(false); }}
+              onFollowUpDone={() => setFollowUpDone(true)}
               teachPhase={teachPhase}
               teachTaskName={teachTaskName}
               onStartTeach={handleStartTeach}
@@ -674,6 +676,7 @@ export default function Home() {
               workspaceConnecting={workspaceConnecting}
               firstRunTask={firstRunTask}
               firstRunDone={firstRunDone}
+              followUpDone={followUpDone}
               firstRunRecurring={firstRunRecurring}
               onFirstRunRemoveRecurring={() => setFirstRunRecurring(false)}
               openFirstRunDetail={firstRunDetailOpen}

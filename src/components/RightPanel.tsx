@@ -88,33 +88,54 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean,
 function FirstRunTaskList({
   firstRunTask,
   firstRunDone,
+  followUpDone = false,
   firstRunRecurring,
   firstRunStep,
   onSelectTask,
 }: {
   firstRunTask: StarterTask;
   firstRunDone: boolean;
+  followUpDone?: boolean;
   firstRunRecurring: boolean;
   firstRunStep: number;
   onSelectTask: (task: Task) => void;
 }) {
   const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring, firstRunStep);
   const seq = firstRunSequences[firstRunTask.category] ?? firstRunSequences.research;
-  const completedTask: Task = {
-    id: "first-run-completed",
-    name: firstRunTask.title,
-    status: "completed",
-    subtitle: "Just now",
-    time: "",
-    integrations: seq.integrations,
-    detail: {
-      description: firstRunTask.description,
-      duration: "28s",
-      steps: seq.steps.map((s) => ({ label: s.label, done: true })),
-      result: seq.resultSummary,
-      artifact: seq.artifact,
-    },
-  };
+  const fuSeq = followUpSequences[firstRunTask.category] ?? followUpSequences.research;
+
+  // When follow-up is done, show that as the completed task instead of the first-run task
+  const completedTask: Task = followUpDone
+    ? {
+        id: "follow-up-completed",
+        name: fuSeq.resultTitle,
+        status: "completed",
+        subtitle: "Just now",
+        time: "",
+        integrations: fuSeq.integrations,
+        detail: {
+          description: fuSeq.resultSummary,
+          duration: "15s",
+          steps: fuSeq.steps.map((s) => ({ label: s.label, done: true })),
+          result: fuSeq.resultSummary,
+          artifact: fuSeq.artifact,
+        },
+      }
+    : {
+        id: "first-run-completed",
+        name: firstRunTask.title,
+        status: "completed",
+        subtitle: "Just now",
+        time: "",
+        integrations: seq.integrations,
+        detail: {
+          description: firstRunTask.description,
+          duration: "28s",
+          steps: seq.steps.map((s) => ({ label: s.label, done: true })),
+          result: seq.resultSummary,
+          artifact: seq.artifact,
+        },
+      };
 
   // Still running
   if (!firstRunDone) {
@@ -160,6 +181,7 @@ export function RightPanel({
   workspaceConnecting = false,
   firstRunTask,
   firstRunDone = false,
+  followUpDone = false,
   firstRunRecurring = false,
   onFirstRunRemoveRecurring,
   openFirstRunDetail = false,
@@ -183,6 +205,8 @@ export function RightPanel({
   workspaceConnecting?: boolean;
   firstRunTask?: StarterTask | null;
   firstRunDone?: boolean;
+  /** True when the follow-up task has finished */
+  followUpDone?: boolean;
   firstRunRecurring?: boolean;
   onFirstRunRemoveRecurring?: () => void;
   /** When true, auto-select the first-run task in the TaskDetail slide-over */
@@ -339,8 +363,8 @@ export function RightPanel({
       });
     }
 
-    // Steps 6-7: LP touchpoint tracker is running
-    if (autoStep >= 6 && autoStep < 8) {
+    // Steps 7-8: LP touchpoint tracker is running (starts after Sequoia completes)
+    if (autoStep >= 7 && autoStep < 8) {
       active.push({
         id: "auto-touchpoint",
         name: "LP touchpoint tracker",
@@ -618,6 +642,7 @@ export function RightPanel({
           <FirstRunTaskList
             firstRunTask={firstRunTask}
             firstRunDone={firstRunDone}
+            followUpDone={followUpDone}
             firstRunRecurring={firstRunRecurring}
             firstRunStep={firstRunStep}
             onSelectTask={handleSelectTask}
