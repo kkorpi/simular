@@ -1021,8 +1021,8 @@ export function ChatArea({
                         </div>
                         <RunningTaskDetail
                           steps={followUpDone
-                            ? fuSeq.steps.map(s => ({ ...s, done: true }))
-                            : [{ label: fuSeq.steps[0]?.label || fuSeq.subtask, done: false }]
+                            ? fuSeq.steps.map((s, i) => ({ timestamp: `0:${String((i + 1) * 2).padStart(2, "0")}`, label: s.label, done: true }))
+                            : [{ timestamp: "0:01", label: fuSeq.steps[0]?.label || fuSeq.subtask, done: false }]
                           }
                           subtasks={[fuSeq.subtask]}
                           done={followUpDone}
