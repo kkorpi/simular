@@ -70,7 +70,9 @@ export default function Home() {
   const [activeView, setActiveView] = useState<ViewState>(initial.view ?? "zero-state");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSection, setSettingsSection] = useState<SettingsSection | undefined>(undefined);
-  const [connectedServices, setConnectedServices] = useState<ConnectedServiceInfo[]>([]);
+  const [connectedServices, setConnectedServices] = useState<ConnectedServiceInfo[]>([
+    { id: "slack", name: "Slack", connectedAt: new Date(Date.now() - 2 * 60 * 60 * 1000) },
+  ]);
   const [cardGalleryOpen, setCardGalleryOpen] = useState(false);
   const [designSystemOpen, setDesignSystemOpen] = useState(false);
   const [messyMode, setMessyMode] = useState(false);
@@ -320,18 +322,29 @@ export default function Home() {
 
   const handleAuthSubmit = (values: Record<string, string>) => {
     const serviceId = authInputService || "linkedin";
-    setAuthInputService(undefined);
+    // Hide the credential form briefly, then show CAPTCHA challenge
     setAuthInputState(undefined);
+    setAuthInputService(undefined);
     setAuthPhase("signing-in");
-    // Simulate auth — in real app this calls backend
     setTimeout(() => {
       setAuthPhase(null);
-      setLinkedinConnected(true);
-      setConnectedServices((prev) => {
-        if (prev.some((s) => s.id === serviceId)) return prev;
-        return [...prev, { id: serviceId, name: serviceId.charAt(0).toUpperCase() + serviceId.slice(1), connectedAt: new Date() }];
-      });
+      // Re-show AuthInput in CAPTCHA state
+      setAuthInputService(serviceId);
+      setAuthInputState("captcha");
     }, 2000);
+  };
+
+  /** Called when user returns from workspace after solving CAPTCHA (or via FullWorkspaceView login success) */
+  const handleCaptchaResolved = () => {
+    const serviceId = authInputService || "linkedin";
+    setAuthInputService(undefined);
+    setAuthInputState(undefined);
+    setAuthPhase(null);
+    setLinkedinConnected(true);
+    setConnectedServices((prev) => {
+      if (prev.some((s) => s.id === serviceId)) return prev;
+      return [...prev, { id: serviceId, name: serviceId.charAt(0).toUpperCase() + serviceId.slice(1), connectedAt: new Date() }];
+    });
   };
 
   const handleAuthSkip = () => {
@@ -366,6 +379,19 @@ export default function Home() {
     setAuthInputService(undefined);
     setAuthInputState(undefined);
     setAuthPhase(null);
+  };
+
+  const handleOAuthSelect = (provider: string) => {
+    const serviceId = authInputService || "linkedin";
+    // Hide auth form, show signing-in phase, then show CAPTCHA
+    setAuthInputState(undefined);
+    setAuthInputService(undefined);
+    setAuthPhase("signing-in");
+    setTimeout(() => {
+      setAuthPhase(null);
+      setAuthInputService(serviceId);
+      setAuthInputState("captcha");
+    }, 2000);
   };
 
   const handleOpenSettingsServices = () => {
@@ -676,6 +702,7 @@ export default function Home() {
               onAuthManualSignIn={handleAuthManualSignIn}
               onAuth2FASubmit={handleAuth2FASubmit}
               onAuth2FACancel={handleAuth2FACancel}
+              onAuthOAuthSelect={handleOAuthSelect}
               authPhase={authPhase}
               onOpenSettingsServices={handleOpenSettingsServices}
               onOnboardingComplete={(profile, task) => {
@@ -810,7 +837,18 @@ export default function Home() {
                 setWorkspaceMode("default");
               }
             }}
-            onLoginSuccess={() => setLinkedinConnected(true)}
+            onLoginSuccess={() => {
+              setLinkedinConnected(true);
+              // Also clear any pending auth state (e.g., CAPTCHA was resolved in workspace)
+              setAuthInputService(undefined);
+              setAuthInputState(undefined);
+              setAuthPhase(null);
+              const sid = workspaceService.toLowerCase();
+              setConnectedServices((prev) => {
+                if (prev.some((s) => s.id === sid)) return prev;
+                return [...prev, { id: sid, name: workspaceService, connectedAt: new Date() }];
+              });
+            }}
             mode={workspaceMode}
             service={workspaceService}
             teachTaskName={teachTaskName || undefined}

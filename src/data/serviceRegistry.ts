@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+export type OAuthProvider = "google" | "apple" | "microsoft" | "github" | "facebook";
+
 export interface AuthField {
   key: string;
   label: string;
@@ -21,6 +23,8 @@ export interface ServiceConfig {
   supports2FA: boolean;
   /** Domain used for trust signal display */
   trustDomain: string;
+  /** OAuth sign-in providers available on this site (e.g., "Sign in with Google") */
+  oauthProviders?: OAuthProvider[];
 }
 
 export const serviceRegistry: Record<string, ServiceConfig> = {
@@ -35,6 +39,7 @@ export const serviceRegistry: Record<string, ServiceConfig> = {
     ],
     supports2FA: true,
     trustDomain: "linkedin.com",
+    oauthProviders: ["google", "apple"],
   },
   gmail: {
     id: "gmail",
@@ -59,6 +64,7 @@ export const serviceRegistry: Record<string, ServiceConfig> = {
     ],
     supports2FA: true,
     trustDomain: "salesforce.com",
+    oauthProviders: ["google"],
   },
 };
 
@@ -84,6 +90,7 @@ export function getService(id: string): ServiceConfig {
       ],
       supports2FA: false,
       trustDomain: id.toLowerCase() + ".com",
+      oauthProviders: ["google", "apple", "microsoft"],
     }
   );
 }

@@ -236,6 +236,7 @@ export function ChatArea({
   onAuthManualSignIn,
   onAuth2FASubmit,
   onAuth2FACancel,
+  onAuthOAuthSelect,
   authPhase,
   onOpenSettingsServices,
 }: {
@@ -291,6 +292,7 @@ export function ChatArea({
   onAuthManualSignIn?: () => void;
   onAuth2FASubmit?: (code: string) => void;
   onAuth2FACancel?: () => void;
+  onAuthOAuthSelect?: (provider: string) => void;
   /** Current auth sub-phase for lock icon in RunningTaskDetail */
   authPhase?: "waiting" | "signing-in" | null;
   /** Opens Settings > Connected Services */
@@ -1660,6 +1662,7 @@ export function ChatArea({
             onSubmit2FA={(code) => onAuth2FASubmit?.(code)}
             onCancel2FA={onAuth2FACancel}
             onOpenSettings={onOpenSettingsServices}
+            onOAuthSelect={onAuthOAuthSelect}
           />
         ) : (
           <TaskInput onSlashCommand={onSlashCommand} onSend={handleChatSend} prefillText={autoPlayPrefill} />

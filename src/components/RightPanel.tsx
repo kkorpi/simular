@@ -446,8 +446,8 @@ export function RightPanel({
         ...t,
         status: "recurring" as const,
         subtitle: "Every weekday at 7:00 AM",
-        detail: { ...t.detail, schedule: "Every weekday at 7:00 AM", nextRun: "Tomorrow at 7:00 AM" },
-      })),
+        detail: { ...t.detail, description: t.detail?.description ?? "", schedule: "Every weekday at 7:00 AM", nextRun: "Tomorrow at 7:00 AM" },
+      } as Task)),
       ...recurring,
     ];
 
