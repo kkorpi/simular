@@ -17,7 +17,6 @@ import { WaitlistSignup } from "@/components/WaitlistSignup";
 import { WaitlistConfirmation } from "@/components/WaitlistConfirmation";
 import { OnboardingScreen, type OnboardingProfile } from "@/components/OnboardingScreen";
 import type { AuthInputState } from "@/components/AuthInput";
-import { getService } from "@/data/serviceRegistry";
 import { SEATS_REMAINING_INIT, TEACH_TASK_NAME, type ViewState, type StarterTask, type TeachPhase } from "@/data/mockData";
 
 const PIP_MIN_WIDTH = 200;
@@ -381,7 +380,7 @@ export default function Home() {
         setSettingsOpen(true);
         break;
       case "integrations":
-        setSettingsSection("workspace");
+        setSettingsSection("integrations");
         setSettingsOpen(true);
         break;
       case "settings":
@@ -829,15 +828,8 @@ export default function Home() {
             onCancelTrial={() => setTrialCancelled(true)}
             onReactivateTrial={() => setTrialCancelled(false)}
             connectedServices={connectedServices}
-            onDisconnectService={(id) => setConnectedServices((prev) => prev.filter((s) => s.id !== id))}
-            onDisconnectAllServices={() => setConnectedServices([])}
-            onConnectService={(id, values) => {
-              setConnectedServices((prev) => {
-                if (prev.some((s) => s.id === id)) return prev;
-                const svc = getService(id);
-                return [...prev, { id, name: svc.name, connectedAt: new Date() }];
-              });
-            }}
+            onSignOut={(id) => setConnectedServices((prev) => prev.filter((s) => s.id !== id))}
+            onSignOutAll={() => setConnectedServices([])}
           />
           <CardGallery
             open={cardGalleryOpen}

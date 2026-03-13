@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useTheme } from "./ThemeProvider";
-import { serviceRegistry, getService } from "@/data/serviceRegistry";
 
 export interface ConnectedServiceInfo {
   id: string;
@@ -21,14 +20,14 @@ interface SettingsOverlayProps {
   onCancelTrial?: () => void;
   onReactivateTrial?: () => void;
   connectedServices?: ConnectedServiceInfo[];
-  onDisconnectService?: (serviceId: string) => void;
-  onDisconnectAllServices?: () => void;
-  onConnectService?: (serviceId: string, values: Record<string, string>) => void;
+  onSignOut?: (serviceId: string) => void;
+  onSignOutAll?: () => void;
 }
 
 type SettingsSection =
   | "appearance"
   | "workspace"
+  | "integrations"
   | "services"
   | "skills"
   | "subscription"
@@ -38,7 +37,8 @@ type SettingsSection =
 const sections: { id: SettingsSection; label: string }[] = [
   { id: "appearance", label: "Appearance" },
   { id: "workspace", label: "Workspace" },
-  { id: "services", label: "Connected Services" },
+  { id: "integrations", label: "Integrations" },
+  { id: "services", label: "Signed-in Accounts" },
   { id: "skills", label: "Skills" },
   { id: "subscription", label: "Subscription" },
   { id: "credits", label: "Credits" },
@@ -47,7 +47,7 @@ const sections: { id: SettingsSection; label: string }[] = [
 
 export { type SettingsSection };
 
-export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGallery, onOpenDesignSystem, trialDaysLeft = 6, trialCancelled, onCancelTrial, onReactivateTrial, connectedServices = [], onDisconnectService, onDisconnectAllServices, onConnectService }: SettingsOverlayProps) {
+export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGallery, onOpenDesignSystem, trialDaysLeft = 6, trialCancelled, onCancelTrial, onReactivateTrial, connectedServices = [], onSignOut, onSignOutAll }: SettingsOverlayProps) {
   const [active, setActive] = useState<SettingsSection>(initialSection || "appearance");
 
   // Sync when initialSection changes (e.g., from slash command)
@@ -138,7 +138,8 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
           <div className="flex-1 px-6 py-5">
             {active === "appearance" && <AppearanceSettings />}
             {active === "workspace" && <WorkspaceSettings />}
-            {active === "services" && <ConnectedServicesSettings services={connectedServices} onDisconnect={onDisconnectService} onDisconnectAll={onDisconnectAllServices} onConnectService={onConnectService} />}
+            {active === "integrations" && <IntegrationsSettings />}
+            {active === "services" && <SignedInAccountsSettings services={connectedServices} onSignOut={onSignOut} onSignOutAll={onSignOutAll} />}
 
             {active === "skills" && <SkillsSettings />}
             {active === "subscription" && <SubscriptionSettings trialDaysLeft={trialDaysLeft} trialCancelled={trialCancelled} onCancelTrial={onCancelTrial} onReactivateTrial={onReactivateTrial} />}
@@ -304,54 +305,95 @@ function HintIcon() {
   );
 }
 
-/* ── Connected Services ── */
-function ConnectedServicesSettings({
+/* ── Integrations (OAuth API connections) ── */
+
+const integrationsList = [
+  { id: "slack", name: "Slack", description: "Send messages and notifications" },
+  { id: "notion", name: "Notion", description: "Create and update documents" },
+  { id: "jira", name: "Jira", description: "Create and manage issues" },
+  { id: "github", name: "GitHub", description: "Manage repos and pull requests" },
+  { id: "google-calendar", name: "Google Calendar", description: "View and create events" },
+  { id: "hubspot", name: "HubSpot", description: "Manage contacts and deals" },
+];
+
+function IntegrationsSettings() {
+  const [connected, setConnected] = useState<Set<string>>(new Set());
+
+  const toggleConnect = (id: string) => {
+    setConnected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Integrations</div>
+        <div className="mt-1 text-[12.5px] text-t3">
+          Connect apps and services Sai can use to take actions on your behalf.
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        {integrationsList.map((integration) => {
+          const isConnected = connected.has(integration.id);
+          return (
+            <div key={integration.id} className="flex items-center gap-3 rounded-lg border border-b1 bg-bg3/50 px-4 py-3">
+              <div className="min-w-0 flex-1">
+                <div className="text-[13px] font-medium text-t1">{integration.name}</div>
+                <div className="text-[11.5px] text-t3">{integration.description}</div>
+              </div>
+              {isConnected ? (
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-1.5 text-[12px] font-medium text-g">
+                    <div className="h-1.5 w-1.5 rounded-full bg-g" />
+                    Connected
+                  </span>
+                  <button
+                    onClick={() => toggleConnect(integration.id)}
+                    className="text-[11px] text-t4 transition-colors hover:text-rd"
+                  >
+                    Disconnect
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => toggleConnect(integration.id)}
+                  className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3 hover:text-t1"
+                >
+                  Connect
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="flex items-start gap-2 text-[11.5px] text-t3">
+        <svg className="mt-px h-3.5 w-3.5 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+        Integrations use OAuth to securely connect without sharing your password. You can revoke access at any time.
+      </div>
+    </div>
+  );
+}
+
+/* ── Signed-in Accounts ── */
+function SignedInAccountsSettings({
   services,
-  onDisconnect,
-  onDisconnectAll,
-  onConnectService,
+  onSignOut,
+  onSignOutAll,
 }: {
   services: ConnectedServiceInfo[];
-  onDisconnect?: (serviceId: string) => void;
-  onDisconnectAll?: () => void;
-  onConnectService?: (serviceId: string, values: Record<string, string>) => void;
+  onSignOut?: (serviceId: string) => void;
+  onSignOutAll?: () => void;
 }) {
-  const [addingService, setAddingService] = useState<string | null>(null);
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [formValues, setFormValues] = useState<Record<string, string>>({});
-  const [showPasswords, setShowPasswords] = useState<Record<string, boolean>>({});
-  const pickerRef = useRef<HTMLDivElement>(null);
-
-  // Close picker on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-        setPickerOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const connectedIds = new Set(services.map((s) => s.id));
-  const availableServices = Object.values(serviceRegistry).filter((s) => !connectedIds.has(s.id));
-
-  const handleSelectService = (serviceId: string) => {
-    setAddingService(serviceId);
-    setPickerOpen(false);
-    setFormValues({});
-    setShowPasswords({});
-  };
-
-  const handleConnectSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (addingService) {
-      onConnectService?.(addingService, formValues);
-      setAddingService(null);
-      setFormValues({});
-    }
-  };
-
   function timeAgo(date: Date): string {
     const diff = Date.now() - date.getTime();
     const minutes = Math.floor(diff / 60000);
@@ -363,14 +405,12 @@ function ConnectedServicesSettings({
     return `${days} day${days !== 1 ? "s" : ""} ago`;
   }
 
-  const addingConfig = addingService ? getService(addingService) : null;
-
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <div className="text-[14px] font-semibold text-t1">Connected Services</div>
+        <div className="text-[14px] font-semibold text-t1">Signed-in Accounts</div>
         <div className="mt-1 text-[12.5px] text-t3">
-          Services Sai can sign into on your behalf.
+          Websites and services you&apos;re signed into in your workspace browser.
         </div>
       </div>
 
@@ -382,176 +422,33 @@ function ConnectedServicesSettings({
               <div className="min-w-0 flex-1">
                 <div className="text-[13px] font-medium text-t1">{svc.name}</div>
                 <div className="mt-0.5 text-[11px] text-t3">
-                  Connected &middot; Last used {timeAgo(svc.connectedAt)}
+                  Signed in &middot; Last active {timeAgo(svc.connectedAt)}
                 </div>
               </div>
               <button
-                onClick={() => onDisconnect?.(svc.id)}
+                onClick={() => onSignOut?.(svc.id)}
                 className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t3 transition-all hover:border-rd/30 hover:text-rd"
               >
-                Disconnect
+                Sign out
               </button>
             </div>
           ))}
         </div>
       ) : (
         <div className="rounded-lg border border-b1 bg-bg3/30 px-4 py-6 text-center">
-          <div className="text-[13px] text-t3">No services connected yet.</div>
-          <div className="mt-1 text-[12px] text-t4">Connect services below so Sai can sign in when a task requires access.</div>
+          <div className="text-[13px] text-t3">No accounts signed in yet.</div>
+          <div className="mt-1 text-[12px] text-t4">Sign into websites in your workspace and they&apos;ll appear here.</div>
         </div>
       )}
-
-      {/* Connect a service — picker or inline form */}
-      {addingConfig ? (
-        <div className="rounded-lg border border-b1 bg-bg3/50 overflow-hidden">
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-b1">
-            <div className="flex items-center gap-2.5">
-              <div
-                className="flex h-6 w-6 items-center justify-center rounded-md"
-                style={{ backgroundColor: addingConfig.brandColor }}
-              >
-                <svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" />
-                  <path d="M7 11V7a5 5 0 0110 0v4" />
-                </svg>
-              </div>
-              <span className="text-[13px] font-medium text-t1">Connect {addingConfig.name}</span>
-            </div>
-            <button
-              onClick={() => { setAddingService(null); setFormValues({}); }}
-              className="text-t4 transition-colors hover:text-t2"
-            >
-              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Form */}
-          <form onSubmit={handleConnectSubmit} className="px-4 py-3">
-            <div className="flex flex-col gap-3">
-              {addingConfig.fields.map((field) => (
-                <div key={field.key}>
-                  <label className="mb-1 block text-[12px] font-medium text-t2">{field.label}</label>
-                  <div className="relative">
-                    <input
-                      type={field.type === "password" && !showPasswords[field.key] ? "password" : field.type === "email" ? "email" : "text"}
-                      autoComplete={field.autoComplete}
-                      value={formValues[field.key] ?? ""}
-                      onChange={(e) => setFormValues((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                      placeholder={field.placeholder}
-                      className="w-full rounded-md border border-b1 bg-bgi px-3 py-2 text-[13px] text-t1 outline-none transition-all placeholder:text-t4 focus:border-b2"
-                    />
-                    {field.type === "password" && (
-                      <button
-                        type="button"
-                        onClick={() => setShowPasswords((prev) => ({ ...prev, [field.key]: !prev[field.key] }))}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-t4 transition-colors hover:text-t2"
-                        tabIndex={-1}
-                      >
-                        {showPasswords[field.key] ? (
-                          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24" />
-                            <line x1="1" y1="1" x2="23" y2="23" />
-                          </svg>
-                        ) : (
-                          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                            <circle cx="12" cy="12" r="3" />
-                          </svg>
-                        )}
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="mt-3 flex items-center justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => { setAddingService(null); setFormValues({}); }}
-                className="rounded-md px-3 py-1.5 text-[12px] font-medium text-t3 transition-all hover:text-t2"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="rounded-md px-4 py-1.5 text-[12px] font-medium text-white transition-all hover:brightness-110"
-                style={{ backgroundColor: addingConfig.brandColor }}
-              >
-                Connect
-              </button>
-            </div>
-          </form>
-        </div>
-      ) : availableServices.length > 0 ? (
-        <div className="relative" ref={pickerRef}>
-          <button
-            onClick={() => setPickerOpen(!pickerOpen)}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-b2 px-4 py-3 text-[12px] font-medium text-t3 transition-all hover:border-b2 hover:bg-bg3/50 hover:text-t2"
-          >
-            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19" />
-              <line x1="5" y1="12" x2="19" y2="12" />
-            </svg>
-            Connect a service
-          </button>
-
-          {pickerOpen && (
-            <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 rounded-lg border border-b1 bg-bg2 py-1 shadow-lg">
-              {availableServices.map((svc) => (
-                <button
-                  key={svc.id}
-                  onClick={() => handleSelectService(svc.id)}
-                  className="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-bg3"
-                >
-                  <div
-                    className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md"
-                    style={{ backgroundColor: svc.brandColor }}
-                  >
-                    <svg className="h-3 w-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="3" y="11" width="18" height="11" rx="2" />
-                      <path d="M7 11V7a5 5 0 0110 0v4" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="text-[13px] font-medium text-t1">{svc.name}</div>
-                    <div className="text-[11px] text-t3">{svc.trustDomain}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : null}
-
-      {/* Trust signal */}
-      <div className="flex items-start gap-2 text-[11.5px] text-t3">
-        <svg
-          className="mt-px h-3.5 w-3.5 shrink-0 text-g"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <rect x="3" y="11" width="18" height="11" rx="2" />
-          <path d="M7 11V7a5 5 0 0110 0v4" />
-        </svg>
-        Credentials are encrypted and stored in your private workspace. They are used only to sign in to services on your behalf.
-      </div>
 
       {services.length > 1 && (
         <>
           <div className="h-px bg-b1" />
           <button
-            onClick={onDisconnectAll}
+            onClick={onSignOutAll}
             className="text-[12px] font-medium text-t3 transition-all hover:text-rd"
           >
-            Disconnect all services
+            Sign out of all
           </button>
         </>
       )}
