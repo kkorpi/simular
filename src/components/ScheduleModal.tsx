@@ -5,6 +5,7 @@ import { useState } from "react";
 interface ScheduleModalProps {
   open: boolean;
   onClose: () => void;
+  onTurnOff?: () => void;
   taskName: string;
   currentSchedule?: string;
   nextRun?: string;
@@ -78,6 +79,7 @@ export { RepeatIcon };
 export function ScheduleModal({
   open,
   onClose,
+  onTurnOff,
   taskName,
   currentSchedule,
   nextRun,
@@ -349,7 +351,7 @@ export function ScheduleModal({
         {/* Footer */}
         <div className="flex items-center justify-between border-t border-b1 px-5 py-3.5">
           <button
-            onClick={onClose}
+            onClick={onTurnOff ?? onClose}
             className="text-[12px] font-medium text-red-400 transition-all hover:text-red-300"
           >
             Turn off schedule

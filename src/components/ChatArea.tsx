@@ -1164,7 +1164,7 @@ export function ChatArea({
                   {/* Header */}
                   <div className="flex items-center gap-2.5 px-3.5 py-2.5">
                     <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-violet-500/15">
-                      <div className="h-2 w-2 rounded-full bg-violet-500 animate-pulse-dot" style={{ "--pulse-glow": "rgba(139, 92, 246, 0.5)" } as React.CSSProperties} />
+                      <div className="h-2 w-2 rounded-full bg-violet-500 animate-pulse" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="text-[13px] font-semibold text-t1">{teachTaskName || "Recording task"}</div>
@@ -1189,7 +1189,7 @@ export function ChatArea({
                         {/* Active capture dot when not all steps revealed */}
                         {teachStepCount < teachRecordedSteps.length && (
                           <div className="flex items-center gap-2 text-[12px] text-violet-400/60 pl-0.5">
-                            <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse-dot" style={{ "--pulse-glow": "rgba(139, 92, 246, 0.4)" } as React.CSSProperties} />
+                            <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse" />
                             <span className="italic">Watching for next action...</span>
                           </div>
                         )}

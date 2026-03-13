@@ -117,15 +117,13 @@ export function RunningTaskDetail({
               {steps.map((step, idx) => (
                   <div
                     key={idx}
-                    className={`flex items-start gap-2.5 py-1.5 ${
-                      step.done ? "" : "opacity-50"
-                    }`}
+                    className="flex items-start gap-2.5 py-1.5"
                   >
                     <div className="mt-[5px] shrink-0">
                       {step.done ? (
                         <div className="h-[7px] w-[7px] rounded-full bg-g" />
                       ) : (
-                        <div className="h-[7px] w-[7px] rounded-full bg-t4 animate-pulse-dot" />
+                        <div className="h-[7px] w-[7px] rounded-full bg-g animate-pulse" />
                       )}
                     </div>
                     <span className="mt-[1px] w-[32px] shrink-0 font-mono text-[10.5px] text-t4">
@@ -133,7 +131,7 @@ export function RunningTaskDetail({
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="text-[12px] leading-[1.5] text-t2">
-                        <span className={step.done ? "" : "text-t3"}>
+                        <span>
                           {step.label}
                         </span>
                         {step.userAction && (

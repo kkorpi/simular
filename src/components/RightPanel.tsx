@@ -236,6 +236,10 @@ export function RightPanel({
   const [isDragging, setIsDragging] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  // Track tasks toggled between recurring ↔ completed
+  const [disabledRecurringIds, setDisabledRecurringIds] = useState<Set<string>>(new Set());
+  const [madeRecurringIds, setMadeRecurringIds] = useState<Set<string>>(new Set());
+
   // Auto-select first-run task when "View details" clicked in chat
   useEffect(() => {
     if (openFirstRunDetail && firstRunTask) {
@@ -422,6 +426,38 @@ export function RightPanel({
     return { active, recurring, completed };
   })();
 
+  // Apply schedule toggles (disabled recurring → completed, made recurring → recurring)
+  const applyScheduleToggles = (lists: { active: Task[]; recurring: Task[]; completed: Task[] }) => {
+    let { active, recurring, completed } = lists;
+
+    // Move disabled recurring tasks to completed
+    const disabledTasks = recurring.filter((t) => disabledRecurringIds.has(t.id));
+    recurring = recurring.filter((t) => !disabledRecurringIds.has(t.id));
+    completed = [
+      ...disabledTasks.map((t) => ({ ...t, status: "completed" as const, subtitle: "Schedule disabled" })),
+      ...completed,
+    ];
+
+    // Move made-recurring completed tasks to recurring
+    const newRecurring = completed.filter((t) => madeRecurringIds.has(t.id));
+    completed = completed.filter((t) => !madeRecurringIds.has(t.id));
+    recurring = [
+      ...newRecurring.map((t) => ({
+        ...t,
+        status: "recurring" as const,
+        subtitle: "Every weekday at 7:00 AM",
+        detail: { ...t.detail, schedule: "Every weekday at 7:00 AM", nextRun: "Tomorrow at 7:00 AM" },
+      })),
+      ...recurring,
+    ];
+
+    return { active, recurring, completed };
+  };
+
+  const toggledTasks = applyScheduleToggles(
+    autoPlayTasks ?? { active: defaultActiveTasks, recurring: defaultRecurringTasks, completed: defaultCompletedTasks }
+  );
+
   // Whether any task is actively running (for the spinner)
   const hasActiveTask = isAutoPlay
     ? autoStep >= 4 && autoStep < 10 // Tasks run from step 4, stop at demo completion
@@ -436,7 +472,7 @@ export function RightPanel({
           {hasActiveTask ? (
             <div className="h-[14px] w-[14px] shrink-0 rounded-full border-2 border-g/30 border-t-g animate-spin" />
           ) : (
-            <div className={`h-[7px] w-[7px] rounded-full ${isOnboarding && !workspaceSetupDone ? "bg-am animate-pulse" : workspaceConnecting ? "bg-am animate-pulse" : "bg-g"}`} />
+            <div className={`h-[7px] w-[7px] rounded-full ${isOnboarding && !workspaceSetupDone ? "bg-am" : workspaceConnecting ? "bg-am" : "bg-g"}`} />
           )}
           <span className="font-mono text-[11.5px] text-t3">{isFreshState ? "Ready" : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace") : workspaceConnecting ? "Setting up workspace" : hasActiveTask ? "Working" : (isAutoPlay && autoStep >= 10) ? "Ready" : (firstRunTask && firstRunDone) ? "Ready" : "Working \u00B7 3.2 hrs"}</span>
         </div>
@@ -623,7 +659,7 @@ export function RightPanel({
                       </div>
                     ) : isCurrent ? (
                       <div className="flex h-[16px] w-[16px] shrink-0 items-center justify-center">
-                        <div className="h-1.5 w-1.5 rounded-full bg-am animate-pulse" />
+                        <div className="h-1.5 w-1.5 rounded-full bg-am" />
                       </div>
                     ) : (
                       <div className="flex h-[16px] w-[16px] shrink-0 items-center justify-center">
@@ -652,9 +688,9 @@ export function RightPanel({
             onSelectTask={handleSelectTask}
             teachPhase={teachPhase}
             teachTaskName={teachTaskName}
-            activeTasksOverride={autoPlayTasks?.active}
-            recurringTasksOverride={autoPlayTasks?.recurring}
-            completedTasksOverride={autoPlayTasks?.completed}
+            activeTasksOverride={toggledTasks.active}
+            recurringTasksOverride={toggledTasks.recurring}
+            completedTasksOverride={toggledTasks.completed}
           />
         )}
       </div>
@@ -685,9 +721,21 @@ export function RightPanel({
                   : undefined
               }
               onDisable={
-                selectedTask.status === "recurring" && selectedTask.id === "first-run-recurring"
+                selectedTask.status === "recurring"
                   ? () => {
-                      onFirstRunRemoveRecurring?.();
+                      if (selectedTask.id === "first-run-recurring") {
+                        onFirstRunRemoveRecurring?.();
+                      } else {
+                        setDisabledRecurringIds((prev) => new Set(prev).add(selectedTask.id));
+                      }
+                      handleSelectTask(null);
+                    }
+                  : undefined
+              }
+              onMakeRecurring={
+                selectedTask.status === "completed"
+                  ? () => {
+                      setMadeRecurringIds((prev) => new Set(prev).add(selectedTask.id));
                       handleSelectTask(null);
                     }
                   : undefined
@@ -704,6 +752,28 @@ export function RightPanel({
                   task={selectedTask}
                   editable={selectedTask.status === "recurring" || selectedTask.status === "completed"}
                   onBack={() => setSettingsOpen(false)}
+                  onMakeRecurring={
+                    selectedTask.status === "completed"
+                      ? () => {
+                          setMadeRecurringIds((prev) => new Set(prev).add(selectedTask.id));
+                          setSettingsOpen(false);
+                          handleSelectTask(null);
+                        }
+                      : undefined
+                  }
+                  onDisableSchedule={
+                    selectedTask.status === "recurring"
+                      ? () => {
+                          if (selectedTask.id === "first-run-recurring") {
+                            onFirstRunRemoveRecurring?.();
+                          } else {
+                            setDisabledRecurringIds((prev) => new Set(prev).add(selectedTask.id));
+                          }
+                          setSettingsOpen(false);
+                          handleSelectTask(null);
+                        }
+                      : undefined
+                  }
                 />
               )}
             </div>

@@ -893,7 +893,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                 <div className="rounded-lg border border-b1 bg-bgcard overflow-hidden divide-y divide-b1">
                   {/* Running */}
                   <div className="flex items-start gap-3 px-4 py-3">
-                    <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-g animate-running-glow" />
+                    <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-g animate-pulse" />
                     <div className="min-w-0 flex-1">
                       <div className="text-[13px] font-medium text-t1">Research Sequoia Scouts portfolio</div>
                       <div className="mt-0.5 text-[11px] text-t3">Started 2m ago</div>
@@ -937,7 +937,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
               <div>
                 <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-4">Status Dots</div>
                 <div className="flex items-center gap-8">
-                  <div className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-g animate-running-glow" /><span className="text-[11px] text-t3">Running</span></div>
+                  <div className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-g animate-pulse" /><span className="text-[11px] text-t3">Running</span></div>
                   <div className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-g opacity-40" /><span className="text-[11px] text-t3">Queued</span></div>
                   <div className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-am" /><span className="text-[11px] text-t3">Recurring</span></div>
                   <div className="flex items-center gap-2"><div className="h-1.5 w-1.5 rounded-full bg-t4" /><span className="text-[11px] text-t3">Completed</span></div>
@@ -1293,9 +1293,9 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                     <span className="text-[10px] font-mono text-t4">bg-g, 7×7</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="h-[7px] w-[7px] rounded-full bg-t4 animate-pulse-dot" />
+                    <div className="h-[7px] w-[7px] rounded-full bg-g animate-pulse" />
                     <span className="text-[12px] text-t3">Running step</span>
-                    <span className="text-[10px] font-mono text-t4">bg-t4, animate-pulse-dot</span>
+                    <span className="text-[10px] font-mono text-t4">bg-g, animate-pulse</span>
                   </div>
                 </div>
               </div>

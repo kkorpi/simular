@@ -90,9 +90,8 @@ function TeachTaskItem({ task }: { task: Task }) {
     <div className="group relative flex items-start gap-2 rounded-lg px-2.5 py-2 bg-violet-500/[0.06]">
       <div
         className={`mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full ${
-          isRecording ? "bg-violet-500 animate-pulse-dot" : "bg-violet-500"
+          isRecording ? "bg-violet-500 animate-pulse" : "bg-violet-500"
         }`}
-        style={isRecording ? { "--pulse-glow": "rgba(139, 92, 246, 0.5)" } as React.CSSProperties : undefined}
       />
       <div className="min-w-0 flex-1">
         <div className="truncate text-xs font-medium text-t1">{task.name}</div>

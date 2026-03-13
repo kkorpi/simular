@@ -335,6 +335,39 @@ body {
   animation: step-row-enter 0.3s ease-out both;
 }
 
+/* ===== Amber shimmer (struggling state) ===== */
+.shimmer-text-amber {
+  background: linear-gradient(
+    90deg,
+    var(--am) 0%,
+    var(--am) 30%,
+    var(--t1) 50%,
+    var(--am) 70%,
+    var(--am) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-text 3.5s ease-in-out infinite;
+}
+
+/* ===== Error step flash ===== */
+@keyframes error-flash {
+  0% { background-color: rgba(239, 68, 68, 0.1); }
+  100% { background-color: transparent; }
+}
+
+.animate-error-flash {
+  animation: error-flash 0.8s ease-out;
+}
+
+/* ===== Amber pulse dot (for retry/struggling steps) ===== */
+.animate-pulse-dot-amber {
+  animation: pulse-dot 5s ease-in-out infinite;
+  --pulse-glow: rgba(232, 168, 48, 0.22);
+}
+
 /* ===== Scrollbar ===== */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }

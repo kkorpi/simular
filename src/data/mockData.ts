@@ -500,6 +500,9 @@ export const talkingPoints = [
 
 // ===== Running Task Step Log =====
 
+export type StepType = "action" | "error" | "thinking" | "user";
+export type StepStatus = "done" | "active" | "failed";
+
 export interface RunningStep {
   timestamp: string;
   label: string;
@@ -507,6 +510,20 @@ export interface RunningStep {
   trustSignal?: string;
   done: boolean;
   userAction?: boolean;
+  /** Step classification for visual rendering (default: "action") */
+  type?: StepType;
+  /** Explicit status for error/retry states */
+  status?: StepStatus;
+  /** Error detail text shown below the label in muted red */
+  errorDetail?: string;
+  /** Steps with the same groupId are collapsed together in summary view */
+  groupId?: string;
+  /** Human-readable summary for collapsed group */
+  groupSummary?: string;
+  /** Whether this step is the final successful outcome of a retry group */
+  groupResolved?: boolean;
+  /** Number of attempts in this group (set on the summary step) */
+  attemptCount?: number;
 }
 
 export const runningTaskSteps: RunningStep[] = [
@@ -1008,3 +1025,227 @@ export const teachRecordedSteps = [
 export const VALID_INVITE_CODES = ["SIMULAR2026", "EARLY100", "LAUNCH", "BETA", "VIP"];
 export const SEATS_TOTAL = 1000;
 export const SEATS_REMAINING_INIT = 214;
+
+// ===== Messy Task Demo =====
+
+/** The pause-point index where the cascade waits for user intervention */
+export const MESSY_TASK_PAUSE_INDEX = 7;
+
+// ── Rich Multi-Turn Scenario Types ──
+
+export interface PillOption {
+  label: string;
+  value: string;
+  /** Text shown in the user chat bubble (defaults to label) */
+  resultText?: string;
+  /** Ends the task early */
+  isCancel?: boolean;
+}
+
+export type InterventionTiming = "pre" | "mid" | "post";
+
+export interface Intervention {
+  id: string;
+  timing: InterventionTiming;
+  agentMessage: string;
+  pills: PillOption[];
+  /** "mid" only — cascade pauses after this many steps have been added */
+  pauseAfterStep?: number;
+  /** Agent acknowledgment after user picks. String for universal, Record for per-pill. */
+  agentAck?: string | Record<string, string>;
+  /** Show amber struggling spinner during this pause */
+  isStruggling?: boolean;
+  /** Placeholder for the text input during this intervention */
+  inputPlaceholder?: string;
+}
+
+export interface MessyScenario {
+  taskLabel: string;
+  userMessage: string;
+  agentOpener: string;
+  subtaskLabel: string;
+  steps: RunningStep[];
+  interventions: Intervention[];
+  result: {
+    title: string;
+    summary: string;
+    artifact: ResultArtifact;
+  };
+}
+
+export const messyTaskSteps: RunningStep[] = [
+  // Group A: First attempts at getting the post permalink
+  { timestamp: "0:01", label: "Clicking Fireworks AI post timestamp to get permalink", type: "action", status: "failed", groupId: "get-link", errorDetail: "Could not resolve ref \"e685\" — element not interactive", done: true },
+  { timestamp: "0:04", label: "Taking fresh snapshot to find the post link", type: "action", groupId: "get-link", done: true },
+  { timestamp: "0:05", label: "I can see the comment is already posted on the Fireworks AI post. Let me try clicking the timestamp link again.", type: "thinking", groupId: "get-link", done: true },
+  { timestamp: "0:23", label: "Clicking Fireworks AI post timestamp for direct link", type: "action", status: "failed", groupId: "get-link", errorDetail: "Could not resolve ref \"e685\" even after fresh snapshot", done: true },
+  { timestamp: "0:28", label: "Using the three-dot menu to copy post link", type: "action", groupId: "get-link", done: true },
+  { timestamp: "0:30", label: "I can see the comments section is expanded. Let me try clicking the post link from the expanded view.", type: "thinking", groupId: "get-link", done: true },
+  { timestamp: "0:39", label: "Clicking Fireworks AI post link to get permalink", type: "action", status: "failed", groupId: "get-link", errorDetail: "Could not resolve ref \"e685\" even after fresh snapshot", done: true, groupSummary: "Tried to get post permalink (3 failed attempts)", attemptCount: 7 },
+  // --- PAUSE POINT: user intervention ---
+  { timestamp: "0:42", label: "Taking screenshot to visually locate the post", type: "action", groupId: "get-link-2", done: true },
+  { timestamp: "0:43", label: "I can see the Fireworks AI post clearly now. Let me click on the \"9h\" timestamp to navigate to the direct post link.", type: "thinking", groupId: "get-link-2", done: true },
+  { timestamp: "0:58", label: "Clicking on the 9h timestamp to get direct post link", type: "action", groupId: "get-link-2", done: true },
+  { timestamp: "1:08", label: "Trying to copy link via three-dot menu on Fireworks post", type: "action", groupId: "get-link-2", done: true },
+  { timestamp: "1:12", label: "I can see the Fireworks AI post clearly. Let me click on the \"9h\" timestamp to get the direct link.", type: "thinking", groupId: "get-link-2", done: true },
+  { timestamp: "1:28", label: "Clicking on 9h timestamp to get direct post URL", type: "action", groupId: "get-link-2", done: true },
+  { timestamp: "1:37", label: "Using three-dot menu to copy link to post", type: "action", groupId: "get-link-2", done: true },
+  { timestamp: "1:43", label: "Getting the Fireworks AI post permalink via three-dot menu", type: "action", groupId: "get-link-2", done: true },
+  { timestamp: "1:46", label: "I can see the three-dot menu is already open on the Fireworks AI post with the \"Copy link to post\" option visible.", type: "thinking", groupId: "get-link-2", done: true },
+  { timestamp: "2:01", label: "Clicked \"Copy link to post\" for Fireworks AI post", type: "action", status: "done", groupId: "get-link-2", groupResolved: true, groupSummary: "Got post link via three-dot menu", attemptCount: 9, done: true },
+];
+
+export const messyTaskResult = {
+  title: "Fireworks AI Post Link Copied",
+  summary: "Successfully copied the permalink for the Fireworks AI post. The link is now in your clipboard, ready to share.",
+  artifact: {
+    format: "link" as const,
+    title: "Fireworks AI Post Link",
+    subtitle: "linkedin.com · permalink copied",
+    icon: "🔗",
+    url: "linkedin.com/posts/fireworks-ai_launch",
+  },
+};
+
+/** Collapse step groups into a smart summary — hides thinking, merges retries */
+export function deriveSmartSummary(steps: RunningStep[]): RunningStep[] {
+  const result: RunningStep[] = [];
+  const seenGroups = new Set<string>();
+
+  for (const step of steps) {
+    // Always show user messages
+    if (step.type === "user") {
+      result.push(step);
+      continue;
+    }
+    // Skip thinking steps in summary
+    if (step.type === "thinking") continue;
+
+    // Group handling
+    if (step.groupId) {
+      if (seenGroups.has(step.groupId)) continue; // already rendered this group
+      seenGroups.add(step.groupId);
+
+      // Find the resolved step for this group, or show current status
+      const groupSteps = steps.filter((s) => s.groupId === step.groupId);
+      const resolved = groupSteps.find((s) => s.groupResolved);
+      const failedCount = groupSteps.filter((s) => s.status === "failed").length;
+
+      if (resolved) {
+        result.push({
+          ...resolved,
+          label: resolved.groupSummary || resolved.label,
+        });
+      } else {
+        // Group still in progress — show first step with attempt count
+        const summary = step.groupSummary || step.label;
+        result.push({
+          ...step,
+          label: failedCount > 0 ? `${summary}` : step.label,
+          status: failedCount > 0 ? "failed" : step.status,
+        });
+      }
+      continue;
+    }
+
+    // Ungrouped action steps pass through
+    result.push(step);
+  }
+
+  return result;
+}
+
+// ── Rich Multi-Turn Scenario: Fireworks AI Funding ──
+
+export const fireworksScenarioSteps: RunningStep[] = [
+  // === CHUNK 1: Research phase (before struggle intervention) ===
+  { timestamp: "0:03", label: "Searching Google for Fireworks AI funding news", type: "action", groupId: "initial-research", done: true },
+  { timestamp: "0:08", label: "Found 3 results — opening TechCrunch, VentureBeat, Crunchbase", type: "action", groupId: "initial-research", done: true },
+  { timestamp: "0:14", label: "Opening TechCrunch article on Fireworks AI Series B", type: "action", groupId: "initial-research", done: true },
+  { timestamp: "0:19", label: "Extracting details from TechCrunch article", type: "action", status: "failed", groupId: "initial-research", errorDetail: "Paywall detected — article content not accessible", done: true, groupSummary: "Searched for funding news (TechCrunch paywalled)", attemptCount: 4, groupResolved: true },
+
+  // --- PAUSE: struggle intervention (pauseAfterStep = 4) ---
+
+  // === CHUNK 2: After struggle resolved — alternate sources + drafting ===
+  { timestamp: "0:25", label: "Trying VentureBeat coverage instead", type: "action", groupId: "alt-sources", done: true },
+  { timestamp: "0:31", label: "Pulling funding details from VentureBeat article", type: "action", groupId: "alt-sources", done: true },
+  { timestamp: "0:38", label: "Pulling round size and valuation from Crunchbase", type: "action", groupId: "alt-sources", done: true, groupSummary: "Gathered details from VentureBeat + Crunchbase", attemptCount: 3, groupResolved: true },
+  { timestamp: "0:42", label: "Cross-referencing investor names with LinkedIn announcement", type: "action", done: true },
+  { timestamp: "0:48", label: "I have enough data — $150M Series B led by Benchmark at $1.5B valuation. Drafting summary now.", type: "thinking", done: true },
+  { timestamp: "0:55", label: "Drafting executive summary of Fireworks AI funding round", type: "action", groupId: "drafting", done: true },
+  { timestamp: "1:08", label: "Adding competitive landscape and product context", type: "action", groupId: "drafting", done: true },
+  { timestamp: "1:15", label: "Summary draft complete — reviewing for accuracy", type: "action", groupId: "drafting", done: true, groupSummary: "Drafted and reviewed funding summary", attemptCount: 3, groupResolved: true },
+];
+
+export const fireworksScenario: MessyScenario = {
+  taskLabel: "Summarize Fireworks AI funding round",
+  userMessage: "Summarize the latest Fireworks AI funding round and share with the team",
+  agentOpener: "On it — I'll research the Fireworks AI funding round, draft a summary, and share it with the team.",
+  subtaskLabel: "Researching Fireworks AI funding",
+
+  steps: fireworksScenarioSteps,
+
+  interventions: [
+    // Beat 1: CLARIFICATION (pre-task)
+    {
+      id: "clarify-topic",
+      timing: "pre",
+      agentMessage: "I see a few recent Fireworks AI announcements. Which should I focus on?",
+      pills: [
+        { label: "The Series B funding", value: "series-b", resultText: "Focus on the Series B funding round" },
+        { label: "The new model launch", value: "model-launch", resultText: "Focus on their new model launch" },
+        { label: "Both — full update", value: "both", resultText: "Cover both — give me the full update" },
+      ],
+      agentAck: {
+        "series-b": "Got it — I'll focus on the Series B details.",
+        "model-launch": "Got it — I'll dig into the new model launch.",
+        "both": "Got it — I'll cover both the funding round and model launch.",
+      },
+      inputPlaceholder: "Or tell me what to focus on...",
+    },
+
+    // Beat 2: STRUGGLE (mid-task, after 5 steps)
+    {
+      id: "paywall-struggle",
+      timing: "mid",
+      pauseAfterStep: 4,
+      agentMessage: "The TechCrunch article has the most detail but it's behind a paywall. Want me to work with what I have from other sources?",
+      pills: [
+        { label: "Use what you have", value: "use-existing", resultText: "Use what you have from other sources" },
+        { label: "Skip it, just summarize", value: "skip-summarize", resultText: "Skip TechCrunch — just summarize what you found" },
+        { label: "Let me paste the key details", value: "paste-details", resultText: "Hold on, let me paste the key details" },
+      ],
+      agentAck: "Good call — let me pull what I can from VentureBeat and Crunchbase.",
+      isStruggling: true,
+      inputPlaceholder: "Or suggest another approach...",
+    },
+
+    // Beat 3: CONFIRMATION (post-task)
+    {
+      id: "share-confirmation",
+      timing: "post",
+      agentMessage: "Summary's ready. Where should I share it?",
+      pills: [
+        { label: "Post to #product-updates", value: "slack", resultText: "Post it to #product-updates" },
+        { label: "Send via email", value: "email", resultText: "Send it via email to the team" },
+        { label: "Just save as draft", value: "draft", resultText: "Just save it as a draft for now" },
+      ],
+      agentAck: {
+        "slack": "Done — posted to #product-updates.",
+        "email": "Done — sent to the team via email.",
+        "draft": "Saved as a draft. You can share it whenever you're ready.",
+      },
+    },
+  ],
+
+  result: {
+    title: "Fireworks AI Funding Summary",
+    summary: "Fireworks AI raised $150M in Series B funding led by Benchmark, valuing the company at $1.5B. The round will fund expansion of their inference optimization platform.",
+    artifact: {
+      format: "document",
+      title: "Fireworks AI — Series B Summary",
+      subtitle: "Executive briefing · 4 paragraphs",
+      icon: "📄",
+    },
+  },
+};

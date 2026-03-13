@@ -151,6 +151,7 @@ export function TaskDetail({
   onOpenWorkspace,
   onOpenSettings,
   onDisable,
+  onMakeRecurring,
 }: {
   task: Task;
   onBack: () => void;
@@ -158,6 +159,7 @@ export function TaskDetail({
   onOpenWorkspace?: () => void;
   onOpenSettings?: () => void;
   onDisable?: () => void;
+  onMakeRecurring?: () => void;
 }) {
   const d = task.detail;
   const [showAllRuns, setShowAllRuns] = useState(false);
@@ -314,7 +316,7 @@ export function TaskDetail({
                     </svg>
                   ) : isActive ? (
                     <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
-                      <div className="h-3 w-3 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+                      <div className="h-[5px] w-[5px] rounded-full bg-g animate-pulse" />
                     </div>
                   ) : (
                     <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
@@ -509,6 +511,14 @@ export function TaskDetail({
             <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
               Run again
             </button>
+            {onMakeRecurring && (
+              <button
+                onClick={onMakeRecurring}
+                className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+              >
+                Make recurring
+              </button>
+            )}
             {onOpenSettings && (
               <button
                 onClick={onOpenSettings}

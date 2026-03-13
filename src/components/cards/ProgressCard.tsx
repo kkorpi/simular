@@ -32,7 +32,7 @@ const statusIcon: Record<ProgressStepStatus, React.ReactNode> = {
     <div className="h-1.5 w-1.5 rounded-full bg-t4" />
   ),
   running: (
-    <div className="h-2 w-2 rounded-full bg-as animate-pulse" />
+    <div className="h-2 w-2 rounded-full bg-g animate-pulse" />
   ),
   done: (
     <svg className="h-3.5 w-3.5 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -80,7 +80,7 @@ export function ProgressCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             {!allDone && !hasError && (
-              <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-as animate-pulse" />
+              <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-g animate-pulse" />
             )}
             {allDone && (
               <svg className="h-3.5 w-3.5 shrink-0 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

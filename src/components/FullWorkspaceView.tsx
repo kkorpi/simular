@@ -280,7 +280,7 @@ export function FullWorkspaceView({
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 rounded-full bg-violet-500/15 px-2.5 py-1 text-[11px] font-medium text-violet-500">
-              <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse-dot" style={{ "--pulse-glow": "rgba(139, 92, 246, 0.5)" } as React.CSSProperties} />
+              <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse" />
               Recording
             </div>
             <button
@@ -314,12 +314,12 @@ export function FullWorkspaceView({
           {/* LIVE / REC indicator */}
           {mode === "teach" ? (
             <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-violet-500">
-              <div className="h-2 w-2 rounded-full bg-violet-500 animate-pulse-dot" style={{ "--pulse-glow": "rgba(139, 92, 246, 0.5)" } as React.CSSProperties} />
+              <div className="h-2 w-2 rounded-full bg-violet-500 animate-pulse" />
               REC
             </div>
           ) : (
             <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-g">
-              <div className="h-2 w-2 rounded-full bg-g animate-running-glow" />
+              <div className="h-2 w-2 rounded-full bg-g animate-pulse" />
               LIVE
             </div>
           )}
@@ -528,8 +528,7 @@ export function FullWorkspaceView({
                     ) : step.status === "active" ? (
                       <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
                         <div
-                          className={`h-[7px] w-[7px] rounded-full animate-pulse-dot ${mode === "teach" ? "bg-violet-500" : "bg-g"}`}
-                          style={mode === "teach" ? { "--pulse-glow": "rgba(139, 92, 246, 0.5)" } as React.CSSProperties : undefined}
+                          className={`h-[7px] w-[7px] rounded-full animate-pulse ${mode === "teach" ? "bg-violet-500" : "bg-g"}`}
                         />
                       </div>
                     ) : (

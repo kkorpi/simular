@@ -52,9 +52,11 @@ interface TaskSettingsPanelProps {
   editable: boolean;
   onBack: () => void;
   onSave?: () => void;
+  onMakeRecurring?: () => void;
+  onDisableSchedule?: () => void;
 }
 
-export function TaskSettingsPanel({ task, editable, onBack, onSave }: TaskSettingsPanelProps) {
+export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurring, onDisableSchedule }: TaskSettingsPanelProps) {
   // ── Config state ──
   const [skills, setSkills] = useState(task.skills ?? []);
   const [integrations, setIntegrations] = useState(task.integrations ?? []);
@@ -71,6 +73,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave }: TaskSettin
   const [customDays, setCustomDays] = useState<string[]>(["Mon", "Tue", "Wed", "Thu", "Fri"]);
 
   const isRecurring = task.status === "recurring";
+  const [showScheduleEditor, setShowScheduleEditor] = useState(false);
 
   // Close integration picker on outside click
   useEffect(() => {
@@ -250,18 +253,31 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave }: TaskSettin
           </div>
         </div>
 
-        {/* ── SCHEDULE (recurring only) ── */}
-        {isRecurring && (
-          <div className="mb-6">
-            <div className="mb-3 flex items-center gap-2">
-              <svg className="h-3.5 w-3.5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="17 1 21 5 17 9" />
-                <path d="M3 11V9a4 4 0 014-4h14" />
-                <polyline points="7 23 3 19 7 15" />
-                <path d="M21 13v2a4 4 0 01-4 4H3" />
+        {/* ── SCHEDULE ── */}
+        <div className="mb-6">
+          <div className="mb-3 flex items-center gap-2">
+            <svg className="h-3.5 w-3.5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="17 1 21 5 17 9" />
+              <path d="M3 11V9a4 4 0 014-4h14" />
+              <polyline points="7 23 3 19 7 15" />
+              <path d="M21 13v2a4 4 0 01-4 4H3" />
+            </svg>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-t3">Schedule</span>
+          </div>
+
+          {!isRecurring && !showScheduleEditor ? (
+            /* ── Non-recurring: "Add schedule" prompt ── */
+            <button
+              onClick={() => setShowScheduleEditor(true)}
+              className="flex w-full items-center gap-2.5 rounded-lg border border-dashed border-b2 px-3.5 py-3 text-[12px] text-t3 transition-all hover:border-ab hover:bg-ab/5 hover:text-t2"
+            >
+              <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.06em] text-t3">Schedule</span>
-            </div>
+              Add a recurring schedule
+            </button>
+          ) : (
 
             <div className="flex flex-col gap-4 rounded-lg border border-b1 bg-bg3/30 px-3.5 py-3">
               {/* Frequency */}
@@ -408,9 +424,32 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave }: TaskSettin
                   </div>
                 )}
               </div>
+
+              {/* Schedule actions */}
+              {isRecurring && onDisableSchedule && (
+                <button
+                  onClick={onDisableSchedule}
+                  className="flex items-center gap-1.5 text-[11px] font-medium text-r transition-all hover:text-r/80"
+                >
+                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <line x1="9" y1="9" x2="15" y2="15" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                  </svg>
+                  Remove schedule
+                </button>
+              )}
+              {!isRecurring && showScheduleEditor && onMakeRecurring && (
+                <button
+                  onClick={onMakeRecurring}
+                  className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110"
+                >
+                  Enable schedule
+                </button>
+              )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Footer */}

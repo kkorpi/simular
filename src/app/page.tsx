@@ -9,6 +9,7 @@ import { FullWorkspaceView } from "@/components/FullWorkspaceView";
 import { SettingsOverlay, type SettingsSection, type ConnectedServiceInfo } from "@/components/SettingsOverlay";
 import { CardGallery } from "@/components/CardGallery";
 import { DesignSystem } from "@/components/DesignSystem";
+import { MessyChatArea } from "@/components/MessyChatArea";
 import { LandingPage } from "@/components/LandingPage";
 import { SignupSSO } from "@/components/SignupSSO";
 import { SignupPayment } from "@/components/SignupPayment";
@@ -73,6 +74,7 @@ export default function Home() {
   const [connectedServices, setConnectedServices] = useState<ConnectedServiceInfo[]>([]);
   const [cardGalleryOpen, setCardGalleryOpen] = useState(false);
   const [designSystemOpen, setDesignSystemOpen] = useState(false);
+  const [messyMode, setMessyMode] = useState(false);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
   const [workspaceMode, setWorkspaceMode] = useState<"default" | "login" | "teach">("default");
   const [workspaceService, setWorkspaceService] = useState<string>("");
@@ -144,6 +146,8 @@ export default function Home() {
       setUserProfile({ role: "vc" });
       setScreen("main-app");
       setDesignSystemOpen(true);
+    } else if (demo === "messy") {
+      jumpToDemo("messy");
     }
   }, []);
 
@@ -182,7 +186,7 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [demoPickerOpen]);
 
-  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "landing-cap" | "teach" | "trial" | "system" | "expired" | "onboarding") => {
+  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "landing-cap" | "teach" | "trial" | "system" | "expired" | "onboarding" | "messy") => {
     setDemoPickerOpen(false);
     setFirstRunTask(null);
     setFirstRunDone(false);
@@ -199,6 +203,7 @@ export default function Home() {
     setSettingsOpen(false);
     setCardGalleryOpen(false);
     setDesignSystemOpen(false);
+    setMessyMode(false);
     setTeachPhase("idle");
     setTeachTaskName("");
     setTrialDialogOpen(false);
@@ -255,6 +260,11 @@ export default function Home() {
       setIsOnboarding(true);
       setWorkspaceSetupStep(0);
       setWorkspaceSetupDone(false);
+      setActiveView("zero-state");
+      setChatKey((k) => k + 1);
+    } else if (mode === "messy") {
+      setTrialDaysLeft(6);
+      setMessyMode(true);
       setActiveView("zero-state");
       setChatKey((k) => k + 1);
     }
@@ -466,6 +476,7 @@ export default function Home() {
             { mode: "onboarding" as const, label: "Onboarding flow", desc: "Landing → signup → in-chat onboarding", icon: "👋" },
             { mode: "fresh" as const, label: "First run", desc: "Chat with greeting + starter tasks", icon: "🌱" },
             { mode: "active" as const, label: "Active session", desc: "Auto-play returning user session", icon: "💬" },
+            { mode: "messy" as const, label: "Multi-turn agent", desc: "Clarification, struggle & follow-up", icon: "🔄" },
             { mode: "gallery" as const, label: "Card gallery", desc: "Browse all 12 card components", icon: "🎴" },
             { mode: "system" as const, label: "Design system", desc: "Colors, type ramp, tokens", icon: "🎨" },
             { mode: "teach" as const, label: "Teach flow", desc: "Agent suggests showing it a custom task", icon: "📖" },
@@ -604,6 +615,27 @@ export default function Home() {
             workspaceSetupLabel={undefined}
           />
           <div className="flex flex-1 overflow-hidden">
+            {messyMode ? (
+              <MessyChatArea
+                key={chatKey}
+                onTaskStart={() => {
+                  setActiveView("task-hover");
+                  setFirstRunTask({
+                    id: "messy-fireworks",
+                    title: "Summarize Fireworks AI funding round",
+                    description: "Research and share a summary of the latest funding news",
+                    trustLevel: "medium",
+                    trustLabel: "Supervised",
+                    icon: "research",
+                    category: "research",
+                  });
+                }}
+                onStepChange={(step) => setFirstRunStep(step)}
+                onDone={() => setFirstRunDone(true)}
+                onAllTurnsDone={() => {}}
+                onViewActivityLog={() => { setWorkspaceMode("default"); setWorkspaceOpen(true); }}
+              />
+            ) : (
             <ChatArea
               key={chatKey}
               view={activeView}
@@ -667,6 +699,7 @@ export default function Home() {
                 }
               }}
             />
+            )}
             <RightPanel
               view={activeView}
               onViewChange={setActiveView}
@@ -704,7 +737,7 @@ export default function Home() {
             {/* Header: task info + expand */}
             <div className="flex items-center gap-2 px-3 py-2">
               <div className="flex items-center gap-2 flex-1 min-w-0">
-                <div className={`h-1.5 w-1.5 shrink-0 rounded-full ${workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? "bg-am animate-pulse" : "bg-g animate-running-glow"}`} />
+                <div className={`h-1.5 w-1.5 shrink-0 rounded-full ${workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? "bg-am" : "bg-g animate-pulse"}`} />
                 <div className="truncate text-[11px] font-medium text-t1">
                   {workspaceConnecting ? "Connecting to workspace..." : isOnboarding && !workspaceSetupDone ? "Setting up workspace..." : (firstRunTask?.title ?? "Research inbound founder")}
                 </div>

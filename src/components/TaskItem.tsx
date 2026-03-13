@@ -6,7 +6,7 @@ import type { Task } from "@/data/mockData";
 
 function StatusDot({ status }: { status: Task["status"] }) {
   if (status === "running")
-    return <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-g animate-running-glow" />;
+    return <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-g animate-pulse" />;
   if (status === "queued")
     return <div className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-g opacity-40" />;
   if (status === "recurring")
