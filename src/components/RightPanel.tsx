@@ -235,6 +235,7 @@ export function RightPanel({
   const [panelWidth, setPanelWidth] = useState(470);
   const [isDragging, setIsDragging] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
 
   // Auto-select first-run task when "View details" clicked in chat
   useEffect(() => {
@@ -427,6 +428,30 @@ export function RightPanel({
     ? autoStep >= 4 && autoStep < 10 // Tasks run from step 4, stop at demo completion
     : !isOnboarding && !workspaceConnecting && (firstRunTask != null && !firstRunDone);
 
+  // Elapsed timer for running tasks
+  useEffect(() => {
+    if (!hasActiveTask) { setElapsed(0); return; }
+    setElapsed(0);
+    const timer = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasActiveTask]);
+
+  const elapsedStr = elapsed > 0 ? `${elapsed}s` : "";
+
+  // Derive current step label for running tasks
+  const currentStepLabel = (() => {
+    if (!hasActiveTask) return "";
+    if (firstRunTask && !firstRunDone) {
+      const seq = firstRunSequences[firstRunTask.category] ?? firstRunSequences.research;
+      const stepIdx = Math.min(firstRunStep - 1, seq.steps.length - 1);
+      if (stepIdx >= 0) {
+        return `Step ${stepIdx + 1} of ${seq.steps.length} — ${seq.steps[stepIdx].label}`;
+      }
+    }
+    return "";
+  })();
+
   // ── Panel content (shared between desktop inline and mobile drawer) ──
   const panelContent = (
     <>
@@ -438,7 +463,7 @@ export function RightPanel({
           ) : (
             <div className={`h-[7px] w-[7px] rounded-full ${isOnboarding && !workspaceSetupDone ? "bg-am animate-pulse" : workspaceConnecting ? "bg-am animate-pulse" : "bg-g"}`} />
           )}
-          <span className="font-mono text-[11.5px] text-t3">{isFreshState ? "Ready" : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace") : workspaceConnecting ? "Setting up workspace" : hasActiveTask ? "Working" : (isAutoPlay && autoStep >= 10) ? "Ready" : (firstRunTask && firstRunDone) ? "Ready" : "Working \u00B7 3.2 hrs"}</span>
+          <span className="font-mono text-[11.5px] text-t3">{isFreshState ? "Ready" : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace") : workspaceConnecting ? "Setting up workspace" : hasActiveTask ? `Working${elapsedStr ? ` · ${elapsedStr}` : ""}` : (isAutoPlay && autoStep >= 10) ? "Ready" : (firstRunTask && firstRunDone) ? "Ready" : "Working \u00B7 3.2 hrs"}</span>
         </div>
         <button
           onClick={onToggleCollapse}
@@ -598,6 +623,13 @@ export function RightPanel({
             );
           })()}
         </div>
+        {/* Current step indicator below preview */}
+        {currentStepLabel && (
+          <div className="mt-1.5 flex items-center gap-1.5 px-1 text-[10px] text-t3 truncate">
+            <div className="h-1 w-1 shrink-0 rounded-full bg-g animate-pulse" />
+            {currentStepLabel}
+          </div>
+        )}
       </div>
 
       {/* Task list */}
