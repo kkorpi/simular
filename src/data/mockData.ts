@@ -869,8 +869,10 @@ export const firstRunSequences: Record<string, FirstRunSequence> = {
       { timestamp: "0:03", label: "Detected sign-in required", done: true },
       { timestamp: "0:04", label: "Searching background on LinkedIn and Crunchbase", done: true },
       { timestamp: "0:10", label: "Pulled founder work history and education", done: true },
+      { timestamp: "0:11", label: "Strong product background — ex-Google, ex-Stripe. Checking if there's a Salesforce match.", type: "thinking", done: true },
       { timestamp: "0:15", label: "Extracted mutual connections and endorsements", done: true },
       { timestamp: "0:20", label: "Pulling company data and funding history", done: true },
+      { timestamp: "0:22", label: "Series B at $1.5B valuation led by Benchmark — solid signal. Pulling recent X activity.", type: "thinking", done: true },
       { timestamp: "0:24", label: "Reviewed recent posts and activity on X", done: true },
       { timestamp: "0:28", label: "Compiling findings into a summary...", done: false },
     ],
@@ -892,6 +894,7 @@ export const firstRunSequences: Record<string, FirstRunSequence> = {
       { timestamp: "0:02", label: "Opened Salesforce and navigated to pipeline view", done: true },
       { timestamp: "0:06", label: "Pulling active deal records and stages", done: true },
       { timestamp: "0:12", label: "Cross-referencing calendar for recent LP touchpoints", done: true },
+      { timestamp: "0:13", label: "3 deals haven't been touched in 45+ days — flagging those first.", type: "thinking", done: true },
       { timestamp: "0:18", label: "Analyzing activity patterns and gaps", done: true },
       { timestamp: "0:22", label: "Flagging stale deals with no activity in 30+ days", done: true },
       { timestamp: "0:25", label: "Preparing actionable recommendations...", done: false },
@@ -914,6 +917,7 @@ export const firstRunSequences: Record<string, FirstRunSequence> = {
       { timestamp: "0:02", label: "Opened Google Calendar to find today's meetings", done: true },
       { timestamp: "0:06", label: "Found 3 meetings with attached Granola links", done: true },
       { timestamp: "0:10", label: "Pulling notes and action items from Granola", done: true },
+      { timestamp: "0:12", label: "The Acme sync had 4 action items but no owners assigned — I'll flag that.", type: "thinking", done: true },
       { timestamp: "0:16", label: "Extracting key decisions and follow-ups per meeting", done: true },
       { timestamp: "0:22", label: "Matching attendees to Salesforce contacts", done: true },
       { timestamp: "0:26", label: "Writing debrief doc in Google Docs...", done: false },
@@ -936,7 +940,7 @@ export interface FollowUpSequence {
   agentMessage: string;
   subtask: string;
   integrations: string[];
-  steps: { label: string; done: boolean }[];
+  steps: { label: string; done: boolean; type?: StepType }[];
   resultTitle: string;
   resultSummary: string;
   artifact: ResultArtifact;
@@ -950,6 +954,7 @@ export const followUpSequences: Record<string, FollowUpSequence> = {
     steps: [
       { label: "Searched LinkedIn for founder profiles", done: true },
       { label: "Pulled recent posts and engagement data", done: true },
+      { label: "Two of three are actively posting about fundraising — worth noting.", type: "thinking", done: true },
       { label: "Extracted mutual connections", done: true },
       { label: "Compiled activity summary", done: true },
     ],
@@ -970,6 +975,7 @@ export const followUpSequences: Record<string, FollowUpSequence> = {
     steps: [
       { label: "Opened PitchBook and searched deal records", done: true },
       { label: "Matched 8 of 12 records to profiles", done: true },
+      { label: "2 deals show valuation changes this quarter — pulling those first.", type: "thinking", done: true },
       { label: "Pulled recent funding rounds and valuations", done: true },
       { label: "Compiled funding analysis", done: true },
     ],
@@ -990,6 +996,7 @@ export const followUpSequences: Record<string, FollowUpSequence> = {
     steps: [
       { label: "Opened meeting debrief in Google Docs", done: true },
       { label: "Tagged action items for each attendee", done: true },
+      { label: "Jamie has 3 action items across 2 meetings — grouping those in the email.", type: "thinking", done: true },
       { label: "Shared doc with 8 attendees via Gmail", done: true },
       { label: "Sent notification emails", done: true },
     ],

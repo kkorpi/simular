@@ -40,7 +40,8 @@ export function RunningTaskDetail({
   const [showAll, setShowAll] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const completedCount = steps.filter((s) => s.done).length;
+  const actionSteps = steps.filter((s) => s.type !== "thinking");
+  const completedCount = actionSteps.filter((s) => s.done).length;
   const lastTimestamp = steps[steps.length - 1]?.timestamp || "0:00";
   const elapsedSeconds = parseTimestamp(lastTimestamp);
   const elapsedLabel = `${elapsedSeconds}s`;
@@ -89,7 +90,7 @@ export function RunningTaskDetail({
         </button>
         <span className={`text-[11px] text-t4 transition-opacity duration-200 ${expanded ? "opacity-0" : "opacity-100"}`}>
           {done
-            ? `Complete · ${completedCount} steps · ${elapsedLabel}`
+            ? `Complete · ${completedCount} step${completedCount !== 1 ? "s" : ""} · ${elapsedLabel}`
             : `Working · ${elapsedLabel}`}
         </span>
       </div>
@@ -114,23 +115,27 @@ export function RunningTaskDetail({
                 maxHeight: showAll ? `${steps.length * ROW_H + 20}px` : `${WINDOW_H}px`,
               }}
             >
-              {steps.map((step, idx) => (
+              {steps.map((step, idx) => {
+                const isThinking = step.type === "thinking";
+                return (
                   <div
                     key={idx}
-                    className="flex items-start gap-2.5 py-1.5"
+                    className={`flex items-start gap-2.5 py-1.5 ${isThinking ? "pl-[19px]" : ""}`}
                   >
-                    <div className="mt-[5px] shrink-0">
-                      {step.done ? (
-                        <div className="h-[7px] w-[7px] rounded-full bg-g" />
-                      ) : (
-                        <div className="h-[7px] w-[7px] rounded-full bg-g animate-pulse" />
-                      )}
-                    </div>
+                    {!isThinking && (
+                      <div className="mt-[5px] shrink-0">
+                        {step.done ? (
+                          <div className="h-[7px] w-[7px] rounded-full bg-g" />
+                        ) : (
+                          <div className="h-[7px] w-[7px] rounded-full bg-g animate-pulse" />
+                        )}
+                      </div>
+                    )}
                     <span className="mt-[1px] w-[32px] shrink-0 font-mono text-[10.5px] text-t4">
                       {step.timestamp}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className="text-[12px] leading-[1.5] text-t2">
+                      <div className={`text-[12px] leading-[1.5] ${isThinking ? "italic text-t4" : "text-t2"}`}>
                         <span>
                           {step.label}
                         </span>
@@ -142,7 +147,8 @@ export function RunningTaskDetail({
                       </div>
                     </div>
                   </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* View all / show less — always rendered, fades in/out */}
