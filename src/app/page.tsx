@@ -77,7 +77,7 @@ export default function Home() {
   const [designSystemOpen, setDesignSystemOpen] = useState(false);
   const [messyMode, setMessyMode] = useState(false);
   const [workspaceOpen, setWorkspaceOpen] = useState(false);
-  const [workspaceMode, setWorkspaceMode] = useState<"default" | "login" | "teach">("default");
+  const [workspaceMode, setWorkspaceMode] = useState<"default" | "login" | "captcha" | "teach">("default");
   const [workspaceService, setWorkspaceService] = useState<string>("");
   // Default collapsed on mobile so the drawer doesn't flash open on first render
   const [panelCollapsed, setPanelCollapsed] = useState(() => {
@@ -356,10 +356,11 @@ export default function Home() {
 
   const handleAuthManualSignIn = () => {
     const service = authInputService || "";
+    const isCaptcha = authInputState === "captcha";
     setAuthInputService(undefined);
     setAuthInputState(undefined);
     setAuthPhase(null);
-    setWorkspaceMode("login");
+    setWorkspaceMode(isCaptcha ? "captcha" : "login");
     const serviceNames: Record<string, string> = { linkedin: "LinkedIn", gmail: "Gmail", salesforce: "Salesforce" };
     setWorkspaceService(serviceNames[service] ?? service.charAt(0).toUpperCase() + service.slice(1));
     setWorkspaceOpen(true);
@@ -750,6 +751,7 @@ export default function Home() {
               isAutoPlay={isAutoPlay}
               autoStep={autoStep}
               firstRunStep={firstRunStep}
+              showCaptcha={authInputState === "captcha"}
             />
           </div>
 

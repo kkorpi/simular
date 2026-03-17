@@ -196,6 +196,7 @@ export function RightPanel({
   isAutoPlay = false,
   autoStep = -1,
   firstRunStep = 0,
+  showCaptcha = false,
 }: {
   view: ViewState;
   onViewChange: (v: ViewState) => void;
@@ -229,6 +230,8 @@ export function RightPanel({
   autoStep?: number;
   /** Current first-run step from ChatArea — syncs step progress in task detail */
   firstRunStep?: number;
+  /** True when CAPTCHA challenge is active — shows CAPTCHA visual in workspace preview */
+  showCaptcha?: boolean;
 }) {
   const isMobile = useIsMobile();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -302,6 +305,20 @@ export function RightPanel({
   const handleSelectTask = useCallback((task: Task | null) => {
     setSelectedTask(task);
   }, []);
+
+  // Whether any task is actively running (for the spinner / elapsed timer)
+  const hasActiveTask = isAutoPlay
+    ? (autoStep ?? 0) >= 4 && (autoStep ?? 0) < 10
+    : !isOnboarding && !workspaceConnecting && (firstRunTask != null && !firstRunDone);
+
+  // Elapsed timer for running tasks (must be above early returns to keep hook order stable)
+  useEffect(() => {
+    if (!hasActiveTask) { setElapsed(0); return; }
+    setElapsed(0);
+    const timer = setInterval(() => setElapsed((s) => s + 1), 1000);
+    return () => clearInterval(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasActiveTask]);
 
   // Desktop: completely unmount when collapsed (existing behavior)
   if (!isMobile && collapsed) return null;
@@ -459,20 +476,6 @@ export function RightPanel({
     autoPlayTasks ?? { active: defaultActiveTasks, recurring: defaultRecurringTasks, completed: defaultCompletedTasks }
   );
 
-  // Whether any task is actively running (for the spinner)
-  const hasActiveTask = isAutoPlay
-    ? autoStep >= 4 && autoStep < 10 // Tasks run from step 4, stop at demo completion
-    : !isOnboarding && !workspaceConnecting && (firstRunTask != null && !firstRunDone);
-
-  // Elapsed timer for running tasks
-  useEffect(() => {
-    if (!hasActiveTask) { setElapsed(0); return; }
-    setElapsed(0);
-    const timer = setInterval(() => setElapsed((s) => s + 1), 1000);
-    return () => clearInterval(timer);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasActiveTask]);
-
   const elapsedStr = elapsed > 0 ? `${elapsed}s` : "";
 
   // Derive current step label for running tasks
@@ -497,9 +500,9 @@ export function RightPanel({
           {hasActiveTask ? (
             <div className="h-[14px] w-[14px] shrink-0 rounded-full border-2 border-g/30 border-t-g animate-spin" />
           ) : (
-            <div className={`h-[7px] w-[7px] rounded-full ${isOnboarding && !workspaceSetupDone ? "bg-am" : workspaceConnecting ? "bg-am" : "bg-g"}`} />
+            <div className={`h-[7px] w-[7px] rounded-full ${showCaptcha ? "bg-am animate-pulse" : isOnboarding && !workspaceSetupDone ? "bg-am" : workspaceConnecting ? "bg-am" : "bg-g"}`} />
           )}
-          <span className="font-mono text-[11.5px] text-t3">{isFreshState ? "Ready" : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace") : workspaceConnecting ? "Setting up workspace" : hasActiveTask ? `Working${elapsedStr ? ` · ${elapsedStr}` : ""}` : (isAutoPlay && autoStep >= 10) ? "Ready" : (firstRunTask && firstRunDone) ? "Ready" : "Working \u00B7 3.2 hrs"}</span>
+          <span className={`font-mono text-[11.5px] ${showCaptcha ? "text-am" : "text-t3"}`}>{showCaptcha ? "Action needed" : isFreshState ? "Ready" : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace") : workspaceConnecting ? "Setting up workspace" : hasActiveTask ? `Working${elapsedStr ? ` · ${elapsedStr}` : ""}` : (isAutoPlay && autoStep >= 10) ? "Ready" : (firstRunTask && firstRunDone) ? "Ready" : "Working \u00B7 3.2 hrs"}</span>
         </div>
         <button
           onClick={onToggleCollapse}
@@ -534,16 +537,18 @@ export function RightPanel({
             const taskIsRunning = !isFreshState && !isOnboarding && !workspaceConnecting && ((isAutoPlay && autoStep < 10) || (firstRunTask && !firstRunDone));
             const seq = firstRunTask ? (firstRunSequences[firstRunTask.category] ?? firstRunSequences.research) : null;
             const currentIntegration = seq?.integrations?.[0] || "";
-            const addressUrl = taskIsRunning
-              ? (isAutoPlay ? "linkedin.com/in/john-doe" : (INTEGRATION_URLS[currentIntegration] || "app.simular.ai"))
-              : isOnboarding || workspaceConnecting
-                ? "workspace.simular.ai"
-                : "linkedin.com/in/john-doe";
+            const addressUrl = showCaptcha
+              ? "linkedin.com/checkpoint/challenge"
+              : taskIsRunning
+                ? (isAutoPlay ? "linkedin.com/in/john-doe" : (INTEGRATION_URLS[currentIntegration] || "app.simular.ai"))
+                : isOnboarding || workspaceConnecting
+                  ? "workspace.simular.ai"
+                  : "linkedin.com/in/john-doe";
 
             return (
               <>
                 {/* Browser chrome header — only when workspace is active (not during setup/connecting/fresh) */}
-                {!isFreshState && !workspaceConnecting && !(isOnboarding && !workspaceSetupDone) && (
+                {(showCaptcha || (!isFreshState && !workspaceConnecting && !(isOnboarding && !workspaceSetupDone))) && (
                   <div className="flex items-center gap-1.5 bg-bg2 px-2.5 py-1.5 border-b border-b1">
                     <div className="flex gap-1">
                       <div className="h-[6px] w-[6px] rounded-full bg-t4/30" />
@@ -553,9 +558,9 @@ export function RightPanel({
                     <div className="flex-1 mx-2 h-[14px] rounded-sm bg-bg3 flex items-center px-2">
                       <span className="text-[8px] text-t4 truncate">{addressUrl}</span>
                     </div>
-                    <div className="flex items-center gap-1 rounded-full bg-g/10 px-1.5 py-px text-[7px] font-semibold text-g">
-                      <div className="h-1 w-1 rounded-full bg-g" />
-                      LIVE
+                    <div className={`flex items-center gap-1 rounded-full px-1.5 py-px text-[7px] font-semibold ${showCaptcha ? "bg-am/10 text-am" : "bg-g/10 text-g"}`}>
+                      <div className={`h-1 w-1 rounded-full ${showCaptcha ? "bg-am animate-pulse" : "bg-g"}`} />
+                      {showCaptcha ? "PAUSED" : "LIVE"}
                     </div>
                   </div>
                 )}
@@ -582,6 +587,35 @@ export function RightPanel({
                         </svg>
                       </div>
                     )
+                  ) : showCaptcha ? (
+                    /* ── CAPTCHA challenge in workspace ── */
+                    <div className="flex h-full flex-col items-center justify-center gap-2 animate-fade-in px-3">
+                      {/* Mini CAPTCHA widget */}
+                      <div className="w-full max-w-[160px] rounded-md border border-b1 bg-bg2 p-2.5 shadow-sm">
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="h-[14px] w-[14px] rounded-[3px] border-2 border-am bg-am/10" />
+                          <span className="text-[8px] text-t2 leading-tight">I&apos;m not a robot</span>
+                          <div className="ml-auto flex flex-col items-center gap-0.5">
+                            <svg className="h-[10px] w-[10px] text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                            <span className="text-[5px] text-t4">reCAPTCHA</span>
+                          </div>
+                        </div>
+                        {/* Image grid hint */}
+                        <div className="grid grid-cols-3 gap-[2px] rounded overflow-hidden">
+                          {Array.from({ length: 9 }).map((_, i) => (
+                            <div key={i} className={`aspect-square ${i === 1 || i === 4 || i === 7 ? "bg-am/20" : "bg-t4/10"}`} />
+                          ))}
+                        </div>
+                        <div className="mt-1.5 text-[6px] text-t3 text-center">Select all squares with traffic lights</div>
+                      </div>
+                      {/* Amber pulsing label */}
+                      <div className="flex items-center gap-1.5 text-[9px] text-am font-medium">
+                        <div className="h-1 w-1 rounded-full bg-am animate-pulse" />
+                        Waiting for you
+                      </div>
+                    </div>
                   ) : workspaceConnecting ? (
                     <div className="flex h-full items-center justify-center">
                       <svg width="36" height="36" viewBox="0 0 90 90" fill="none">

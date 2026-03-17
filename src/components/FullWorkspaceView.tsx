@@ -50,7 +50,7 @@ export function FullWorkspaceView({
   open: boolean;
   onClose: () => void;
   onLoginSuccess?: () => void;
-  mode?: "default" | "login" | "teach";
+  mode?: "default" | "login" | "captcha" | "teach";
   service?: string;
   /** Persistent instruction from the agent, shown as a banner below the coaching bar */
   instruction?: string;
@@ -104,7 +104,7 @@ export function FullWorkspaceView({
 
   const activeSteps = mode === "teach"
     ? teachSteps
-    : mode === "login"
+    : mode === "login" || mode === "captcha"
       ? (loginSuccess ? loginSuccessSteps : loginSteps)
       : workspaceSteps;
 
@@ -203,6 +203,60 @@ export function FullWorkspaceView({
           : "inset(0 0 100% 100% round 12px)",
       }}
     >
+
+      {/* CAPTCHA coaching banner */}
+      {mode === "captcha" && service && (
+        <div className={`flex shrink-0 items-center gap-3 border-b border-b1 px-5 py-3 transition-colors ${
+          loginSuccess ? "bg-g/[0.06]" : "bg-bg2"
+        }`}>
+          {loginSuccess ? (
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-g/20">
+              <svg className="h-4 w-4 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+          ) : (
+            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-amber-500/15">
+              <svg className="h-4 w-4 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M4 2l14.5 11.5-5.5 1.5 3.5 6.5-2.5 1.5-3.5-6.5-4 4z" />
+              </svg>
+              <div className="absolute inset-0 rounded-md border border-amber-500/40 animate-[ping_2s_ease-out_infinite] opacity-50" />
+            </div>
+          )}
+          <div className="flex-1">
+            {loginSuccess ? (
+              <>
+                <div className="text-[13px] font-medium text-t1">
+                  Verified! Resuming your task...
+                </div>
+                <div className="text-[11px] text-t3">
+                  Closing in {countdown}s
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-[13px] font-medium text-t1">
+                  Complete the verification to continue
+                </div>
+                <div className="text-[11px] text-t3">
+                  {service} needs to verify you&apos;re human. Solve the CAPTCHA below and I&apos;ll resume.
+                </div>
+              </>
+            )}
+          </div>
+          {loginSuccess && (
+            <button
+              onClick={() => {
+                setLoginSuccess(false);
+                setCountdown(5);
+              }}
+              className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3"
+            >
+              Keep open
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Login coaching banner */}
       {mode === "login" && service && (
@@ -317,6 +371,11 @@ export function FullWorkspaceView({
               <div className="h-2 w-2 rounded-full bg-violet-500 animate-pulse" />
               REC
             </div>
+          ) : mode === "captcha" ? (
+            <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-am">
+              <div className="h-2 w-2 rounded-full bg-am animate-pulse" />
+              PAUSED
+            </div>
           ) : (
             <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-g">
               <div className="h-2 w-2 rounded-full bg-g animate-pulse" />
@@ -357,7 +416,101 @@ export function FullWorkspaceView({
         </div>
 
         {/* Placeholder content */}
-        {mode === "teach" ? (
+        {mode === "captcha" && loginSuccess ? (
+          <div className="flex flex-col items-center text-center animate-fade-in">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-g/20 mb-4">
+              <svg className="h-8 w-8 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div className="text-[15px] font-medium text-t1 mb-1">Verification complete</div>
+            <div className="text-[12px] text-t3">Connected to {service}. Resuming your task...</div>
+          </div>
+        ) : mode === "captcha" ? (
+          <div className="flex flex-col items-center text-center">
+            {/* Simulated reCAPTCHA challenge page */}
+            <div className="w-[400px] rounded-lg border border-b1 bg-bg2 shadow-xl overflow-hidden">
+              {/* reCAPTCHA header */}
+              <div className="flex items-center justify-between border-b border-b1 bg-[#4A90D9] px-4 py-2.5">
+                <span className="text-[13px] font-medium text-white">Select all images with <strong>traffic lights</strong></span>
+                <svg className="h-4 w-4 text-white/60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="16" x2="12" y2="12" />
+                  <line x1="12" y1="8" x2="12.01" y2="8" />
+                </svg>
+              </div>
+              {/* 3×3 image grid */}
+              <div className="grid grid-cols-3 gap-[2px] bg-b1 p-[2px]">
+                {Array.from({ length: 9 }).map((_, i) => {
+                  const highlighted = i === 1 || i === 4 || i === 7;
+                  return (
+                    <button
+                      key={i}
+                      onClick={() => {
+                        // On clicking 3 highlighted squares, resolve
+                        if (highlighted) handleLoginSubmit();
+                      }}
+                      className={`relative aspect-square transition-all ${
+                        highlighted
+                          ? "bg-bg3 hover:brightness-110"
+                          : "bg-bg3 hover:brightness-110"
+                      }`}
+                    >
+                      {/* Placeholder content representing image tiles */}
+                      <div className={`absolute inset-0 flex items-center justify-center ${
+                        highlighted ? "bg-am/8" : "bg-t4/5"
+                      }`}>
+                        {highlighted ? (
+                          <svg className="h-8 w-8 text-t4/40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <circle cx="12" cy="5" r="3" />
+                            <circle cx="12" cy="12" r="3" />
+                            <circle cx="12" cy="19" r="3" />
+                            <line x1="12" y1="2" x2="12" y2="22" />
+                          </svg>
+                        ) : (
+                          <div className="h-full w-full bg-gradient-to-br from-t4/5 to-t4/10" />
+                        )}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+              {/* Footer with verify button */}
+              <div className="flex items-center justify-between border-t border-b1 px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <svg className="h-5 w-5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M1 4v6h6" />
+                    <path d="M3.51 15a9 9 0 102.13-9.36L1 10" />
+                  </svg>
+                  <svg className="h-5 w-5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" />
+                    <path d="M19 10v2a7 7 0 01-14 0v-2" />
+                    <line x1="12" y1="19" x2="12" y2="23" />
+                  </svg>
+                  <svg className="h-5 w-5 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12.01" y2="8" />
+                  </svg>
+                </div>
+                <button
+                  onClick={handleLoginSubmit}
+                  className="rounded bg-[#4A90D9] px-6 py-2 text-[13px] font-semibold text-white transition-all hover:bg-[#3A7BC8]"
+                >
+                  VERIFY
+                </button>
+              </div>
+              {/* reCAPTCHA branding */}
+              <div className="flex items-center justify-end gap-1.5 border-t border-b1 bg-bg3/50 px-3 py-1.5">
+                <svg className="h-[14px] w-[14px] text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+                <span className="text-[9px] text-t4">reCAPTCHA</span>
+                <span className="text-[8px] text-t4/50">Privacy - Terms</span>
+              </div>
+            </div>
+          </div>
+        ) : mode === "teach" ? (
           <div className="flex flex-col items-center text-center">
             {/* Simulated Gmail sign-in page */}
             <div className="w-[360px] rounded-lg border border-b1 bg-bg2 p-8 shadow-xl">
