@@ -20,11 +20,9 @@ interface Message {
 const CONVERSATION: Message[] = [
   { from: "user", text: "Hey Sai, set up my phone", delay: 600, preComposed: true },
   { from: "typing", delay: 1400 },
-  { from: "sai", text: "Hi! I'm Sai, your Simular assistant.\n\nTap the link below to connect your phone:", delay: 0 },
+  { from: "sai", text: "Hi! I'm Sai, your Simular assistant.\n\nI just sent you a verification code. Tap the link below to enter it:", delay: 0 },
   { from: "typing", delay: 800 },
   { from: "sai", text: "sai.co/verify", delay: 0, isLink: true },
-  { from: "typing", delay: 600 },
-  { from: "sai", text: `Your verification code: ${VERIFY_CODE}`, delay: 0 },
 ];
 
 /* Messages shown after verification */
@@ -214,7 +212,7 @@ function IMessageScreen({ onLinkTap }: { onLinkTap: () => void }) {
    ───────────────────────────────────────────── */
 function VerifyScreen({ onVerified }: { onVerified: () => void }) {
   const [entered, setEntered] = useState(false);
-  const [phase, setPhase] = useState<"input" | "verifying" | "done">("input");
+  const [phase, setPhase] = useState<"waiting" | "filling" | "filled" | "verifying" | "done">("waiting");
   const [filledChars, setFilledChars] = useState(0);
   const [resent, setResent] = useState(false);
 
@@ -223,22 +221,22 @@ function VerifyScreen({ onVerified }: { onVerified: () => void }) {
     return () => clearTimeout(t);
   }, []);
 
-  const handleKeyTap = useCallback((num: string) => {
-    if (phase !== "input") return;
-    const nextIdx = filledChars;
-    if (nextIdx >= VERIFY_CODE.length) return;
-    // Only accept the correct digit
-    if (num !== VERIFY_CODE[nextIdx]) return;
-    const newCount = nextIdx + 1;
-    setFilledChars(newCount);
-    // If all digits entered, auto-verify
-    if (newCount === VERIFY_CODE.length) {
-      setTimeout(() => setPhase("verifying"), 300);
-      setTimeout(() => setPhase("done"), 1700);
-      setTimeout(() => onVerified(), 2500);
+  const handleAutofillTap = useCallback(() => {
+    if (phase !== "waiting") return;
+    setPhase("filling");
+
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    for (let i = 0; i < VERIFY_CODE.length; i++) {
+      timers.push(setTimeout(() => setFilledChars(i + 1), i * 80));
     }
+    timers.push(setTimeout(() => setPhase("filled"), VERIFY_CODE.length * 80 + 100));
+    timers.push(setTimeout(() => setPhase("verifying"), VERIFY_CODE.length * 80 + 400));
+    timers.push(setTimeout(() => setPhase("done"), VERIFY_CODE.length * 80 + 1800));
+    timers.push(setTimeout(() => onVerified(), VERIFY_CODE.length * 80 + 2600));
+
+    return () => timers.forEach(clearTimeout);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, filledChars]);
+  }, [phase]);
 
   const handleResend = () => {
     setResent(true);
@@ -324,7 +322,7 @@ function VerifyScreen({ onVerified }: { onVerified: () => void }) {
         </div>
       </div>
 
-      <IOSNumberPad onKeyTap={handleKeyTap} />
+      <IOSNumberPad code={VERIFY_CODE} phase={phase} onAutofillTap={handleAutofillTap} />
     </div>
   );
 }
@@ -419,7 +417,8 @@ function LinkedScreen({ onRestart }: { onRestart: () => void }) {
 }
 
 /* ─── iOS Number Pad with Autofill Bar ─── */
-function IOSNumberPad({ onKeyTap }: { onKeyTap: (num: string) => void }) {
+function IOSNumberPad({ code, phase, onAutofillTap }: { code: string; phase: string; onAutofillTap: () => void }) {
+  const tapped = phase !== "waiting";
   const numKeys = [
     { num: "1", letters: "" },
     { num: "2", letters: "ABC" },
@@ -434,14 +433,27 @@ function IOSNumberPad({ onKeyTap }: { onKeyTap: (num: string) => void }) {
 
   return (
     <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue', sans-serif" }}>
+      {/* Autofill suggestion bar */}
+      <button
+        onClick={onAutofillTap}
+        className={`flex w-full items-center justify-center border-t py-2 transition-opacity ${
+          tapped ? "opacity-40 pointer-events-none" : "opacity-100 cursor-pointer active:opacity-70"
+        }`}
+        style={{ background: "#d1d3d9", borderColor: "#b8bac0" }}
+      >
+        <div className="flex flex-col items-center">
+          <div className="text-[11px]" style={{ color: "#666" }}>From Messages</div>
+          <div className="text-[17px] font-medium" style={{ color: "#000" }}>{code}</div>
+        </div>
+      </button>
+
       {/* Number pad */}
       <div className="px-2 pb-7 pt-1.5" style={{ background: "#d1d3d9" }}>
         <div className="grid grid-cols-3 gap-[6px] mb-[6px]">
           {numKeys.map(({ num, letters }) => (
-            <button
+            <div
               key={num}
-              onClick={() => onKeyTap(num)}
-              className="flex h-[46px] flex-col items-center justify-center rounded-[5px] active:brightness-90 transition-all"
+              className="flex h-[46px] flex-col items-center justify-center rounded-[5px]"
               style={{ background: "#fff", boxShadow: "0 1px 0 #898a8d" }}
             >
               <span className="text-[22px] leading-none" style={{ color: "#000" }}>{num}</span>
@@ -450,18 +462,17 @@ function IOSNumberPad({ onKeyTap }: { onKeyTap: (num: string) => void }) {
                   {letters}
                 </span>
               )}
-            </button>
+            </div>
           ))}
         </div>
         <div className="grid grid-cols-3 gap-[6px]">
           <div />
-          <button
-            onClick={() => onKeyTap("0")}
-            className="flex h-[46px] flex-col items-center justify-center rounded-[5px] active:brightness-90 transition-all"
+          <div
+            className="flex h-[46px] flex-col items-center justify-center rounded-[5px]"
             style={{ background: "#fff", boxShadow: "0 1px 0 #898a8d" }}
           >
             <span className="text-[22px] leading-none" style={{ color: "#000" }}>0</span>
-          </button>
+          </div>
           <div className="flex h-[46px] items-center justify-center">
             <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z" />
