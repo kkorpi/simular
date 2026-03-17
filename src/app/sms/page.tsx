@@ -253,20 +253,8 @@ function VerifyScreen({ onVerified }: { onVerified: () => void }) {
         entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
       }`}
     >
-      {/* Safari-like top bar */}
-      <div className="flex items-center justify-between px-5 pb-2 pt-3 bg-bg">
-        <div className="flex items-center gap-2 text-[13px] text-t3">
-          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-          Messages
-        </div>
-        <div className="rounded-lg bg-bg3 px-3 py-1 text-[11px] text-t3">sai.co/verify</div>
-        <div className="w-[60px]" />
-      </div>
-
       {/* Main content */}
-      <div className="flex flex-1 flex-col items-center px-6 pt-10 bg-bg overflow-y-auto">
+      <div className="flex flex-1 flex-col items-center px-6 pt-14 bg-bg overflow-y-auto">
         <div className="mb-3">
           <SimularLogo size={52} />
         </div>
