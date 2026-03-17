@@ -258,8 +258,7 @@ function VerifyScreen({ onVerified }: { onVerified: () => void }) {
         <div className="mb-3">
           <SimularLogo size={52} />
         </div>
-        <div className="mb-1 text-[13px] font-medium text-t2">Sai</div>
-        <h1 className="mb-2 text-[26px] font-bold text-t1">Verify your phone</h1>
+        <h1 className="mt-4 mb-2 text-[26px] font-bold text-t1">Verify your phone</h1>
         <p className="mb-8 text-center text-[14px] leading-[1.5] text-t3">
           Enter the code from Sai&apos;s text message.
         </p>
