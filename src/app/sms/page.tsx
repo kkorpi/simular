@@ -267,10 +267,8 @@ function VerifyScreen({ onVerified }: { onVerified: () => void }) {
 
       {/* Main content */}
       <div className="flex flex-1 flex-col items-center px-6 pt-10 bg-bg overflow-y-auto">
-        <div className="mb-3 flex h-[52px] w-[52px] items-center justify-center rounded-2xl" style={{ background: "linear-gradient(135deg, #7c5ce0, #5b8def)" }}>
-          <svg className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-          </svg>
+        <div className="mb-3">
+          <SimularLogo size={52} />
         </div>
         <div className="mb-1 text-[13px] font-medium text-t2">Sai</div>
         <h1 className="mb-2 text-[26px] font-bold text-t1">Verify your phone</h1>
