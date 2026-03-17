@@ -301,12 +301,7 @@ function VerifyScreen({ onVerified }: { onVerified: () => void }) {
                 </svg>
                 <span className="text-g font-medium">Verified!</span>
               </>
-            ) : (
-              <>
-                <div className="h-3 w-3 animate-pulse rounded-full bg-am/60" />
-                <span className="text-t4">Waiting for code…</span>
-              </>
-            )}
+            ) : null}
           </div>
         </div>
 
