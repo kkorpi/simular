@@ -54,7 +54,7 @@ export default function SmsOnboardingPage() {
   return (
     <div className="flex h-dvh w-full items-center justify-center bg-bg">
       <div
-        className={`relative flex h-full w-full max-w-[430px] flex-col overflow-hidden transition-all duration-[280ms] ${
+        className={`relative flex h-full w-full max-w-[430px] flex-col overflow-hidden transition-[transform,opacity] duration-[280ms] ${
           transitioning ? "scale-[0.97] opacity-0" : "scale-100 opacity-100"
         }`}
       >
@@ -80,7 +80,7 @@ function LandingScreen({ onContinue, isMobile }: { onContinue: () => void; isMob
 
   return (
     <div
-      className={`flex h-full flex-col items-center justify-center px-8 transition-all duration-500 ${
+      className={`flex h-full flex-col items-center justify-center px-8 transition-[transform,opacity] duration-200 ${
         entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
       }`}
     >
@@ -247,7 +247,7 @@ function VerifyScreen({ onVerified }: { onVerified: () => void }) {
 
   return (
     <div
-      className={`flex h-full flex-col transition-all duration-500 ${
+      className={`flex h-full flex-col transition-[transform,opacity] duration-200 ${
         entered ? "opacity-100 translate-y-0" : "opacity-0 translate-y-3"
       }`}
     >
@@ -271,7 +271,7 @@ function VerifyScreen({ onVerified }: { onVerified: () => void }) {
               return (
                 <div
                   key={i}
-                  className={`flex h-[52px] w-[42px] items-center justify-center rounded-lg border text-[24px] font-semibold transition-all duration-100 ${
+                  className={`flex h-[52px] w-[42px] items-center justify-center rounded-lg border text-[24px] font-semibold transition-colors duration-100 ${
                     isFilled
                       ? "border-as bg-as/10 text-t1"
                       : isActive

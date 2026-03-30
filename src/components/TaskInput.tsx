@@ -262,7 +262,8 @@ export function TaskInput({ onSlashCommand, onSend, prefillText }: { onSlashComm
       {showMenu && filteredCommands.length > 0 && (
         <div
           ref={slashRef}
-          className="absolute bottom-full left-0 right-0 mb-1.5 overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-lg"
+          role="listbox"
+          className="absolute bottom-full left-0 origin-bottom right-0 mb-1.5 overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-lg"
         >
           <div className="px-3 pt-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-wide text-t4">
             Quick actions
@@ -270,6 +271,8 @@ export function TaskInput({ onSlashCommand, onSend, prefillText }: { onSlashComm
           {filteredCommands.map((cmd, i) => (
             <button
               key={cmd.command}
+              role="option"
+              aria-selected={i === slashIndex}
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSlashSelect(cmd.command)}
               onMouseEnter={() => setSlashIndex(i)}
@@ -309,6 +312,7 @@ export function TaskInput({ onSlashCommand, onSend, prefillText }: { onSlashComm
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
+        aria-label="Task description"
         placeholder="Describe a task..."
         rows={1}
         className="resize-none overflow-hidden bg-transparent px-4 pt-3 pb-1.5 text-[13px] leading-[1.5] text-t1 placeholder:text-t4 outline-none"
@@ -340,7 +344,7 @@ export function TaskInput({ onSlashCommand, onSend, prefillText }: { onSlashComm
 
           {/* Attach popover */}
           {attachOpen && (
-            <div className="absolute bottom-full left-0 mb-1.5 w-[260px] overflow-visible rounded-lg border border-b1 bg-bg2 py-1.5 shadow-lg">
+            <div className="absolute bottom-full left-0 origin-bottom mb-1.5 w-[260px] overflow-visible rounded-lg border border-b1 bg-bg2 py-1.5 shadow-lg">
               {/* Add files */}
               <button
                 onMouseDown={(e) => e.preventDefault()}
@@ -465,7 +469,7 @@ export function TaskInput({ onSlashCommand, onSend, prefillText }: { onSlashComm
 
           {/* Dropdown */}
           {modelOpen && (
-            <div className="absolute bottom-full left-0 mb-1 w-[180px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+            <div className="absolute bottom-full left-0 origin-bottom mb-1 w-[180px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
               {models.map((m) => (
                 <button
                   key={m}
@@ -496,7 +500,7 @@ export function TaskInput({ onSlashCommand, onSend, prefillText }: { onSlashComm
         {/* Send button */}
         <button
           onClick={handleSend}
-          className={`flex items-center justify-center rounded-full p-1.5 transition-all ${
+          className={`flex items-center justify-center rounded-full p-1.5 transition-colors ${
             value.trim() && !showMenu
               ? "bg-ab text-abt hover:brightness-110"
               : "text-t4 cursor-default"

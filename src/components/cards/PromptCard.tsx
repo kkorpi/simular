@@ -71,8 +71,8 @@ export function PromptCard({
               onClick={() => handleAction(action)}
               className={
                 action.style === "primary"
-                  ? "rounded-md border border-transparent bg-gs px-2.5 py-1 text-[11.5px] font-medium text-gt transition-all hover:brightness-110"
-                  : "rounded-md border border-b1 bg-transparent px-2.5 py-1 text-[11.5px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+                  ? "rounded-md border border-transparent bg-gs px-2.5 py-1 text-[11.5px] font-medium text-gt transition-colors hover:brightness-110"
+                  : "rounded-md border border-b1 bg-transparent px-2.5 py-1 text-[11.5px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
               }
             >
               {action.label}
@@ -134,7 +134,7 @@ export function PromptCard({
               value={typedConfirm}
               onChange={(e) => setTypedConfirm(e.target.value)}
               placeholder={confirmText}
-              className="w-full rounded-md border border-b1 bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none placeholder:text-t4 transition-all focus:border-as"
+              className="w-full rounded-md border border-b1 bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none placeholder:text-t4 transition-colors focus:border-as"
             />
           </div>
         )}
@@ -152,11 +152,11 @@ export function PromptCard({
                 className={
                   isPrimary
                     ? isDestructive
-                      ? `rounded-md bg-rd px-2.5 py-1 text-xs font-medium text-white transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed`
-                      : `rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed`
+                      ? `rounded-md bg-rd px-2.5 py-1 text-xs font-medium text-white transition-colors hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed`
+                      : `rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-colors hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed`
                     : action.style === "outline"
-                      ? "rounded-md border border-b1 bg-transparent px-2.5 py-1 text-xs font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
-                      : "text-[11px] font-medium text-blt transition-all hover:underline"
+                      ? "rounded-md border border-b1 bg-transparent px-2.5 py-1 text-xs font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
+                      : "text-[11px] font-medium text-blt transition-colors hover:underline"
                 }
               >
                 {action.icon && <span className="mr-1 inline-flex">{action.icon}</span>}
@@ -180,10 +180,10 @@ export function PromptCard({
             onClick={() => handleAction(action)}
             className={
               action.style === "primary"
-                ? "flex cursor-pointer items-center gap-1.5 rounded-md bg-ab px-3 py-1.5 text-[12.5px] font-medium text-abt transition-all hover:brightness-110"
+                ? "flex cursor-pointer items-center gap-1.5 rounded-md bg-ab px-3 py-1.5 text-[12.5px] font-medium text-abt transition-colors hover:brightness-110"
                 : action.style === "outline"
-                  ? "flex cursor-pointer items-center gap-1.5 rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12.5px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3h hover:text-t1"
-                  : "text-[12.5px] font-medium text-blt transition-all hover:underline"
+                  ? "flex cursor-pointer items-center gap-1.5 rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12.5px] font-medium text-t2 transition-colors hover:border-b2 hover:bg-bg3h hover:text-t1"
+                  : "text-[12.5px] font-medium text-blt transition-colors hover:underline"
             }
           >
             {action.icon && <span className="inline-flex">{action.icon}</span>}

@@ -60,7 +60,7 @@ function PillBar({
           key={pill.value}
           onClick={() => onSelect(pill)}
           disabled={disabled}
-          className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-all ${
+          className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-colors ${
             pill.value === selectedValue
               ? "border-as/50 bg-as/10 text-blt"
               : disabled
@@ -128,7 +128,7 @@ function MessyTaskInput({
         <button
           onClick={handleSend}
           disabled={!value.trim() || disabled}
-          className={`flex items-center justify-center rounded-full p-1.5 transition-all ${
+          className={`flex items-center justify-center rounded-full p-1.5 transition-colors ${
             value.trim() && !disabled
               ? "bg-ab text-abt hover:brightness-110"
               : "text-t4 cursor-default"
@@ -167,7 +167,7 @@ function ArtifactIcon({ format }: { format: string }) {
 
 function ArtifactLink({ artifact }: { artifact: ResultArtifact }) {
   return (
-    <button className="mt-3 flex w-full items-center gap-2.5 rounded-md border border-b1 bg-bg3h/50 px-3 py-2.5 text-left transition-all hover:bg-bg3h hover:border-b2">
+    <button className="mt-3 flex w-full items-center gap-2.5 rounded-md border border-b1 bg-bg3h/50 px-3 py-2.5 text-left transition-colors hover:bg-bg3h hover:border-b2">
       <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-bg3h"><ArtifactIcon format={artifact.format} /></div>
       <div className="min-w-0 flex-1">
         <div className="truncate text-[12.5px] font-medium text-t1">{artifact.title}</div>
@@ -503,7 +503,7 @@ export function MessyChatArea({ onTaskStart, onStepChange, onDone, onAllTurnsDon
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={handleStartTask}
-                    className="rounded-md border border-b1 bg-bg3 px-3 py-1.5 text-[13px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3h"
+                    className="rounded-md border border-b1 bg-bg3 px-3 py-1.5 text-[13px] font-medium text-t2 transition-colors hover:border-b2 hover:bg-bg3h"
                   >
                     {scenario.taskLabel}
                   </button>
@@ -654,7 +654,7 @@ export function MessyChatArea({ onTaskStart, onStepChange, onDone, onAllTurnsDon
             <div className="mt-5 flex justify-center animate-fade-in">
               <button
                 onClick={handleRestart}
-                className="flex items-center gap-1.5 rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t3 transition-all hover:bg-bg3 hover:text-t2"
+                className="flex items-center gap-1.5 rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t3 transition-colors hover:bg-bg3 hover:text-t2"
               >
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="1 4 1 10 7 10" />

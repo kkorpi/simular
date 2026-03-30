@@ -124,7 +124,7 @@ export function WaitlistSignup({ onSubmit, onBack }: WaitlistSignupProps) {
           </button>
 
           {roleOpen && (
-            <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+            <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 origin-top rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
               {roles.map((r) => (
                 <button
                   key={r.id}
@@ -184,7 +184,7 @@ export function WaitlistSignup({ onSubmit, onBack }: WaitlistSignupProps) {
           </button>
 
           {appsOpen && (
-            <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 max-h-[156px] overflow-y-auto rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+            <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 origin-top max-h-[156px] overflow-y-auto rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
               {apps.map((app) => (
                 <button
                   key={app.id}
@@ -212,7 +212,7 @@ export function WaitlistSignup({ onSubmit, onBack }: WaitlistSignupProps) {
         <button
           onClick={handleSubmit}
           disabled={!email.trim()}
-          className={`mt-6 flex h-12 w-full items-center justify-center rounded-md text-[15px] font-medium transition-all ${
+          className={`mt-6 flex h-12 w-full items-center justify-center rounded-md text-[15px] font-medium transition-[transform,background-color,color,filter] active:scale-[0.97] ${
             email.trim()
               ? "bg-as text-white hover:bg-as2"
               : "bg-bg3 text-t4 cursor-not-allowed"

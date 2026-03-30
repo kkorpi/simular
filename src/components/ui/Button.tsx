@@ -11,7 +11,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode;
 }
 
-const base = "inline-flex cursor-pointer items-center gap-1.5 font-medium transition-all disabled:opacity-40 disabled:cursor-not-allowed";
+const base = "inline-flex cursor-pointer items-center gap-1.5 font-medium transition-[transform,background-color,color,filter] active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed";
 
 const variants: Record<ButtonVariant, string> = {
   primary:
@@ -27,8 +27,8 @@ const variants: Record<ButtonVariant, string> = {
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: "px-2.5 py-1 text-[11px]",
-  md: "px-3 py-1.5 text-[12.5px]",
+  sm: "px-2.5 py-1 text-[11px] min-h-[36px]",
+  md: "px-3 py-1.5 text-[12.5px] min-h-[44px]",
 };
 
 export function Button({

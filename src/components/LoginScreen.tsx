@@ -94,7 +94,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
             {proofPoints.map((point, i) => (
               <div
                 key={i}
-                className={`flex items-center gap-3.5 rounded-lg border border-b1 bg-bg2/50 px-4 py-3 transition-all duration-500 ${
+                className={`flex items-center gap-3.5 rounded-lg border border-b1 bg-bg2/50 px-4 py-3 transition-[transform,opacity] duration-200 ${
                   i < visiblePoints
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-2 pointer-events-none"
@@ -139,7 +139,7 @@ export function LoginScreen({ onLogin }: { onLogin: () => void }) {
           {/* Sign in button */}
           <button
             onClick={onLogin}
-            className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-md bg-white text-[15px] font-medium text-[#1f1f1f] shadow-sm transition-all hover:bg-white/90"
+            className="mt-8 flex h-12 w-full items-center justify-center gap-3 rounded-md bg-oauth-google-bg text-[15px] font-medium text-oauth-google-text shadow-sm transition-[transform,background-color,color,filter] active:scale-[0.97] hover:brightness-95"
           >
             {/* Google "G" icon */}
             <svg className="h-5 w-5" viewBox="0 0 24 24">

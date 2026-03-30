@@ -122,15 +122,13 @@ const colorGroups: { label: string; tokens: { name: string; var: string }[] }[] 
 
 const extendedColorGroups: { label: string; desc: string; swatches: { name: string; bg: string; hex: string }[] }[] = [
   {
-    label: "Violet — Teach / Learn Mode",
-    desc: "Used for teach mode UI: step logs, recording indicators, workspace coaching bar, session dividers.",
+    label: "Teach / Learn Mode (theme-aware)",
+    desc: "Used for teach mode UI: step logs, recording indicators, workspace coaching bar, session dividers. Uses CSS variables that adapt to light/dark theme.",
     swatches: [
-      { name: "violet-600", bg: "#7c3aed", hex: "#7C3AED" },
-      { name: "violet-500", bg: "#8b5cf6", hex: "#8B5CF6" },
-      { name: "violet-400", bg: "#a78bfa", hex: "#A78BFA" },
-      { name: "violet-500/20", bg: "rgba(139, 92, 246, 0.2)", hex: "rgba(139,92,246,0.2)" },
-      { name: "violet-500/10", bg: "rgba(139, 92, 246, 0.1)", hex: "rgba(139,92,246,0.1)" },
-      { name: "violet-500/[0.04]", bg: "rgba(139, 92, 246, 0.04)", hex: "rgba(139,92,246,0.04)" },
+      { name: "--teach", bg: "var(--teach)", hex: "dark:#8B5CF6 / light:#7C3AED" },
+      { name: "--teach-text", bg: "var(--teach-text)", hex: "dark:#A78BFA / light:#6D28D9" },
+      { name: "--teach-bg", bg: "var(--teach-bg)", hex: "dark:rgba(139,92,246,0.2) / light:rgba(124,58,237,0.15)" },
+      { name: "--teach-subtle", bg: "var(--teach-subtle)", hex: "dark:rgba(139,92,246,0.1) / light:rgba(124,58,237,0.08)" },
     ],
   },
   {
@@ -269,7 +267,7 @@ function Swatch({ name, cssVar, resolvedColors }: { name: string; cssVar: string
   return (
     <button onClick={handleCopy} className="group flex flex-col gap-1.5 text-left">
       <div
-        className={`h-[64px] w-full rounded-lg border border-b1 transition-all group-hover:scale-[1.03] ${isTransparent ? "bg-[repeating-conic-gradient(#333_0%_25%,#222_0%_50%)_0_0/12px_12px]" : ""}`}
+        className={`h-[64px] w-full rounded-lg border border-b1 transition-transform group-hover:scale-[1.03] ${isTransparent ? "bg-[repeating-conic-gradient(#333_0%_25%,#222_0%_50%)_0_0/12px_12px]" : ""}`}
         style={{ backgroundColor: resolved }}
       />
       <div className="text-[11px] font-medium text-t2">{name}</div>
@@ -299,7 +297,7 @@ function HardSwatch({ name, bg, hex }: { name: string; bg: string; hex: string }
   return (
     <button onClick={handleCopy} className="group flex flex-col gap-1.5 text-left">
       <div
-        className={`h-[64px] w-full rounded-lg border border-b1 transition-all group-hover:scale-[1.03] ${isTransparent ? "bg-[repeating-conic-gradient(#333_0%_25%,#222_0%_50%)_0_0/12px_12px]" : ""}`}
+        className={`h-[64px] w-full rounded-lg border border-b1 transition-transform group-hover:scale-[1.03] ${isTransparent ? "bg-[repeating-conic-gradient(#333_0%_25%,#222_0%_50%)_0_0/12px_12px]" : ""}`}
         style={{ backgroundColor: bg }}
       />
       <div className="text-[11px] font-medium text-t2">{name}</div>
@@ -546,7 +544,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
               const current = el.getAttribute("data-theme");
               el.setAttribute("data-theme", current === "dark" ? "light" : "dark");
             }}
-            className="flex items-center gap-2 rounded-md border border-b1 px-3 py-1.5 text-[11px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+            className="flex items-center gap-2 rounded-md border border-b1 px-3 py-1.5 text-[11px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
           >
             <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="5" />
@@ -563,7 +561,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
           </button>
           <button
             onClick={onClose}
-            className="flex h-8 w-8 items-center justify-center rounded-md text-t3 transition-all hover:bg-bg3h hover:text-t1"
+            className="flex h-8 w-8 items-center justify-center rounded-md text-t3 transition-colors hover:bg-bg3h hover:text-t1"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" />
@@ -587,7 +585,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                   <button
                     key={s.id}
                     onClick={() => setActiveSection(s.id)}
-                    className={`w-full px-5 py-2.5 text-left transition-all max-md:w-auto max-md:shrink-0 max-md:px-3 max-md:py-2.5 max-md:text-center max-md:rounded-md max-md:my-1.5 ${
+                    className={`w-full px-5 py-2.5 text-left transition-colors max-md:w-auto max-md:shrink-0 max-md:px-3 max-md:py-2.5 max-md:text-center max-md:rounded-md max-md:my-1.5 ${
                       activeSection === s.id ? "bg-bg3" : "hover:bg-bg3/50"
                     }`}
                   >
@@ -724,7 +722,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                     {group.icons.map((icon) => (
                       <div
                         key={icon.name}
-                        className="group flex flex-col items-center gap-2 rounded-lg border border-b1 bg-bgcard px-3 py-4 transition-all hover:border-b2 hover:bg-bg3"
+                        className="group flex flex-col items-center gap-2 rounded-lg border border-b1 bg-bgcard px-3 py-4 transition-colors hover:border-b2 hover:bg-bg3"
                       >
                         <div className="flex h-[40px] w-[40px] items-center justify-center text-t1">
                           {icon.svg}
@@ -846,12 +844,12 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                 <div className="flex items-center gap-4">
                   <div className="relative h-[80px] w-[160px] rounded-xl border border-b1 overflow-hidden">
                     <div className="absolute inset-0 bg-bg3" />
-                    <div className="absolute inset-0 bg-black/65 backdrop-blur-[5px] flex items-center justify-center">
+                    <div className="absolute inset-0 bg-overlay backdrop-blur-[5px] flex items-center justify-center">
                       <span className="text-[11px] text-t2">Overlay blur</span>
                     </div>
                   </div>
                   <div className="text-[12px] text-t3">
-                    <div className="font-mono text-t4 text-[11px]">bg-black/65 backdrop-blur-[5px]</div>
+                    <div className="font-mono text-t4 text-[11px]">bg-overlay backdrop-blur-[5px]</div>
                     <div className="mt-1">Used for modal backdrops</div>
                   </div>
                 </div>
@@ -870,7 +868,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                     <button
                       key={s}
                       onClick={() => setButtonSize(s)}
-                      className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition-all ${buttonSize === s ? "border-as bg-as/10 text-blt" : "border-b1 text-t3 hover:text-t2"}`}
+                      className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition-colors ${buttonSize === s ? "border-as bg-as/10 text-blt" : "border-b1 text-t3 hover:text-t2"}`}
                     >
                       {s}
                     </button>
@@ -1024,7 +1022,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                       type="text"
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
-                      className="w-full rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 placeholder:text-t4 outline-none transition-all focus:border-as focus:ring-1 focus:ring-as/30"
+                      className="w-full rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 placeholder:text-t4 outline-none transition-colors focus:border-as focus:ring-1 focus:ring-as/30"
                     />
                   </div>
                   <div>
@@ -1032,7 +1030,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                     <textarea
                       rows={3}
                       placeholder="Describe what this task should do..."
-                      className="w-full rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 placeholder:text-t4 outline-none transition-all focus:border-as focus:ring-1 focus:ring-as/30 resize-none"
+                      className="w-full rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 placeholder:text-t4 outline-none transition-colors focus:border-as focus:ring-1 focus:ring-as/30 resize-none"
                     />
                   </div>
                   <div>
@@ -1041,7 +1039,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                       <input
                         type="number"
                         defaultValue={500}
-                        className="w-[100px] rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 outline-none transition-all focus:border-as focus:ring-1 focus:ring-as/30"
+                        className="w-[100px] rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 outline-none transition-colors focus:border-as focus:ring-1 focus:ring-as/30"
                       />
                       <span className="text-[12px] text-t3">USD</span>
                     </div>
@@ -1070,7 +1068,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                   <div className="relative">
                     <button
                       onClick={() => { setDropdownOpen(!dropdownOpen); setFreqDropdownOpen(false); }}
-                      className="flex w-full items-center justify-between rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 transition-all hover:border-b2"
+                      className="flex w-full items-center justify-between rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 transition-colors hover:border-b2"
                     >
                       <span>{dropdownValue}</span>
                       <svg className={`h-3.5 w-3.5 text-t3 transition-transform ${dropdownOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
@@ -1103,7 +1101,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                   <div className="relative">
                     <button
                       onClick={() => { setFreqDropdownOpen(!freqDropdownOpen); setDropdownOpen(false); }}
-                      className="flex w-full items-center justify-between rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 transition-all hover:border-b2"
+                      className="flex w-full items-center justify-between rounded-md border border-b1 bg-bg px-3 py-2 text-[13px] text-t1 transition-colors hover:border-b2"
                     >
                       <span>{freqDropdownValue}</span>
                       <svg className={`h-3.5 w-3.5 text-t3 transition-transform ${freqDropdownOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 12 15 18 9" /></svg>
@@ -1140,7 +1138,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                     <div className="relative">
                       <button
                         onClick={() => { setRangeCalOpen(rangeCalOpen === "start" ? null : "start"); setRangeCalMonth(rangeStart.month); setRangeCalYear(rangeStart.year); }}
-                        className={`flex items-center gap-2 rounded-md border px-3 py-1.5 text-[12px] text-t1 outline-none transition-all ${rangeCalOpen === "start" ? "border-as bg-bg3" : "border-b1 bg-bg3 hover:border-b2"}`}
+                        className={`flex items-center gap-2 rounded-md border px-3 py-1.5 text-[12px] text-t1 outline-none transition-colors ${rangeCalOpen === "start" ? "border-as bg-bg3" : "border-b1 bg-bg3 hover:border-b2"}`}
                       >
                         <svg className="h-3 w-3 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
                         {formatDate(rangeStart)}
@@ -1164,7 +1162,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                     <div className="relative">
                       <button
                         onClick={() => { setRangeCalOpen(rangeCalOpen === "end" ? null : "end"); setRangeCalMonth(rangeEnd.month); setRangeCalYear(rangeEnd.year); }}
-                        className={`flex items-center gap-2 rounded-md border px-3 py-1.5 text-[12px] text-t1 outline-none transition-all ${rangeCalOpen === "end" ? "border-as bg-bg3" : "border-b1 bg-bg3 hover:border-b2"}`}
+                        className={`flex items-center gap-2 rounded-md border px-3 py-1.5 text-[12px] text-t1 outline-none transition-colors ${rangeCalOpen === "end" ? "border-as bg-bg3" : "border-b1 bg-bg3 hover:border-b2"}`}
                       >
                         <svg className="h-3 w-3 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
                         {formatDate(rangeEnd)}
@@ -1193,7 +1191,7 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                   <div className="relative">
                     <button
                       onClick={() => { setCalendarOpen(!calendarOpen); setCalendarMonth(selectedDate.month); setCalendarYear(selectedDate.year); }}
-                      className={`flex w-full items-center gap-2 rounded-md border px-3 py-1.5 text-[12px] text-t1 outline-none transition-all ${calendarOpen ? "border-as bg-bg3" : "border-b1 bg-bg3 hover:border-b2"}`}
+                      className={`flex w-full items-center gap-2 rounded-md border px-3 py-1.5 text-[12px] text-t1 outline-none transition-colors ${calendarOpen ? "border-as bg-bg3" : "border-b1 bg-bg3 hover:border-b2"}`}
                     >
                       <svg className="h-3 w-3 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
                       {formatDate(selectedDate)}
@@ -1458,8 +1456,8 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                 <div className="flex items-center gap-6 rounded-lg border border-b1 bg-bgcard px-5 py-4">
                   <div className="flex h-[40px] w-[60px] shrink-0 items-center justify-center">
                     <div className="flex flex-col gap-1 w-full">
-                      <div className="h-1.5 w-full rounded-full bg-violet-500/30" style={{ animation: "step-log-enter 0.3s ease-out" }} />
-                      <div className="h-1.5 w-3/4 rounded-full bg-violet-500/20" style={{ animation: "step-log-enter 0.3s ease-out 0.1s both" }} />
+                      <div className="h-1.5 w-full rounded-full bg-teach/30" style={{ animation: "step-log-enter 0.3s ease-out" }} />
+                      <div className="h-1.5 w-3/4 rounded-full bg-teach-bg" style={{ animation: "step-log-enter 0.3s ease-out 0.1s both" }} />
                     </div>
                   </div>
                   <div>

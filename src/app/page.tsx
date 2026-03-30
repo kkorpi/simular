@@ -203,8 +203,25 @@ export default function Home() {
     if (h.screen === "main-app") setUserProfile((p) => p.role ? p : { ...p, role: "vc" });
   }, []);
 
-  // Sync hash when screen or view changes — use demo slug when a demo is active
+  // Sync hash when screen or view changes — use demo slug when a demo is active.
+  // If the user navigates away from the demo's initial screen (e.g. clicks
+  // through landing → SSO → payment), clear the demo ref so the hash tracks
+  // the real screen.
   useEffect(() => {
+    if (currentDemoRef.current) {
+      // Demo picker sets up a specific screen; once the user moves past it,
+      // stop pinning the hash to the demo slug.
+      const demoScreen = (() => {
+        const m = currentDemoRef.current;
+        if (m === "landing") return "landing";
+        if (m === "onboarding") return "onboarding";
+        return "main-app";
+      })();
+      if (screen !== demoScreen) {
+        currentDemoRef.current = null;
+      }
+    }
+
     if (currentDemoRef.current) {
       const slug = MODE_TO_SLUG[currentDemoRef.current];
       const newHash = `#${slug}`;
@@ -560,7 +577,7 @@ export default function Home() {
 
   // ── Demo picker overlay (Cmd+Shift+D) ──
   const demoPicker = demoPickerOpen && (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setDemoPickerOpen(false)}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-overlay-light backdrop-blur-sm" onClick={() => setDemoPickerOpen(false)}>
       <div className="w-[520px] max-md:w-[calc(100vw-2rem)] max-md:max-h-[70dvh] max-md:overflow-y-auto rounded-xl border border-b1 bg-bg2 p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-1 text-[13px] font-semibold text-t1">Demo Mode</div>
         <div className="mb-4 text-[11px] text-t3">Jump to any state. <span className="font-mono text-t4">Cmd+Shift+D</span></div>
@@ -580,7 +597,7 @@ export default function Home() {
             <button
               key={opt.mode}
               onClick={() => jumpToDemo(opt.mode)}
-              className={`flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-all hover:border-b2 hover:bg-bg3h ${
+              className={`flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-colors hover:border-b2 hover:bg-bg3h ${
                 screen === opt.mode
                   ? "border-as bg-as/[0.06]"
                   : "border-b1 bg-bgcard shadow-[var(--card-shadow)]"
@@ -654,6 +671,7 @@ export default function Home() {
         <SignupPayment
           onSubmit={() => {
             setIsOnboarding(true);
+            setSaiIntroOpen(true);
             setWorkspaceSetupStep(0);
             setWorkspaceSetupDone(false);
             setActiveView("zero-state");
@@ -672,6 +690,7 @@ export default function Home() {
           onReady={(profile) => {
             setUserProfile(profile);
             setActiveView("zero-state");
+            setSaiIntroOpen(true);
             setWorkspaceConnecting(true);
             setScreen("main-app");
             // Auto-clear connecting state after 3s
@@ -698,7 +717,7 @@ export default function Home() {
           {/* Sai intro interstitial — shown as modal before in-chat onboarding */}
           {saiIntroOpen && (
             <div
-              className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+              className="fixed inset-0 z-[90] flex items-center justify-center bg-overlay backdrop-blur-sm"
               onClick={() => setSaiIntroOpen(false)}
             >
               <div
@@ -722,7 +741,7 @@ export default function Home() {
                   </div>
                   <button
                     onClick={() => setSaiIntroOpen(false)}
-                    className="shrink-0 rounded-lg bg-ab px-5 py-2.5 text-[13px] font-medium text-abt transition-all hover:brightness-110"
+                    className="shrink-0 rounded-lg bg-ab px-5 py-2.5 text-[13px] font-medium text-abt transition-colors hover:brightness-110"
                   >
                     Get started
                   </button>
@@ -889,7 +908,7 @@ export default function Home() {
             {/* Screen preview */}
             <div
               onClick={() => !workspaceConnecting && !(isOnboarding && !workspaceSetupDone) && setWorkspaceOpen(true)}
-              className={`relative flex aspect-video items-center justify-center bg-bg3 transition-all ${workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? "" : "cursor-pointer hover:brightness-110"}`}
+              className={`relative flex aspect-video items-center justify-center bg-bg3 transition-colors ${workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? "" : "cursor-pointer hover:brightness-110"}`}
             >
               {workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? (
                 <div className="flex flex-col items-center gap-2 text-center">
@@ -1016,7 +1035,7 @@ export default function Home() {
                     </div>
                     <button
                       onClick={() => { setTrialCancelled(false); setTrialDaysLeft(6); }}
-                      className="mt-5 flex h-10 w-full items-center justify-center rounded-md bg-as text-[13px] font-medium text-white transition-all hover:bg-as2"
+                      className="mt-5 flex h-10 w-full items-center justify-center rounded-md bg-as text-[13px] font-medium text-white transition-colors hover:bg-as2"
                     >
                       Subscribe to Plus
                     </button>
@@ -1041,7 +1060,7 @@ export default function Home() {
                     </div>
                     <button
                       onClick={() => { setTrialCancelled(false); setTrialDaysLeft(6); }}
-                      className="mt-5 flex h-10 w-full items-center justify-center rounded-md border border-as/30 bg-as/10 text-[13px] font-medium text-blt transition-all hover:bg-as/20"
+                      className="mt-5 flex h-10 w-full items-center justify-center rounded-md border border-as/30 bg-as/10 text-[13px] font-medium text-blt transition-colors hover:bg-as/20"
                     >
                       Upgrade to Pro
                     </button>
@@ -1070,7 +1089,7 @@ export default function Home() {
 
           {/* Trial expiring dialog */}
           {trialDialogOpen && (
-            <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setTrialDialogOpen(false)}>
+            <div className="fixed inset-0 z-[80] flex items-center justify-center bg-overlay-light backdrop-blur-sm" onClick={() => setTrialDialogOpen(false)}>
               <div className="w-[420px] max-md:w-[calc(100vw-2rem)] max-md:max-h-[90vh] max-md:overflow-y-auto overflow-hidden rounded-2xl border border-b1 bg-bg2 shadow-[var(--sc)]" onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div className="px-6 pt-6 pb-4">
@@ -1128,13 +1147,13 @@ export default function Home() {
                         setSettingsSection("subscription");
                         setSettingsOpen(true);
                       }}
-                      className="rounded-md border border-b1 bg-transparent px-4 py-2 text-[13px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+                      className="rounded-md border border-b1 bg-transparent px-4 py-2 text-[13px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
                     >
                       Manage plan
                     </button>
                     <button
                       onClick={() => setTrialDialogOpen(false)}
-                      className="rounded-md bg-ab px-4 py-2 text-[13px] font-semibold text-abt transition-all hover:opacity-90"
+                      className="rounded-md bg-ab px-4 py-2 text-[13px] font-semibold text-abt transition-colors hover:opacity-90"
                     >
                       Got it, keep my plan
                     </button>

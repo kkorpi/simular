@@ -127,7 +127,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
       <div className="flex shrink-0 items-center gap-2.5 border-b border-b1 px-4 py-3.5">
         <button
           onClick={onBack}
-          className="shrink-0 rounded-md p-1 text-t3 transition-all hover:bg-bg3 hover:text-t1"
+          className="shrink-0 rounded-md p-1 text-t3 transition-colors hover:bg-bg3 hover:text-t1"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
@@ -155,7 +155,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
                       type="button"
                       onClick={() => toggleSkill(skill)}
                       disabled={!editable}
-                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-all ${active ? pillActive : pillInactive} ${editable ? "cursor-pointer" : "cursor-default"}`}
+                      className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors ${active ? pillActive : pillInactive} ${editable ? "cursor-pointer" : "cursor-default"}`}
                     >
                       {!active && editable && <span className="mr-0.5">+</span>}
                       {skill}
@@ -186,18 +186,18 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
                     <button
                       type="button"
                       onClick={() => setAddingIntegration(!addingIntegration)}
-                      className="rounded-full border border-dashed border-b2 px-2.5 py-0.5 text-[11px] font-medium text-t4 transition-all hover:border-b2 hover:text-t3"
+                      className="rounded-full border border-dashed border-b2 px-2.5 py-0.5 text-[11px] font-medium text-t4 transition-colors hover:border-b2 hover:text-t3"
                     >
                       + Add
                     </button>
                     {addingIntegration && (
-                      <div className="absolute left-0 top-[calc(100%+4px)] z-10 max-h-[200px] w-[180px] overflow-y-auto overflow-hidden rounded-lg border border-b1 bg-bg2 py-1 shadow-[var(--sc)]">
+                      <div className="absolute left-0 top-[calc(100%+4px)] z-10 origin-top max-h-[200px] w-[180px] overflow-y-auto overflow-hidden rounded-lg border border-b1 bg-bg2 py-1 shadow-[var(--sc)]">
                         {availableIntegrations.map((name) => (
                           <button
                             key={name}
                             type="button"
                             onClick={() => addIntegration(name)}
-                            className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-t2 transition-all hover:bg-bg3 hover:text-t1"
+                            className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
                           >
                             {name}
                           </button>
@@ -219,7 +219,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
                     type="button"
                     onClick={() => editable && setMaxDuration(opt)}
                     disabled={!editable}
-                    className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition-all ${maxDuration === opt ? segActive : segInactive} ${editable ? "cursor-pointer" : "cursor-default"}`}
+                    className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition-colors ${maxDuration === opt ? segActive : segInactive} ${editable ? "cursor-pointer" : "cursor-default"}`}
                   >
                     {opt}
                   </button>
@@ -237,7 +237,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
                     type="button"
                     onClick={() => editable && setAutonomy(level)}
                     disabled={!editable}
-                    className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition-all ${autonomy === level ? segActive : segInactive} ${editable ? "cursor-pointer" : "cursor-default"}`}
+                    className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition-colors ${autonomy === level ? segActive : segInactive} ${editable ? "cursor-pointer" : "cursor-default"}`}
                   >
                     {level}
                   </button>
@@ -269,7 +269,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
             /* ── Non-recurring: "Add schedule" prompt ── */
             <button
               onClick={() => setShowScheduleEditor(true)}
-              className="flex w-full items-center gap-2.5 rounded-lg border border-dashed border-b2 px-3.5 py-3 text-[12px] text-t3 transition-all hover:border-ab hover:bg-ab/5 hover:text-t2"
+              className="flex w-full items-center gap-2.5 rounded-lg border border-dashed border-b2 px-3.5 py-3 text-[12px] text-t3 transition-colors hover:border-ab hover:bg-ab/5 hover:text-t2"
             >
               <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -289,7 +289,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
                       key={f.id}
                       onClick={() => editable && setFrequency(f.id)}
                       disabled={!editable}
-                      className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition-all ${frequency === f.id ? segActive : segInactive} ${editable ? "cursor-pointer" : "cursor-default"}`}
+                      className={`rounded-md border px-2.5 py-1 text-[11px] font-medium transition-colors ${frequency === f.id ? segActive : segInactive} ${editable ? "cursor-pointer" : "cursor-default"}`}
                     >
                       {f.label}
                     </button>
@@ -330,7 +330,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
                           key={day}
                           onClick={() => editable && setWeeklyDay(fullDay)}
                           disabled={!editable}
-                          className={`flex h-7 w-7 items-center justify-center rounded-md text-[10px] font-medium transition-all ${isActive ? "bg-ab text-abt" : "bg-bg3 text-t3 hover:text-t2"} ${editable ? "cursor-pointer" : "cursor-default"}`}
+                          className={`flex h-7 w-7 items-center justify-center rounded-md text-[10px] font-medium transition-colors ${isActive ? "bg-ab text-abt" : "bg-bg3 text-t3 hover:text-t2"} ${editable ? "cursor-pointer" : "cursor-default"}`}
                         >
                           {day.charAt(0)}
                         </button>
@@ -350,7 +350,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
                         key={d}
                         onClick={() => editable && setMonthDay(d)}
                         disabled={!editable}
-                        className={`flex h-7 w-7 items-center justify-center rounded-md text-[10px] font-medium transition-all ${monthDay === d ? "bg-ab text-abt" : "bg-bg3 text-t3 hover:text-t2"} ${editable ? "cursor-pointer" : "cursor-default"}`}
+                        className={`flex h-7 w-7 items-center justify-center rounded-md text-[10px] font-medium transition-colors ${monthDay === d ? "bg-ab text-abt" : "bg-bg3 text-t3 hover:text-t2"} ${editable ? "cursor-pointer" : "cursor-default"}`}
                       >
                         {d}
                       </button>
@@ -371,7 +371,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
                           key={day}
                           onClick={() => editable && toggleCustomDay(day)}
                           disabled={!editable}
-                          className={`flex h-7 w-7 items-center justify-center rounded-md text-[10px] font-medium transition-all ${isActive ? "bg-ab text-abt" : "bg-bg3 text-t3 hover:text-t2"} ${editable ? "cursor-pointer" : "cursor-default"}`}
+                          className={`flex h-7 w-7 items-center justify-center rounded-md text-[10px] font-medium transition-colors ${isActive ? "bg-ab text-abt" : "bg-bg3 text-t3 hover:text-t2"} ${editable ? "cursor-pointer" : "cursor-default"}`}
                         >
                           {day.charAt(0)}
                         </button>
@@ -429,7 +429,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
               {isRecurring && onDisableSchedule && (
                 <button
                   onClick={onDisableSchedule}
-                  className="flex items-center gap-1.5 text-[11px] font-medium text-r transition-all hover:text-r/80"
+                  className="flex items-center gap-1.5 text-[11px] font-medium text-r transition-colors hover:text-r/80"
                 >
                   <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -442,7 +442,7 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
               {!isRecurring && showScheduleEditor && onMakeRecurring && (
                 <button
                   onClick={onMakeRecurring}
-                  className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110"
+                  className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-colors hover:brightness-110"
                 >
                   Enable schedule
                 </button>
@@ -457,13 +457,13 @@ export function TaskSettingsPanel({ task, editable, onBack, onSave, onMakeRecurr
         <div className="flex shrink-0 items-center justify-start gap-2 border-t border-b1 px-4 py-3">
           <button
             onClick={() => { onSave?.(); onBack(); }}
-            className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110"
+            className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-colors hover:brightness-110"
           >
             Save
           </button>
           <button
             onClick={onBack}
-            className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+            className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
           >
             Cancel
           </button>

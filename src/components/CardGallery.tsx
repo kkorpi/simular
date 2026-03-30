@@ -67,7 +67,7 @@ const resultBodyPresets: { label: string; body: ResultBody }[] = [
         <>
           I&apos;ve compiled a comprehensive summary with background, key data points, and relevant sources. You can review the full document or open it in your workspace.
           {/* Artifact link */}
-          <button className="mt-3 flex w-full items-center gap-2.5 rounded-md border border-b1 bg-bg3h/50 px-3 py-2.5 text-left transition-all hover:bg-bg3h hover:border-b2">
+          <button className="mt-3 flex w-full items-center gap-2.5 rounded-md border border-b1 bg-bg3h/50 px-3 py-2.5 text-left transition-colors hover:bg-bg3h hover:border-b2">
             <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-bg3h">
               <svg className="h-4 w-4 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><polyline points="14 2 14 8 20 8" /></svg>
             </div>
@@ -489,7 +489,7 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
         </div>
         <button
           onClick={onClose}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-t3 transition-all hover:bg-bg3 hover:text-t1"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-t3 transition-colors hover:bg-bg3 hover:text-t1"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="6" x2="6" y2="18" />
@@ -507,7 +507,7 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
               <button
                 key={ct.id}
                 onClick={() => setActiveCard(ct.id)}
-                className={`w-full px-5 py-2.5 text-left transition-all max-md:w-auto max-md:shrink-0 max-md:px-3 max-md:py-2.5 max-md:text-center max-md:rounded-md max-md:my-1.5 ${
+                className={`w-full px-5 py-2.5 text-left transition-colors max-md:w-auto max-md:shrink-0 max-md:px-3 max-md:py-2.5 max-md:text-center max-md:rounded-md max-md:my-1.5 ${
                   activeCard === ct.id ? "bg-bg3" : "hover:bg-bg3/50"
                 }`}
               >
@@ -1181,7 +1181,7 @@ function PillButton({ active, onClick, children }: { active: boolean; onClick: (
   return (
     <button
       onClick={onClick}
-      className={`rounded-md border px-2.5 py-1 text-[11px] font-medium capitalize transition-all ${
+      className={`rounded-md border px-2.5 py-1 text-[11px] font-medium capitalize transition-colors ${
         active ? "border-as bg-as/10 text-blt" : "border-b1 text-t3 hover:text-t2"
       }`}
     >

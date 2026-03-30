@@ -192,6 +192,8 @@ export function FullWorkspaceView({
 
   return (
     <div
+      role="dialog"
+      aria-label="Workspace"
       className={`fixed inset-0 z-[60] flex flex-col bg-bg transition-[clip-path,opacity] duration-[350ms] ease-[cubic-bezier(0.4,0,0.2,1)] ${
         open
           ? "pointer-events-auto opacity-100"
@@ -317,9 +319,9 @@ export function FullWorkspaceView({
 
       {/* Teach mode coaching banner */}
       {mode === "teach" && (
-        <div className="flex shrink-0 items-center gap-3 border-b border-violet-500/20 bg-violet-500/[0.04] px-5 py-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-violet-500/15">
-            <svg className="h-4 w-4 text-violet-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <div className="flex shrink-0 items-center gap-3 border-b border-teach/20 bg-teach/[0.04] px-5 py-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-teach/15">
+            <svg className="h-4 w-4 text-teach" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" />
               <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" />
             </svg>
@@ -333,13 +335,13 @@ export function FullWorkspaceView({
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 rounded-full bg-violet-500/15 px-2.5 py-1 text-[11px] font-medium text-violet-500">
-              <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse" />
+            <div className="flex items-center gap-1.5 rounded-full bg-teach/15 px-2.5 py-1 text-[11px] font-medium text-teach">
+              <div className="h-1.5 w-1.5 rounded-full bg-teach animate-pulse" />
               Recording
             </div>
             <button
               onClick={() => onDoneTeach?.()}
-              className="rounded-md bg-violet-500 px-3 py-1 text-[11px] font-semibold text-white transition-all hover:bg-violet-600"
+              className="rounded-md bg-teach px-3 py-1 text-[11px] font-semibold text-lt transition-colors hover:brightness-110"
             >
               Done
             </button>
@@ -367,8 +369,8 @@ export function FullWorkspaceView({
         <div className="absolute top-4 right-4 z-10 flex items-center divide-x divide-b1 rounded-xl bg-bg2/90 shadow-md backdrop-blur-sm">
           {/* LIVE / REC indicator */}
           {mode === "teach" ? (
-            <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-violet-500">
-              <div className="h-2 w-2 rounded-full bg-violet-500 animate-pulse" />
+            <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-teach">
+              <div className="h-2 w-2 rounded-full bg-teach animate-pulse" />
               REC
             </div>
           ) : mode === "captcha" ? (
@@ -495,7 +497,7 @@ export function FullWorkspaceView({
                 </div>
                 <button
                   onClick={handleLoginSubmit}
-                  className="rounded bg-[#4A90D9] px-6 py-2 text-[13px] font-semibold text-white transition-all hover:bg-[#3A7BC8]"
+                  className="rounded bg-[#4A90D9] px-6 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#3A7BC8]"
                 >
                   VERIFY
                 </button>
@@ -539,7 +541,7 @@ export function FullWorkspaceView({
                 </div>
                 <button
                   type="submit"
-                  className="h-9 w-full rounded-full bg-[#1A73E8] text-[14px] font-semibold text-white transition-all hover:brightness-110"
+                  className="h-9 w-full rounded-full bg-[#1A73E8] text-[14px] font-semibold text-white transition-colors hover:brightness-110"
                 >
                   Sign in
                 </button>
@@ -582,7 +584,7 @@ export function FullWorkspaceView({
                 </div>
                 <button
                   type="submit"
-                  className="h-9 w-full rounded-full bg-[#0A66C2] text-[14px] font-semibold text-white transition-all hover:brightness-110"
+                  className="h-9 w-full rounded-full bg-[#0A66C2] text-[14px] font-semibold text-white transition-colors hover:brightness-110"
                 >
                   Sign in
                 </button>
@@ -675,7 +677,7 @@ export function FullWorkspaceView({
                     }`}
                   >
                     {step.status === "done" ? (
-                      <svg className={`h-3.5 w-3.5 shrink-0 ${mode === "teach" ? "text-violet-500" : "text-g"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg className={`h-3.5 w-3.5 shrink-0 ${mode === "teach" ? "text-teach" : "text-g"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
                     ) : step.status === "active" ? (

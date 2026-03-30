@@ -58,15 +58,17 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/65 backdrop-blur-[5px]" onClick={onClose}>
-      <div className="flex h-[640px] w-[840px] max-md:h-full max-md:w-full max-md:rounded-none overflow-hidden rounded-2xl border border-b1 max-md:border-0 bg-bg shadow-[var(--sc)] max-md:flex-col" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-overlay backdrop-blur-[5px]" onClick={onClose}>
+      <div role="dialog" aria-label="Settings" className="flex h-[640px] w-[840px] max-md:h-full max-md:w-full max-md:rounded-none overflow-hidden rounded-2xl border border-b1 max-md:border-0 bg-bg shadow-[var(--sc)] max-md:flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Left nav (desktop) / Top nav (mobile) */}
-        <div className="flex w-[200px] shrink-0 flex-col border-r border-b1 bg-bg2 py-4 max-md:w-full max-md:flex-row max-md:items-center max-md:border-r-0 max-md:border-b max-md:py-2 max-md:px-2 max-md:gap-0 max-md:overflow-x-auto">
+        <div role="tablist" className="flex w-[200px] shrink-0 flex-col border-r border-b1 bg-bg2 py-4 max-md:w-full max-md:flex-row max-md:items-center max-md:border-r-0 max-md:border-b max-md:py-2 max-md:px-2 max-md:gap-0 max-md:overflow-x-auto">
           {sections.map((s) => (
             <button
               key={s.id}
+              role="tab"
+              aria-selected={active === s.id}
               onClick={() => setActive(s.id)}
-              className={`px-5 py-2.5 text-left text-[13.5px] font-medium transition-all max-md:px-3 max-md:py-1.5 max-md:text-center max-md:text-[12px] max-md:whitespace-nowrap max-md:rounded-md max-md:shrink-0 ${
+              className={`px-5 py-2.5 text-left text-[13.5px] font-medium transition-colors max-md:px-3 max-md:py-1.5 max-md:text-center max-md:text-[12px] max-md:whitespace-nowrap max-md:rounded-md max-md:shrink-0 ${
                 active === s.id
                   ? "text-t1 max-md:bg-bg3"
                   : "text-t3 hover:text-t2"
@@ -82,7 +84,7 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
               {onOpenCardGallery && (
                 <button
                   onClick={() => { onOpenCardGallery(); onClose(); }}
-                  className="flex items-center gap-2 px-5 py-2.5 text-left text-[13.5px] font-medium text-t3 transition-all hover:text-t2"
+                  className="flex items-center gap-2 px-5 py-2.5 text-left text-[13.5px] font-medium text-t3 transition-colors hover:text-t2"
                 >
                   <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="7" height="7" />
@@ -96,7 +98,7 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
               {onOpenDesignSystem && (
                 <button
                   onClick={() => { onOpenDesignSystem(); onClose(); }}
-                  className="flex items-center gap-2 px-5 py-2.5 text-left text-[13.5px] font-medium text-t3 transition-all hover:text-t2"
+                  className="flex items-center gap-2 px-5 py-2.5 text-left text-[13.5px] font-medium text-t3 transition-colors hover:text-t2"
                 >
                   <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10" />
@@ -125,7 +127,7 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
             </div>
             <button
               onClick={onClose}
-              className="flex h-7 w-7 items-center justify-center rounded-md text-t3 transition-all hover:bg-bg3 hover:text-t1"
+              className="flex h-9 w-9 items-center justify-center rounded-md text-t3 transition-colors hover:bg-bg3 hover:text-t1"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18" />
@@ -135,7 +137,7 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
           </div>
 
           {/* Content */}
-          <div className="flex-1 px-6 py-5">
+          <div role="tabpanel" className="flex-1 px-6 py-5">
             {active === "appearance" && <AppearanceSettings />}
             {active === "workspace" && <WorkspaceSettings />}
             {active === "integrations" && <IntegrationsSettings />}
@@ -164,7 +166,7 @@ function AppearanceSettings() {
           <button
             key={t}
             onClick={() => setPreference(t)}
-            className={`rounded-md border px-4 py-2 text-[13px] font-medium capitalize transition-all ${
+            className={`rounded-md border px-4 py-2 text-[13px] font-medium capitalize transition-colors ${
               preference === t
                 ? "border-b2 bg-bg3 text-t1"
                 : "border-b1 text-t3 hover:border-b2 hover:text-t2"
@@ -216,7 +218,7 @@ function WorkspaceSettings() {
                 </svg>
               </button>
               {thinkingOpen && (
-                <div className="absolute right-0 top-[calc(100%+4px)] z-10 w-[120px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                <div className="absolute right-0 top-[calc(100%+4px)] z-10 origin-top-right w-[120px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
                   {thinkingOptions.map((opt) => (
                     <button
                       key={opt}
@@ -362,7 +364,7 @@ function IntegrationsSettings() {
               ) : (
                 <button
                   onClick={() => toggleConnect(integration.id)}
-                  className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3 hover:text-t1"
+                  className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:border-b2 hover:bg-bg3 hover:text-t1"
                 >
                   Connect
                 </button>
@@ -427,7 +429,7 @@ function SignedInAccountsSettings({
               </div>
               <button
                 onClick={() => onSignOut?.(svc.id)}
-                className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t3 transition-all hover:border-rd/30 hover:text-rd"
+                className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t3 transition-colors hover:border-rd/30 hover:text-rd"
               >
                 Sign out
               </button>
@@ -446,7 +448,7 @@ function SignedInAccountsSettings({
           <div className="h-px bg-b1" />
           <button
             onClick={onSignOutAll}
-            className="text-[12px] font-medium text-t3 transition-all hover:text-rd"
+            className="text-[12px] font-medium text-t3 transition-colors hover:text-rd"
           >
             Sign out of all
           </button>
@@ -555,7 +557,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
           </div>
           <button
             onClick={onReactivateTrial}
-            className="mt-3 flex h-8 w-full items-center justify-center rounded-md border border-amber-500/30 text-[12px] font-medium text-am transition-all hover:bg-amber-500/10"
+            className="mt-3 flex h-8 w-full items-center justify-center rounded-md border border-amber-500/30 text-[12px] font-medium text-am transition-colors hover:bg-amber-500/10"
           >
             Reactivate trial
           </button>
@@ -572,7 +574,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
               <button
                 key={p}
                 onClick={() => setSelectedPlan(p)}
-                className={`relative rounded-[5px] px-3 py-1 text-[11px] font-semibold transition-all ${
+                className={`relative rounded-[5px] px-3 py-1 text-[11px] font-semibold transition-colors ${
                   selectedPlan === p
                     ? "bg-bg2 text-t1 shadow-sm"
                     : "text-t3 hover:text-t2"
@@ -652,7 +654,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
 
           {/* Upgrade button (Pro only) */}
           {selectedPlan === "pro" && (
-            <button className="mt-3 flex h-9 w-full items-center justify-center rounded-md bg-as text-[13px] font-medium text-white transition-all hover:bg-as2">
+            <button className="mt-3 flex h-9 w-full items-center justify-center rounded-md bg-as text-[13px] font-medium text-white transition-colors hover:bg-as2">
               Upgrade to Pro
             </button>
           )}
@@ -696,7 +698,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
           <div className="mt-3 rounded-lg border border-b1 bg-bg3/50 p-4">
             <div className="text-[13px] text-t2">No payment method on file</div>
             <div className="mt-1 text-[11px] text-t3">Add a card before your trial ends to keep access.</div>
-            <button className="mt-3 rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3 hover:text-t1">
+            <button className="mt-3 rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:border-b2 hover:bg-bg3 hover:text-t1">
               Add payment method
             </button>
           </div>
@@ -717,13 +719,13 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
               <div className="mt-3 flex items-center gap-2">
                 <button
                   onClick={() => setShowCancelConfirm(false)}
-                  className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3"
+                  className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3"
                 >
                   Keep my trial
                 </button>
                 <button
                   onClick={() => { setShowCancelConfirm(false); onCancelTrial?.(); }}
-                  className="rounded-md bg-rd px-3 py-1.5 text-[12px] font-medium text-white transition-all hover:brightness-110"
+                  className="rounded-md bg-rd px-3 py-1.5 text-[12px] font-medium text-white transition-colors hover:brightness-110"
                 >
                   Cancel trial
                 </button>
@@ -732,7 +734,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
           ) : (
             <button
               onClick={() => setShowCancelConfirm(true)}
-              className="text-[12px] font-medium text-t3 transition-all hover:text-rd"
+              className="text-[12px] font-medium text-t3 transition-colors hover:text-rd"
             >
               Cancel trial
             </button>
@@ -793,7 +795,7 @@ function CreditsSettings() {
           <div className="text-[13px] text-t2">Need more credits?</div>
           <div className="text-[11px] text-t3">Add-on packs available for high-usage months</div>
         </div>
-        <button className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3">
+        <button className="rounded-md border border-b1 px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3">
           Buy credits
         </button>
       </div>

@@ -149,14 +149,14 @@ export function DraftCard({
               setFields(initialFields);
               setMode("review");
             }}
-            className="rounded-md border border-b1 bg-bg2 px-3.5 py-1.5 text-[13px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+            className="rounded-md border border-b1 bg-bg2 px-3.5 py-1.5 text-[13px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
           >
             Cancel
           </button>
           {onOpenWorkspace && (
             <button
               onClick={onOpenWorkspace}
-              className="flex items-center gap-1.5 rounded-md border border-b1 bg-bg2 px-3.5 py-1.5 text-[13px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+              className="flex items-center gap-1.5 rounded-md border border-b1 bg-bg2 px-3.5 py-1.5 text-[13px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
             >
               <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="15 3 21 3 21 9" />
@@ -170,7 +170,7 @@ export function DraftCard({
           <div className="flex-1" />
           <button
             onClick={() => handleResolve("approved")}
-            className="rounded-md bg-g px-3.5 py-1.5 text-[13px] font-medium text-white transition-all hover:brightness-110"
+            className="rounded-md bg-g px-3.5 py-1.5 text-[13px] font-medium text-lt transition-colors hover:brightness-110"
           >
             {approveLabel}
           </button>
@@ -236,19 +236,19 @@ export function DraftCard({
         <div className="flex items-center gap-2 border-t border-b1 px-4 py-3">
           <button
             onClick={() => setMode("editing")}
-            className="rounded-md border border-b1 bg-bg2 px-3.5 py-1.5 text-[13px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+            className="rounded-md border border-b1 bg-bg2 px-3.5 py-1.5 text-[13px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
           >
             Edit first
           </button>
           <button
             onClick={() => handleResolve("denied")}
-            className="rounded-md border border-b1 bg-bg2 px-3.5 py-1.5 text-[13px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+            className="rounded-md border border-b1 bg-bg2 px-3.5 py-1.5 text-[13px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
           >
             {denyLabel}
           </button>
           <button
             onClick={() => handleResolve("approved")}
-            className="rounded-md bg-g px-3.5 py-1.5 text-[13px] font-medium text-white transition-all hover:brightness-110"
+            className="rounded-md bg-g px-3.5 py-1.5 text-[13px] font-medium text-lt transition-colors hover:brightness-110"
           >
             {approveLabel}
           </button>

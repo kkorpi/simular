@@ -106,10 +106,12 @@ export function ScheduleModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/65 backdrop-blur-[5px]"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-overlay backdrop-blur-[5px]"
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-label="Edit schedule"
         className="w-[420px] max-md:w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-b1 bg-bg shadow-[var(--sc)]"
         onClick={(e) => e.stopPropagation()}
       >
@@ -128,7 +130,7 @@ export function ScheduleModal({
           </div>
           <button
             onClick={onClose}
-            className="flex h-7 w-7 items-center justify-center rounded-md text-t3 transition-all hover:bg-bg3 hover:text-t1"
+            className="flex h-9 w-9 items-center justify-center rounded-md text-t3 transition-colors hover:bg-bg3 hover:text-t1"
           >
             <svg
               className="h-4 w-4"
@@ -157,7 +159,7 @@ export function ScheduleModal({
                 <button
                   key={f.id}
                   onClick={() => setFrequency(f.id)}
-                  className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-all ${
+                  className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-colors ${
                     frequency === f.id
                       ? "border-b2 bg-bg3 text-t1"
                       : "border-b1 text-t3 hover:border-b2 hover:text-t2"
@@ -227,7 +229,7 @@ export function ScheduleModal({
                     <button
                       key={day}
                       onClick={() => setWeeklyDay(fullDay)}
-                      className={`flex h-8 w-8 items-center justify-center rounded-md text-[11px] font-medium transition-all ${
+                      className={`flex h-8 w-8 items-center justify-center rounded-md text-[11px] font-medium transition-colors ${
                         isActive
                           ? "bg-ab text-abt"
                           : "bg-bg3 text-t3 hover:text-t2"
@@ -252,7 +254,7 @@ export function ScheduleModal({
                   <button
                     key={d}
                     onClick={() => setMonthDay(d)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-md text-[12px] font-medium transition-all ${
+                    className={`flex h-8 w-8 items-center justify-center rounded-md text-[12px] font-medium transition-colors ${
                       monthDay === d
                         ? "bg-ab text-abt"
                         : "bg-bg3 text-t3 hover:text-t2"
@@ -278,7 +280,7 @@ export function ScheduleModal({
                     <button
                       key={day}
                       onClick={() => toggleCustomDay(day)}
-                      className={`flex h-8 w-8 items-center justify-center rounded-md text-[11px] font-medium transition-all ${
+                      className={`flex h-8 w-8 items-center justify-center rounded-md text-[11px] font-medium transition-colors ${
                         isActive
                           ? "bg-ab text-abt"
                           : "bg-bg3 text-t3 hover:text-t2"
@@ -352,20 +354,20 @@ export function ScheduleModal({
         <div className="flex items-center justify-between border-t border-b1 px-5 py-3.5">
           <button
             onClick={onTurnOff ?? onClose}
-            className="text-[12px] font-medium text-red-400 transition-all hover:text-red-300"
+            className="text-[12px] font-medium text-red-400 transition-colors hover:text-red-300"
           >
             Turn off schedule
           </button>
           <div className="flex gap-2">
             <button
               onClick={onClose}
-              className="rounded-md border border-b1 bg-transparent px-4 py-2 text-[13px] font-medium text-t2 transition-all hover:bg-bg3 hover:text-t1"
+              className="rounded-md border border-b1 bg-transparent px-4 py-2 text-[13px] font-medium text-t2 transition-colors hover:bg-bg3 hover:text-t1"
             >
               Cancel
             </button>
             <button
               onClick={onClose}
-              className="rounded-md bg-ab px-4 py-2 text-[13px] font-medium text-abt transition-all hover:brightness-110"
+              className="rounded-md bg-ab px-4 py-2 text-[13px] font-medium text-abt transition-colors hover:brightness-110"
             >
               Save
             </button>

@@ -156,7 +156,7 @@ export function MessyTaskDetail({
       <div className="flex items-center gap-2 pb-2">
         <button
           onClick={() => { setExpanded(!expanded); setShowAll(false); }}
-          className="flex items-center gap-1.5 rounded-md px-1 py-0.5 text-[11.5px] font-medium text-t4 transition-all hover:text-t3"
+          className="flex items-center gap-1.5 rounded-md px-1 py-0.5 text-[11.5px] font-medium text-t4 transition-colors hover:text-t3"
         >
           <svg
             className={`h-3 w-3 transition-transform duration-200 ${expanded ? "" : "-rotate-90"}`}
@@ -232,7 +232,7 @@ export function MessyTaskDetail({
                 <span>&middot;</span>
                 <button
                   onClick={onViewActivityLog}
-                  className="font-medium text-blt transition-all hover:underline"
+                  className="font-medium text-blt transition-colors hover:underline"
                 >
                   View full activity log
                 </button>

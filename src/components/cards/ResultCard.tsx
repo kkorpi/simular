@@ -202,10 +202,10 @@ export function ResultCard({
               onClick={action.onClick}
               className={
                 action.style === "primary"
-                  ? "rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-all hover:brightness-110"
+                  ? "rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-colors hover:brightness-110"
                   : action.style === "outline"
-                    ? "rounded-md border border-b1 bg-transparent px-2.5 py-1 text-xs font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
-                    : "text-[11px] font-medium text-blt transition-all hover:underline"
+                    ? "rounded-md border border-b1 bg-transparent px-2.5 py-1 text-xs font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
+                    : "text-[11px] font-medium text-blt transition-colors hover:underline"
               }
             >
               {action.icon && <span className="mr-1 inline-flex">{action.icon}</span>}
