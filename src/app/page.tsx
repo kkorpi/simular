@@ -16,6 +16,7 @@ import { SignupPayment } from "@/components/SignupPayment";
 import { WaitlistSignup } from "@/components/WaitlistSignup";
 import { WaitlistConfirmation } from "@/components/WaitlistConfirmation";
 import { OnboardingScreen, type OnboardingProfile } from "@/components/OnboardingScreen";
+import { SaiInterstitial } from "@/components/SaiInterstitial";
 import type { AuthInputState } from "@/components/AuthInput";
 import { SEATS_REMAINING_INIT, TEACH_TASK_NAME, type ViewState, type StarterTask, type TeachPhase } from "@/data/mockData";
 
@@ -106,6 +107,9 @@ export default function Home() {
   const [trialDaysLeft, setTrialDaysLeft] = useState(6);
   const [trialCancelled, setTrialCancelled] = useState(false);
   const [trialDialogOpen, setTrialDialogOpen] = useState(false);
+
+  // ── Sai intro interstitial (shown before in-chat onboarding) ──
+  const [saiIntroOpen, setSaiIntroOpen] = useState(false);
 
   // ── Onboarding-in-chat state ──
   const [isOnboarding, setIsOnboarding] = useState(false);
@@ -213,6 +217,7 @@ export default function Home() {
     setIsAutoPlay(false);
     setIsReturningUser(false);
     setShowNewTaskCard(false);
+    setSaiIntroOpen(false);
     if (mode === "landing") {
       setCapReached(false);
       setSeatsRemaining(SEATS_REMAINING_INIT);
@@ -258,6 +263,7 @@ export default function Home() {
     } else if (mode === "onboarding") {
       setTrialDaysLeft(6);
       setUserProfile({});
+      setSaiIntroOpen(true);
       setIsOnboarding(true);
       setWorkspaceSetupStep(0);
       setWorkspaceSetupDone(false);
@@ -626,6 +632,41 @@ export default function Home() {
     case "main-app":
       return (
         <div className="flex h-dvh flex-col">
+          {/* Sai intro interstitial — shown as modal before in-chat onboarding */}
+          {saiIntroOpen && (
+            <div
+              className="fixed inset-0 z-[90] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+              onClick={() => setSaiIntroOpen(false)}
+            >
+              <div
+                className="w-[640px] max-w-[calc(100vw-2rem)] rounded-2xl border border-b1 bg-bg shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Animation */}
+                <div className="px-5 pt-5">
+                  <SaiInterstitial />
+                </div>
+
+                {/* Footer: text left, button right */}
+                <div className="flex items-center gap-4 px-6 py-5">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[15px] text-t1 font-semibold leading-snug">
+                      Sai has its own computer.
+                    </p>
+                    <p className="mt-1 text-[13px] text-t3 leading-relaxed">
+                      It browses the web, opens apps, and works through tasks around the clock. Describe what you need. Sai takes it from here.
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setSaiIntroOpen(false)}
+                    className="shrink-0 rounded-lg bg-ab px-5 py-2.5 text-[13px] font-medium text-abt transition-all hover:brightness-110"
+                  >
+                    Get started
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
           <TopBar
             isZeroState={activeView === "zero-state" && !isOnboarding}
             onOpenSettings={() => setSettingsOpen(true)}

@@ -728,7 +728,7 @@ export function ChatArea({
                     Good morning, Katie.
                   </div>
                   <div className="mt-0.5 text-sm leading-[1.6] text-t2">
-                    Sai works in your browser, across your apps. Here are a few things to try.
+                    Sai has its own computer and works across apps. Describe what you need. Sai takes it from here. Here are a few things to try.
                   </div>
                 </div>
               </div>
