@@ -74,7 +74,7 @@ export function ProgressCard({
   const hasError = errorCount > 0;
 
   return (
-    <CardShell accent={hasError ? "amber" : allDone ? "green" : accent}>
+    <CardShell accent={hasError ? "amber" : allDone ? "green" : accent} role="status">
       {/* Header */}
       <div className="flex items-center justify-between px-3.5 py-2.5">
         <div className="min-w-0 flex-1">
@@ -138,7 +138,7 @@ export function ProgressCard({
             {step.status === "error" && onRetry && (
               <button
                 onClick={() => onRetry(i)}
-                className="shrink-0 text-[11px] font-medium text-blt transition-all hover:underline"
+                className="shrink-0 text-[11px] font-medium text-blt transition-colors hover:underline"
               >
                 Retry
               </button>
@@ -156,10 +156,10 @@ export function ProgressCard({
               onClick={action.onClick}
               className={
                 action.style === "primary"
-                  ? "rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-all hover:brightness-110"
+                  ? "rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-colors hover:brightness-110"
                   : action.style === "outline"
-                    ? "rounded-md border border-b1 bg-transparent px-2.5 py-1 text-xs font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
-                    : "text-[11px] font-medium text-blt transition-all hover:underline"
+                    ? "rounded-md border border-b1 bg-transparent px-2.5 py-1 text-xs font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
+                    : "text-[11px] font-medium text-blt transition-colors hover:underline"
               }
             >
               {action.label}

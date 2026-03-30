@@ -19,7 +19,7 @@ export function WorkingIndicator({ label, done, authWaiting }: { label: string; 
   }, [label, displayLabel]);
 
   return (
-    <div className="flex items-center">
+    <div role="status" aria-live="polite" className="flex items-center">
       {done ? (
         <svg className="mr-1.5 h-3.5 w-3.5 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
       ) : authWaiting ? (

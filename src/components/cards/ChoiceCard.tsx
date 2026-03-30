@@ -102,7 +102,7 @@ export function ChoiceCard({
               <button
                 key={opt.id}
                 onClick={() => handleSelect(opt)}
-                className={`flex w-[160px] flex-col rounded-lg border p-3 text-left transition-all ${
+                className={`flex w-[160px] flex-col rounded-lg border p-3 text-left transition-colors ${
                   isSelected
                     ? "border-as bg-as/[0.04] shadow-[0_0_0_1px_var(--as)]"
                     : hasSelection
@@ -143,7 +143,7 @@ export function ChoiceCard({
                 <button
                   key={opt.id}
                   onClick={() => handleSelect(opt)}
-                  className={`flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition-all ${
+                  className={`flex w-full items-center gap-3 px-3.5 py-2.5 text-left transition-colors ${
                     isSelected ? "bg-as/[0.04]" : "hover:bg-bg3h"
                   }`}
                 >
@@ -208,7 +208,7 @@ export function ChoiceCard({
                 <button
                   key={opt.id}
                   onClick={() => handleSelect(opt)}
-                  className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-all ${
+                  className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-colors ${
                     isSelected
                       ? "border-as/50 bg-as/10 text-blt"
                       : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h"
@@ -296,7 +296,7 @@ export function ChoiceCard({
                 <div key={opt.id} className="flex-1 min-w-[120px] px-3 py-2">
                   <button
                     onClick={() => handleSelect(opt)}
-                    className={`w-full rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-all ${
+                    className={`w-full rounded-md border px-2.5 py-1.5 text-[11px] font-medium transition-colors ${
                       isSelected
                         ? "border-as bg-as/10 text-blt"
                         : "border-b1 text-t2 hover:border-b2 hover:bg-bg3h hover:text-t1"

@@ -174,7 +174,7 @@ export function FormCard({
                 value={values[field.key] as string}
                 placeholder={field.placeholder}
                 onChange={(e) => updateValue(field.key, e.target.value)}
-                className={`w-full rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none placeholder:text-t4 transition-all focus:border-as ${
+                className={`w-full rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none placeholder:text-t4 transition-colors focus:border-as ${
                   errors[field.key] ? "border-rd" : "border-b1"
                 }`}
               />
@@ -186,7 +186,7 @@ export function FormCard({
                 placeholder={field.placeholder}
                 rows={field.rows ?? 3}
                 onChange={(e) => updateValue(field.key, e.target.value)}
-                className={`w-full resize-none rounded-md border bg-bg3 px-3 py-1.5 text-[12px] leading-[1.6] text-t1 outline-none placeholder:text-t4 transition-all focus:border-as ${
+                className={`w-full resize-none rounded-md border bg-bg3 px-3 py-1.5 text-[12px] leading-[1.6] text-t1 outline-none placeholder:text-t4 transition-colors focus:border-as ${
                   errors[field.key] ? "border-rd" : "border-b1"
                 }`}
               />
@@ -200,7 +200,7 @@ export function FormCard({
                   min={field.min}
                   max={field.max}
                   onChange={(e) => updateValue(field.key, Number(e.target.value))}
-                  className={`w-[100px] rounded-md border bg-bg3 px-3 py-1.5 text-rdight text-[12px] text-t1 outline-none transition-all focus:border-as ${
+                  className={`w-[100px] rounded-md border bg-bg3 px-3 py-1.5 text-rdight text-[12px] text-t1 outline-none transition-colors focus:border-as ${
                     errors[field.key] ? "border-rd" : "border-b1"
                   }`}
                 />
@@ -213,7 +213,7 @@ export function FormCard({
                 <button
                   type="button"
                   onClick={() => setOpenSelect(openSelect === field.key ? null : field.key)}
-                  className={`flex w-full items-center justify-between rounded-md border bg-bg3 px-3 py-1.5 text-left text-[12px] text-t1 outline-none transition-all hover:border-b2 ${
+                  className={`flex w-full items-center justify-between rounded-md border bg-bg3 px-3 py-1.5 text-left text-[12px] text-t1 outline-none transition-colors hover:border-b2 ${
                     errors[field.key] ? "border-rd" : "border-b1"
                   }`}
                 >
@@ -223,7 +223,7 @@ export function FormCard({
                   </svg>
                 </button>
                 {openSelect === field.key && (
-                  <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                  <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 origin-top rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
                     {field.options.map((opt) => (
                       <button
                         key={opt.value}
@@ -265,7 +265,7 @@ export function FormCard({
                 type="date"
                 value={values[field.key] as string}
                 onChange={(e) => updateValue(field.key, e.target.value)}
-                className={`rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none transition-all focus:border-as ${
+                className={`rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none transition-colors focus:border-as ${
                   errors[field.key] ? "border-rd" : "border-b1"
                 }`}
               />
@@ -277,7 +277,7 @@ export function FormCard({
                   type="date"
                   value={values[field.key + "_start"] as string}
                   onChange={(e) => updateValue(field.key + "_start", e.target.value)}
-                  className={`rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none transition-all focus:border-as ${
+                  className={`rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none transition-colors focus:border-as ${
                     errors[field.key + "_start"] ? "border-rd" : "border-b1"
                   }`}
                 />
@@ -286,7 +286,7 @@ export function FormCard({
                   type="date"
                   value={values[field.key + "_end"] as string}
                   onChange={(e) => updateValue(field.key + "_end", e.target.value)}
-                  className={`rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none transition-all focus:border-as ${
+                  className={`rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none transition-colors focus:border-as ${
                     errors[field.key + "_end"] ? "border-rd" : "border-b1"
                   }`}
                 />
@@ -314,13 +314,13 @@ export function FormCard({
                     placeholder={field.placeholder ?? "Type and press Enter"}
                     onChange={(e) => setChipInput((prev) => ({ ...prev, [field.key]: e.target.value }))}
                     onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addChip(field.key); } }}
-                    className={`flex-1 rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none placeholder:text-t4 transition-all focus:border-as ${
+                    className={`flex-1 rounded-md border bg-bg3 px-3 py-1.5 text-[12px] text-t1 outline-none placeholder:text-t4 transition-colors focus:border-as ${
                       errors[field.key] ? "border-rd" : "border-b1"
                     }`}
                   />
                   <button
                     onClick={() => addChip(field.key)}
-                    className="rounded-md border border-b1 bg-transparent px-2.5 py-1 text-[11px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+                    className="rounded-md border border-b1 bg-transparent px-2.5 py-1 text-[11px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
                   >
                     Add
                   </button>
@@ -350,14 +350,14 @@ export function FormCard({
       <div className="flex items-center gap-2 border-t border-b1 px-3.5 py-2">
         <button
           onClick={handleSubmit}
-          className="rounded-md bg-ab px-3 py-1.5 text-xs font-medium text-abt transition-all hover:brightness-110"
+          className="rounded-md bg-ab px-3 py-1.5 text-xs font-medium text-abt transition-colors hover:brightness-110"
         >
           {submitLabel}
         </button>
         {onCancel && (
           <button
             onClick={onCancel}
-            className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-xs font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+            className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-xs font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
           >
             {cancelLabel}
           </button>

@@ -4,14 +4,14 @@ export function WorkspaceTab({ onFullView }: { onFullView: () => void }) {
       {/* Live screen preview */}
       <div
         onClick={onFullView}
-        className="relative flex aspect-video cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-b1 bg-bg3 transition-all hover:border-b2"
+        className="relative flex aspect-video cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-b1 bg-bg3 transition-colors hover:border-b2"
       >
-        <div className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-full bg-black/65 px-[7px] py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
+        <div className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-full bg-bg2/80 px-[7px] py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
           <div className="h-1 w-1 rounded-full bg-g" />
           LIVE
         </div>
         {/* Expand icon */}
-        <div className="absolute bottom-1.5 right-1.5 flex items-center justify-center rounded-md bg-black/50 p-0.5 backdrop-blur-sm">
+        <div className="absolute bottom-1.5 right-1.5 flex items-center justify-center rounded-md bg-bg2/80 p-0.5 backdrop-blur-sm">
           <svg
             className="h-4 w-4 text-t3"
             viewBox="0 0 24 24"
@@ -56,7 +56,7 @@ export function WorkspaceTab({ onFullView }: { onFullView: () => void }) {
         </div>
         <button
           onClick={onFullView}
-          className="rounded-md bg-transparent px-[7px] py-[3px] text-[11px] text-t3 transition-all hover:bg-bg3 hover:text-t2"
+          className="rounded-md bg-transparent px-[7px] py-[3px] text-[11px] text-t3 transition-colors hover:bg-bg3 hover:text-t2"
         >
           Full view
         </button>

@@ -19,7 +19,7 @@ export function ScheduleBar({ schedule, onEdit, onTurnOff, onTurnOn }: ScheduleB
       {onEdit && (
         <button
           onClick={onEdit}
-          className="text-[11px] font-medium text-blt transition-all hover:underline"
+          className="text-[11px] font-medium text-blt transition-colors hover:underline"
         >
           Change schedule
         </button>
@@ -27,7 +27,7 @@ export function ScheduleBar({ schedule, onEdit, onTurnOff, onTurnOn }: ScheduleB
       {onTurnOff && (
         <button
           onClick={onTurnOff}
-          className="text-[11px] font-medium text-t3 transition-all hover:text-t1"
+          className="text-[11px] font-medium text-t3 transition-colors hover:text-t1"
         >
           Turn off
         </button>
@@ -35,7 +35,7 @@ export function ScheduleBar({ schedule, onEdit, onTurnOff, onTurnOn }: ScheduleB
       {onTurnOn && (
         <button
           onClick={onTurnOn}
-          className="text-[11px] font-medium text-blt transition-all hover:underline"
+          className="text-[11px] font-medium text-blt transition-colors hover:underline"
         >
           Make recurring
         </button>

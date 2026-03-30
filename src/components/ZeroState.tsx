@@ -87,7 +87,7 @@ export function ZeroState({ onStartTask, onCreateOwn, userRole, customWorkflow }
           <div className="mb-4">
             <button
               onClick={onCreateOwn}
-              className="group flex w-full items-center gap-4 rounded-lg border border-as/30 bg-as/[0.04] px-4 py-4 text-left transition-all hover:border-as/50 hover:bg-as/[0.08]"
+              className="group flex w-full items-center gap-4 rounded-lg border border-as/30 bg-as/[0.04] px-4 py-4 text-left transition-colors hover:border-as/50 hover:bg-as/[0.08]"
             >
               <div className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-md bg-as/10">
                 <svg className="h-5 w-5 text-blt" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -146,7 +146,7 @@ function StarterTaskCard({
   return (
     <button
       onClick={onStart}
-      className="group flex items-center gap-4 rounded-lg border border-b1 bg-bgcard px-4 py-4 text-left shadow-[var(--card-shadow)] transition-all hover:bg-bg2"
+      className="group flex items-center gap-4 rounded-lg border border-b1 bg-bgcard px-4 py-4 text-left shadow-[var(--card-shadow)] transition-colors hover:bg-bg2"
     >
       {/* Icon */}
       <div className="flex h-[44px] w-[44px] shrink-0 items-center justify-center rounded-md bg-bg3h">

@@ -41,6 +41,16 @@
   --st: #a8a8b0;
   --sb: #2e2e34;
   --thumb-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --overlay: rgba(0, 0, 0, 0.65);
+  --overlay-light: rgba(0, 0, 0, 0.50);
+  --teach: #8b5cf6;
+  --teach-text: #a78bfa;
+  --teach-subtle: rgba(139, 92, 246, 0.10);
+  --teach-bg: rgba(139, 92, 246, 0.20);
+  --oauth-google-bg: #ffffff;
+  --oauth-google-text: #1f1f1f;
+  --oauth-apple-bg: #000000;
+  --oauth-apple-text: #ffffff;
 }
 
 /* ===== Light Theme ===== */
@@ -70,8 +80,8 @@
   --gs: rgba(24, 135, 90, 0.08);
   --gg: rgba(24, 135, 90, 0.18);
   --gt: #15704a;
-  --am: #8a5e0c;
-  --ams: rgba(138, 94, 12, 0.08);
+  --am: #ea580c;
+  --ams: rgba(234, 88, 12, 0.08);
   --bl: #2c6084;
   --bls: rgba(44, 96, 132, 0.12);
   --blt: #2c6084;
@@ -84,6 +94,16 @@
   --st: #1a1a1e;
   --sb: #c4c4ca;
   --thumb-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --overlay: rgba(0, 0, 0, 0.35);
+  --overlay-light: rgba(0, 0, 0, 0.25);
+  --teach: #7c3aed;
+  --teach-text: #6d28d9;
+  --teach-subtle: rgba(124, 58, 237, 0.08);
+  --teach-bg: rgba(124, 58, 237, 0.15);
+  --oauth-google-bg: #f0f0f2;
+  --oauth-google-text: #1f1f1f;
+  --oauth-apple-bg: #1a1a1e;
+  --oauth-apple-text: #ffffff;
 }
 
 /* ===== Brand Colors (theme-independent) ===== */
@@ -161,6 +181,16 @@
   --color-brand-slack: var(--brand-slack);
   --color-brand-hubspot: var(--brand-hubspot);
   --color-brand-jira: var(--brand-jira);
+  --color-overlay: var(--overlay);
+  --color-overlay-light: var(--overlay-light);
+  --color-teach: var(--teach);
+  --color-teach-text: var(--teach-text);
+  --color-teach-subtle: var(--teach-subtle);
+  --color-teach-bg: var(--teach-bg);
+  --color-oauth-google-bg: var(--oauth-google-bg);
+  --color-oauth-google-text: var(--oauth-google-text);
+  --color-oauth-apple-bg: var(--oauth-apple-bg);
+  --color-oauth-apple-text: var(--oauth-apple-text);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains);
 }
@@ -171,6 +201,19 @@ body {
   color: var(--t1);
   -webkit-font-smoothing: antialiased;
   transition: background 0.2s, color 0.2s;
+}
+
+/* ===== Button Press Feedback ===== */
+/* Matches buttons with a visible resting background (bg-ab, bg-as, bg-g,
+   bg-rd, bg-teach, bg-bg3, bg-oauth-*) or a visible resting border
+   (border-b1, border-b2, border-as, border-teach). Excludes list-item
+   buttons that only have hover:bg-* or no visible chrome. */
+button[class*=" bg-"]:not(:disabled):active,
+button[class^="bg-"]:not(:disabled):active,
+button[class*=" border-"]:not(:disabled):active,
+button[class^="border-"]:not(:disabled):active {
+  scale: 0.98;
+  transition: scale 0.06s ease-out !important;
 }
 
 /* ===== JetBrains Mono — always 11px uppercase ===== */
@@ -200,11 +243,11 @@ body {
 }
 
 .animate-working-dot-2 {
-  animation: working-dots 1.4s ease-in-out infinite 0.15s;
+  animation: working-dots 1.4s ease-in-out infinite 0.05s;
 }
 
 .animate-working-dot-3 {
-  animation: working-dots 1.4s ease-in-out infinite 0.3s;
+  animation: working-dots 1.4s ease-in-out infinite 0.1s;
 }
 
 /* ===== Running Task Ping ===== */
@@ -424,11 +467,70 @@ body {
 }
 
 .animate-imsg-dot-1 { animation: imsg-dot 1.2s ease-in-out infinite; }
-.animate-imsg-dot-2 { animation: imsg-dot 1.2s ease-in-out 0.15s infinite; }
-.animate-imsg-dot-3 { animation: imsg-dot 1.2s ease-in-out 0.3s infinite; }
+.animate-imsg-dot-2 { animation: imsg-dot 1.2s ease-in-out 0.05s infinite; }
+.animate-imsg-dot-3 { animation: imsg-dot 1.2s ease-in-out 0.1s infinite; }
+
+/* ===== Custom Easing Tokens ===== */
+:root {
+  --ease-out-strong: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-strong: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+}
 
 /* ===== Scrollbar ===== */
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--b1); border-radius: 100px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--b2); }
+
+/* ===== Touch Device Hover Guard ===== */
+/* On touch-only devices, prevent hover effects from sticking on tap */
+@media (hover: none) {
+  /* Reset common hover background/color changes on coarse pointer devices */
+  button:hover,
+  a:hover,
+  [role="menuitem"]:hover,
+  [role="tab"]:hover,
+  [role="option"]:hover {
+    filter: none !important;
+  }
+}
+
+/* ===== Reduced Motion ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .shimmer-text,
+  .shimmer-text-amber {
+    animation: none;
+    -webkit-text-fill-color: var(--t2);
+    background: none;
+  }
+
+  .shimmer-bar::after {
+    animation: none;
+  }
+
+  .animate-pulse-dot,
+  .animate-pulse-dot-amber {
+    animation: none;
+  }
+
+  .animate-logo-fill {
+    animation: none;
+    clip-path: inset(0);
+  }
+
+  .blink-cursor {
+    animation: none;
+    opacity: 1;
+  }
+
+  .collapsible {
+    transition: none;
+  }
+}

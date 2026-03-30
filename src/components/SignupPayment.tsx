@@ -139,7 +139,7 @@ export function SignupPayment({ onSubmit, onBack }: SignupPaymentProps) {
         <button
           onClick={handleSubmit}
           disabled={!allFilled || processing}
-          className={`mt-6 flex h-12 w-full items-center justify-center rounded-md text-[15px] font-medium transition-all ${
+          className={`mt-6 flex h-12 w-full items-center justify-center rounded-md text-[15px] font-medium transition-colors ${
             allFilled && !processing
               ? "bg-as text-white hover:bg-as2"
               : "bg-bg3 text-t4 cursor-not-allowed"

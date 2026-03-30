@@ -29,7 +29,7 @@ export function TopBar({
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div className="relative z-30 flex h-[50px] shrink-0 items-center border-b border-b1 px-5">
+    <div role="banner" className="relative z-30 flex h-[50px] shrink-0 items-center border-b border-b1 px-5">
       {/* Left: logo + name (clickable → zero state) */}
       <button
         onClick={onGoHome}
@@ -49,7 +49,7 @@ export function TopBar({
         ) : (
           <button
             onClick={onOpenSubscription}
-            className={`pointer-events-auto flex items-center gap-1.5 rounded-full border px-3 py-1 transition-all ${
+            className={`pointer-events-auto flex items-center gap-1.5 rounded-full border px-3 py-1 transition-colors ${
               trialDaysLeft <= 1
                 ? "border-amber-500/40 bg-amber-500/10 hover:border-amber-500/60 hover:bg-amber-500/15"
                 : "border-b1 bg-bg2 hover:border-b2 hover:bg-bg3h"
@@ -84,8 +84,10 @@ export function TopBar({
           <img
             src="/avatar-katie.jpg"
             alt="Katie"
+            aria-label="User menu"
+            aria-expanded={menuOpen}
             onClick={() => setMenuOpen(!menuOpen)}
-            className="h-7 w-7 cursor-pointer rounded-full object-cover transition-all hover:ring-2 hover:ring-b2"
+            className="h-9 w-9 cursor-pointer rounded-full object-cover transition-shadow hover:ring-2 hover:ring-b2"
           />
           <AvatarMenu
             open={menuOpen}

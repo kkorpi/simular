@@ -63,7 +63,7 @@ export function StatusCard({
         <div className="flex items-center gap-2 border-t border-b1 px-3.5 py-2">
           <button
             onClick={onReconnect}
-            className="rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-all hover:brightness-110"
+            className="rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-colors hover:brightness-110"
           >
             Reconnect
           </button>

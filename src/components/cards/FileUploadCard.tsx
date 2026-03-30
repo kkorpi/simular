@@ -52,7 +52,7 @@ export function FileUploadCard({
           {isActive && (
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-bg3h">
               <div
-                className="h-full rounded-full bg-as transition-all duration-300"
+                className="h-full rounded-full bg-as transition-all duration-200"
                 style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
               />
             </div>
@@ -69,7 +69,7 @@ export function FileUploadCard({
         <div className="flex items-center gap-2 border-t border-b1 px-3.5 py-2">
           <button
             onClick={onCancel}
-            className="text-[11px] font-medium text-blt transition-all hover:underline"
+            className="text-[11px] font-medium text-blt transition-colors hover:underline"
           >
             Cancel
           </button>

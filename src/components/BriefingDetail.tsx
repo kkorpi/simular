@@ -12,7 +12,7 @@ export function BriefingDetail({ onBack }: { onBack: () => void }) {
       <div className="flex shrink-0 items-center gap-2.5 border-b border-b1 px-5 py-4">
         <button
           onClick={onBack}
-          className="flex items-center gap-1 rounded-md bg-transparent px-2 py-1 text-xs text-t3 transition-all hover:bg-bg3 hover:text-t1"
+          className="flex items-center gap-1 rounded-md bg-transparent px-2 py-1 text-xs text-t3 transition-colors hover:bg-bg3 hover:text-t1"
         >
           <svg
             className="h-3.5 w-3.5"
@@ -102,7 +102,7 @@ export function BriefingDetail({ onBack }: { onBack: () => void }) {
             {briefingSources.map((s, i) => (
               <div
                 key={i}
-                className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-xs text-t2 transition-all hover:bg-bg3"
+                className="flex cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-xs text-t2 transition-colors hover:bg-bg3"
               >
                   <div>
                   <div>{s.title}</div>
@@ -116,13 +116,13 @@ export function BriefingDetail({ onBack }: { onBack: () => void }) {
 
       {/* Actions */}
       <div className="flex shrink-0 gap-2 border-t border-b1 px-5 py-4">
-        <button className="rounded-md bg-ab px-4 py-[7px] text-[12.5px] font-medium text-abt transition-all hover:brightness-110">
+        <button className="rounded-md bg-ab px-4 py-[7px] text-[12.5px] font-medium text-abt transition-colors hover:brightness-110">
           Copy to clipboard
         </button>
-        <button className="rounded-md border border-b1 bg-transparent px-4 py-[7px] text-[12.5px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+        <button className="rounded-md border border-b1 bg-transparent px-4 py-[7px] text-[12.5px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1">
           Open in Google Docs
         </button>
-        <button className="rounded-md border border-b1 bg-transparent px-4 py-[7px] text-[12.5px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+        <button className="rounded-md border border-b1 bg-transparent px-4 py-[7px] text-[12.5px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1">
           Share via email
         </button>
       </div>

@@ -105,12 +105,12 @@ function OverflowMenu({ onOpenSettings, onManualSignIn }: {
         </svg>
       </button>
       {open && (
-        <div className="absolute right-0 top-full z-20 mt-1 w-[260px] overflow-hidden rounded-lg border border-b1 bg-bg2 py-1.5 shadow-[var(--sc)]">
+        <div className="absolute right-0 top-full z-20 origin-top mt-1 w-[260px] overflow-hidden rounded-lg border border-b1 bg-bg2 py-1.5 shadow-[var(--sc)]">
           {onOpenSettings && (
             <button
               type="button"
               onClick={() => { setOpen(false); onOpenSettings(); }}
-              className="flex w-full items-center gap-3 px-4 py-2 text-[13px] text-t2 transition-all hover:bg-bg3 hover:text-t1"
+              className="flex w-full items-center gap-3 px-4 py-2 text-[13px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
             >
               <span className="text-t3">
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -125,7 +125,7 @@ function OverflowMenu({ onOpenSettings, onManualSignIn }: {
             <button
               type="button"
               onClick={() => { setOpen(false); onManualSignIn(); }}
-              className="flex w-full items-center gap-3 px-4 py-2 text-[13px] text-t2 transition-all hover:bg-bg3 hover:text-t1"
+              className="flex w-full items-center gap-3 px-4 py-2 text-[13px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
             >
               <span className="text-t3">
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -192,9 +192,9 @@ function FacebookLogo({ className }: { className?: string }) {
 }
 
 const OAUTH_PROVIDER_CONFIG: Record<OAuthProvider, { name: string; Logo: React.FC<{ className?: string }>; className: string }> = {
-  google: { name: "Google", Logo: GoogleLogo, className: "bg-white text-[#1f1f1f] hover:bg-white/90 shadow-sm" },
-  apple: { name: "Apple", Logo: AppleLogo, className: "bg-[#000] text-white hover:bg-[#1a1a1a]" },
-  microsoft: { name: "Microsoft", Logo: MicrosoftLogo, className: "bg-white text-[#1f1f1f] hover:bg-white/90 shadow-sm" },
+  google: { name: "Google", Logo: GoogleLogo, className: "bg-oauth-google-bg text-oauth-google-text hover:brightness-95 shadow-sm" },
+  apple: { name: "Apple", Logo: AppleLogo, className: "bg-oauth-apple-bg text-oauth-apple-text hover:brightness-110" },
+  microsoft: { name: "Microsoft", Logo: MicrosoftLogo, className: "bg-oauth-google-bg text-oauth-google-text hover:brightness-95 shadow-sm" },
   github: { name: "GitHub", Logo: GitHubProviderLogo, className: "bg-brand-github text-white hover:brightness-125" },
   facebook: { name: "Facebook", Logo: FacebookLogo, className: "bg-brand-facebook text-white hover:brightness-110" },
 };
@@ -205,7 +205,7 @@ function OAuthButton({ provider, onClick }: { provider: OAuthProvider; onClick: 
     <button
       type="button"
       onClick={onClick}
-      className={`flex items-center gap-2 rounded-md px-3.5 py-2 text-[12px] font-medium transition-all ${config.className}`}
+      className={`flex items-center gap-2 rounded-md px-3.5 py-2 text-[12px] font-medium transition-colors ${config.className}`}
     >
       <config.Logo className="h-3.5 w-3.5 shrink-0" />
       Sign in with {config.name}
@@ -319,7 +319,7 @@ export function AuthInput({
               onChange={(e) => setTwoFactorCode(e.target.value.replace(/[^0-9]/g, ""))}
               placeholder="000000"
               maxLength={8}
-              className="w-[140px] rounded-md border border-b1 bg-bgi px-3 py-2 text-center font-mono text-[14px] tracking-[0.15em] text-t1 outline-none transition-all placeholder:text-t4 focus:border-b2"
+              className="w-[140px] rounded-md border border-b1 bg-bgi px-3 py-2 text-center font-mono text-[14px] tracking-[0.15em] text-t1 outline-none transition-colors placeholder:text-t4 focus:border-b2"
             />
           </div>
         </form>
@@ -329,7 +329,7 @@ export function AuthInput({
           <button
             type="button"
             onClick={onCancel2FA}
-            className="rounded-md px-3 py-1.5 text-[12px] font-medium text-t3 transition-all hover:text-t2"
+            className="rounded-md px-3 py-1.5 text-[12px] font-medium text-t3 transition-colors hover:text-t2"
           >
             Cancel
           </button>
@@ -337,7 +337,7 @@ export function AuthInput({
             type="submit"
             onClick={handleSubmitCode}
             disabled={!twoFactorCode.trim()}
-            className={`rounded-md px-4 py-1.5 text-[12px] font-medium text-white transition-all ${
+            className={`rounded-md px-4 py-1.5 text-[12px] font-medium text-white transition-colors ${
               twoFactorCode.trim()
                 ? "hover:brightness-110"
                 : "opacity-50 cursor-default"
@@ -382,14 +382,14 @@ export function AuthInput({
           <button
             type="button"
             onClick={onSkip}
-            className="rounded-md px-3 py-1.5 text-[12px] font-medium text-t3 transition-all hover:text-t2"
+            className="rounded-md px-3 py-1.5 text-[12px] font-medium text-t3 transition-colors hover:text-t2"
           >
             Skip
           </button>
           <button
             type="button"
             onClick={onManualSignIn}
-            className="flex items-center gap-1.5 rounded-md bg-accent px-4 py-1.5 text-[12px] font-medium text-white transition-all hover:brightness-110"
+            className="flex items-center gap-1.5 rounded-md bg-as px-4 py-1.5 text-[12px] font-medium text-white transition-colors hover:brightness-110"
           >
             Open workspace
             <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -483,7 +483,7 @@ export function AuthInput({
                   value={values[field.key] ?? ""}
                   onChange={(e) => updateValue(field.key, e.target.value)}
                   placeholder={field.placeholder}
-                  className="w-full rounded-md border border-b1 bg-bgi px-3 py-2 text-[13px] text-t1 outline-none transition-all placeholder:text-t4 focus:border-b2"
+                  className="w-full rounded-md border border-b1 bg-bgi px-3 py-2 text-[13px] text-t1 outline-none transition-colors placeholder:text-t4 focus:border-b2"
                 />
                 {field.type === "password" && (
                   <button
@@ -533,14 +533,14 @@ export function AuthInput({
         <button
           type="button"
           onClick={onSkip}
-          className="rounded-md px-3 py-1.5 text-[12px] font-medium text-t3 transition-all hover:text-t2"
+          className="rounded-md px-3 py-1.5 text-[12px] font-medium text-t3 transition-colors hover:text-t2"
         >
           Skip
         </button>
         <button
           type="submit"
           onClick={handleSubmit}
-          className="rounded-md px-4 py-1.5 text-[12px] font-medium text-white transition-all hover:brightness-110"
+          className="rounded-md px-4 py-1.5 text-[12px] font-medium text-white transition-colors hover:brightness-110"
           style={{ backgroundColor: service.brandColor }}
         >
           Connect

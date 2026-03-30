@@ -536,7 +536,7 @@ export function RightPanel({
       <div className="shrink-0 p-3">
         <div
           onClick={() => !workspaceConnecting && !isOnboarding && onOpenWorkspace()}
-          className={`relative flex aspect-[16/11] flex-col overflow-hidden rounded-lg border border-b1 bg-bg3 transition-all ${
+          className={`relative flex aspect-[16/11] flex-col overflow-hidden rounded-lg border border-b1 bg-bg3 transition-colors ${
             workspaceConnecting || isOnboarding ? "" : "cursor-pointer hover:border-b2"
           }`}
         >
@@ -867,7 +867,7 @@ export function RightPanel({
       >
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+          className="absolute inset-0 bg-overlay-light backdrop-blur-[2px]"
           onClick={onToggleCollapse}
         />
         {/* Drawer */}
@@ -885,6 +885,8 @@ export function RightPanel({
   // ── Desktop: inline flex sibling (existing behavior) ──
   return (
     <div
+      role="complementary"
+      aria-label="Tasks panel"
       className={`relative flex shrink-0 flex-col overflow-hidden border-l border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}
       style={{ width: panelWidth }}
     >

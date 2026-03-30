@@ -221,7 +221,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
 
             <button
               onClick={handleContinue}
-              className="mt-8 inline-flex h-11 items-center gap-2.5 rounded-md bg-as px-8 text-[14px] font-medium text-white transition-all hover:bg-as2"
+              className="mt-8 inline-flex h-11 items-center gap-2.5 rounded-md bg-as px-8 text-[14px] font-medium text-white transition-[transform,background-color,color,filter] active:scale-[0.97] hover:bg-as2"
             >
               Get started
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -268,7 +268,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
             {!allQuestionsAnswered && currentQ ? (
               <div
                 key={questionIndex}
-                className={`rounded-lg border border-b1 bg-bg2 px-5 py-5 transition-all duration-300 ${
+                className={`rounded-lg border border-b1 bg-bg2 px-5 py-5 transition-[transform,opacity] duration-200 ${
                   showQuestion ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
                 }`}
               >
@@ -300,7 +300,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                       </button>
 
                       {roleOpen && (
-                        <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                        <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-10 origin-top rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
                           {roleOptions.map((r) => (
                             <button
                               key={r.id}
@@ -345,7 +345,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                           <button
                             key={opt.id}
                             onClick={() => handleToggleApp(opt.id)}
-                            className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-all ${
+                            className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-colors ${
                               selected
                                 ? "border-as/50 bg-as/10 text-blt"
                                 : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h"
@@ -372,7 +372,7 @@ export function OnboardingScreen({ onReady }: { onReady: (profile: OnboardingPro
                       <button
                         key={opt.id}
                         onClick={() => handleSelectHandoff(opt.id)}
-                        className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-all ${
+                        className={`rounded-md border px-3.5 py-2 text-[13px] font-medium transition-colors ${
                           handoff === opt.id
                             ? "border-as/50 bg-as/10 text-blt"
                             : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h"

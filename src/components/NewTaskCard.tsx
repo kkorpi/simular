@@ -223,7 +223,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
         </div>
         <button
           onClick={onClose}
-          className="flex h-6 w-6 items-center justify-center rounded-md text-t3 transition-all hover:bg-bg3 hover:text-t1"
+          className="flex h-6 w-6 items-center justify-center rounded-md text-t3 transition-colors hover:bg-bg3 hover:text-t1"
         >
           <svg
             className="h-3.5 w-3.5"
@@ -290,7 +290,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
                   </svg>
                 </button>
                 {frequencyOpen && (
-                  <div className="absolute left-0 top-[calc(100%+4px)] z-10 w-[140px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                  <div className="absolute left-0 top-[calc(100%+4px)] z-10 origin-top w-[140px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
                     {frequencyOptions.map((f) => (
                       <button
                         key={f}
@@ -334,7 +334,7 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
                 </svg>
               </button>
               {durationOpen && (
-                <div className="absolute right-0 top-[calc(100%+4px)] z-10 w-[140px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                <div className="absolute right-0 top-[calc(100%+4px)] z-10 origin-top-right w-[140px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
                   {durationOptions.map((d) => (
                     <button
                       key={d}
@@ -386,14 +386,14 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
                   setAddingNewIntegration(false);
                   setNewIntegrationValue("");
                 }}
-                className="flex items-center gap-1 rounded-full border border-dashed border-b2 px-2.5 py-1 text-[11px] font-medium text-t3 transition-all hover:bg-bg3 hover:text-t2"
+                className="flex items-center gap-1 rounded-full border border-dashed border-b2 px-2.5 py-1 text-[11px] font-medium text-t3 transition-colors hover:bg-bg3 hover:text-t2"
               >
                 <PlusIcon />
                 Add
               </button>
 
               {integrationDropdownOpen && (
-                <div className="absolute bottom-full left-0 mb-1 w-[180px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg z-10">
+                <div className="absolute bottom-full left-0 origin-bottom mb-1 w-[180px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg z-10">
                   {!addingNewIntegration ? (
                     <>
                       {availableIntegrations.map((integ) => (
@@ -473,14 +473,14 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
                   setAddingNewSkill(false);
                   setNewSkillValue("");
                 }}
-                className="flex items-center gap-1 rounded-full border border-dashed border-b2 px-2.5 py-1 text-[11px] font-medium text-t3 transition-all hover:bg-bg3 hover:text-t2"
+                className="flex items-center gap-1 rounded-full border border-dashed border-b2 px-2.5 py-1 text-[11px] font-medium text-t3 transition-colors hover:bg-bg3 hover:text-t2"
               >
                 <PlusIcon />
                 Add
               </button>
 
               {skillsDropdownOpen && (
-                <div className="absolute bottom-full left-0 mb-1 w-[180px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg z-10">
+                <div className="absolute bottom-full left-0 origin-bottom mb-1 w-[180px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg z-10">
                   {!addingNewSkill ? (
                     <>
                       {availableSkills.map((skill) => (
@@ -565,14 +565,14 @@ export function NewTaskCard({ onClose, onCreate }: NewTaskCardProps) {
         <div className="flex items-center justify-end gap-2">
           <button
             onClick={onClose}
-            className="rounded-md border border-b1 bg-transparent px-4 py-2 text-[13px] font-medium text-t2 transition-all hover:bg-bg3 hover:text-t1"
+            className="rounded-md border border-b1 bg-transparent px-4 py-2 text-[13px] font-medium text-t2 transition-colors hover:bg-bg3 hover:text-t1"
           >
             Cancel
           </button>
           <button
             onClick={handleCreate}
             disabled={!name.trim()}
-            className={`rounded-md px-4 py-2 text-[13px] font-medium transition-all ${
+            className={`rounded-md px-4 py-2 text-[13px] font-medium transition-colors ${
               name.trim()
                 ? "bg-ab text-abt hover:brightness-110"
                 : "bg-bg3 text-t4 cursor-default"

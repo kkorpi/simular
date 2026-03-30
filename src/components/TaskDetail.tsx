@@ -68,7 +68,7 @@ function ArtifactCard({
           )}
         </div>
         {artifact.url && (
-          <button className="shrink-0 rounded-md p-1 text-t4 transition-all hover:bg-bg3h hover:text-t1">
+          <button className="shrink-0 rounded-md p-1 text-t4 transition-colors hover:bg-bg3h hover:text-t1">
             <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
               <polyline points="15 3 21 3 21 9" />
@@ -115,7 +115,7 @@ function ArtifactCard({
           {(artifact.preview.split("\n").length > 4 || (artifact.preview.length > 200)) && (
             <button
               onClick={() => setExpanded(!expanded)}
-              className="flex w-full items-center justify-center gap-1 border-t border-b1 bg-bg3 py-1.5 text-[11px] font-medium text-t3 transition-all hover:text-t1"
+              className="flex w-full items-center justify-center gap-1 border-t border-b1 bg-bg3 py-1.5 text-[11px] font-medium text-t3 transition-colors hover:text-t1"
             >
               <svg className={`h-3 w-3 transition-transform ${expanded ? "" : "-rotate-90"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="6 9 12 15 18 9" />
@@ -130,7 +130,7 @@ function ArtifactCard({
       {artifact.format === "briefing" && onViewResult && (
         <button
           onClick={onViewResult}
-          className="flex w-full items-center justify-center gap-1.5 border-t border-b1 bg-bg3 py-2 text-[11.5px] font-medium text-blt transition-all hover:bg-bg3h"
+          className="flex w-full items-center justify-center gap-1.5 border-t border-b1 bg-bg3 py-2 text-[11.5px] font-medium text-blt transition-colors hover:bg-bg3h"
         >
           <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
@@ -166,7 +166,7 @@ function UploadRow({ upload }: { upload: Upload }) {
         <div className="truncate text-[12px] font-medium text-t1">{upload.name}</div>
         <div className="text-[10px] text-t4">{upload.size}</div>
       </div>
-      <button className="shrink-0 rounded-md p-1.5 text-t4 transition-all hover:bg-bg3h hover:text-t1">
+      <button className="shrink-0 rounded-md p-1.5 text-t4 transition-colors hover:bg-bg3h hover:text-t1">
         <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
           <polyline points="7 10 12 15 17 10" />
@@ -206,7 +206,7 @@ export function TaskDetail({
       <div className="flex shrink-0 items-center gap-2.5 border-b border-b1 px-4 py-3.5">
         <button
           onClick={onBack}
-          className="shrink-0 rounded-md p-1 text-t3 transition-all hover:bg-bg3h hover:text-t1"
+          className="shrink-0 rounded-md p-1 text-t3 transition-colors hover:bg-bg3h hover:text-t1"
         >
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="15 18 9 12 15 6" />
@@ -237,19 +237,19 @@ export function TaskDetail({
         {/* Screen preview — only for running/queued tasks */}
         {task.thumbEmoji && (task.status === "running" || task.status === "queued") && (
           <div
-            className={`mb-5 overflow-hidden rounded-md border border-b1 ${onOpenWorkspace ? "cursor-pointer transition-all hover:border-b2" : ""}`}
+            className={`mb-5 overflow-hidden rounded-md border border-b1 ${onOpenWorkspace ? "cursor-pointer transition-colors hover:border-b2" : ""}`}
             onClick={onOpenWorkspace}
           >
             <div className="relative flex aspect-video items-center justify-center bg-bg">
               {task.status === "running" && (
-                <div className="absolute top-1.5 right-1.5 flex items-center gap-[3px] rounded-full bg-black/65 px-1.5 py-0.5 text-[8px] font-semibold text-g">
+                <div className="absolute top-1.5 right-1.5 flex items-center gap-[3px] rounded-full bg-bg2/80 px-1.5 py-0.5 text-[8px] font-semibold text-g">
                   <div className="h-[3px] w-[3px] rounded-full bg-g" />
                   LIVE
                 </div>
               )}
               {/* Expand icon */}
               {onOpenWorkspace && (
-                <div className="absolute bottom-1.5 right-1.5 flex items-center justify-center rounded-md bg-black/50 p-1 backdrop-blur-sm">
+                <div className="absolute bottom-1.5 right-1.5 flex items-center justify-center rounded-md bg-bg2/80 p-1 backdrop-blur-sm">
                   <svg
                     className="h-4 w-4 text-t3"
                     viewBox="0 0 24 24"
@@ -393,7 +393,7 @@ export function TaskDetail({
               <div className="mb-2.5">
                 <button
                   onClick={() => setShowFullResult(!showFullResult)}
-                  className="flex items-center gap-1.5 text-[12px] font-medium text-blt transition-all hover:underline"
+                  className="flex items-center gap-1.5 text-[12px] font-medium text-blt transition-colors hover:underline"
                 >
                   <svg className={`h-3 w-3 transition-transform ${showFullResult ? "" : "-rotate-90"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polyline points="6 9 12 15 18 9" />
@@ -469,7 +469,7 @@ export function TaskDetail({
                     key={i}
                     type="button"
                     onClick={() => run.fullResult ? setExpandedRun(expandedRun === i ? null : i) : undefined}
-                    className={`flex flex-col rounded-md px-2.5 py-2 text-left transition-all hover:bg-bg3h ${run.fullResult ? "cursor-pointer" : "cursor-default"}`}
+                    className={`flex flex-col rounded-md px-2.5 py-2 text-left transition-colors hover:bg-bg3h ${run.fullResult ? "cursor-pointer" : "cursor-default"}`}
                   >
                     <div className="flex items-start gap-2.5">
                       <div className={`mt-1 h-1.5 w-1.5 shrink-0 rounded-full ${run.hasActionItems ? "bg-am" : "bg-g"}`} />
@@ -504,7 +504,7 @@ export function TaskDetail({
             {d.runHistory.length > 3 && (
               <button
                 onClick={() => setShowAllRuns(!showAllRuns)}
-                className="mt-1 w-full rounded-md py-1.5 text-center text-[11.5px] font-medium text-t3 transition-all hover:bg-bg3h hover:text-t1"
+                className="mt-1 w-full rounded-md py-1.5 text-center text-[11.5px] font-medium text-t3 transition-colors hover:bg-bg3h hover:text-t1"
               >
                 {showAllRuns
                   ? "Show less"
@@ -519,39 +519,39 @@ export function TaskDetail({
       <div className="flex shrink-0 flex-wrap gap-2 border-t border-b1 px-4 py-3">
         {task.status === "running" && (
           <>
-            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1">
               Pause
             </button>
-            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1">
               Cancel
             </button>
           </>
         )}
         {task.status === "queued" && (
           <>
-            <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
+            <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-colors hover:brightness-110">
               Run now
             </button>
-            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1">
               Remove from queue
             </button>
           </>
         )}
         {task.status === "recurring" && (
           <>
-            <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
+            <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-colors hover:brightness-110">
               Run now
             </button>
             <button
               onClick={onDisable}
-              className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+              className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
             >
               Disable
             </button>
             {onOpenSettings && (
               <button
                 onClick={onOpenSettings}
-                className="ml-auto flex h-[30px] w-[30px] items-center justify-center rounded-md border border-b1 bg-transparent text-t3 transition-all hover:bg-bg3h hover:text-t1"
+                className="ml-auto flex h-[30px] w-[30px] items-center justify-center rounded-md border border-b1 bg-transparent text-t3 transition-colors hover:bg-bg3h hover:text-t1"
               >
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3" />
@@ -566,26 +566,26 @@ export function TaskDetail({
             {hasRichResult && onViewResult ? (
               <button
                 onClick={onViewResult}
-                className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110"
+                className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-colors hover:brightness-110"
               >
                 View full briefing
               </button>
             ) : d?.artifact?.url ? (
-              <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
+              <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-colors hover:brightness-110">
                 Open in {({ code: "GitHub", spreadsheet: "Sheets", link: "browser", email: "Gmail", calendar: "Calendar" } as Record<string, string>)[d.artifact.format] ?? "Docs"}
               </button>
             ) : (
-              <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-all hover:brightness-110">
+              <button className="rounded-md bg-ab px-3 py-1.5 text-[12px] font-medium text-abt transition-colors hover:brightness-110">
                 View in chat
               </button>
             )}
-            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+            <button className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1">
               Run again
             </button>
             {onMakeRecurring && (
               <button
                 onClick={onMakeRecurring}
-                className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+                className="rounded-md border border-b1 bg-transparent px-3 py-1.5 text-[12px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1"
               >
                 Make recurring
               </button>
@@ -593,7 +593,7 @@ export function TaskDetail({
             {onOpenSettings && (
               <button
                 onClick={onOpenSettings}
-                className="ml-auto flex h-[30px] w-[30px] items-center justify-center rounded-md border border-b1 bg-transparent text-t3 transition-all hover:bg-bg3h hover:text-t1"
+                className="ml-auto flex h-[30px] w-[30px] items-center justify-center rounded-md border border-b1 bg-transparent text-t3 transition-colors hover:bg-bg3h hover:text-t1"
               >
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="3" />

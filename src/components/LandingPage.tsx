@@ -135,7 +135,7 @@ export function LandingPage({
               <button
                 onClick={handleClaimSpot}
                 disabled={!code.trim()}
-                className={`mt-4 flex h-12 w-full items-center justify-center rounded-md text-[15px] font-medium transition-all ${
+                className={`mt-4 flex h-12 w-full items-center justify-center rounded-md text-[15px] font-medium transition-[transform,background-color,color,filter] active:scale-[0.97] ${
                   code.trim()
                     ? "bg-as text-white hover:brightness-110"
                     : "bg-bg3 text-t4 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -171,7 +171,7 @@ export function LandingPage({
               {/* Waitlist button */}
               <button
                 onClick={onGoToWaitlist}
-                className="mt-6 flex h-12 w-full items-center justify-center rounded-md bg-as text-[15px] font-medium text-white transition-all hover:brightness-110"
+                className="mt-6 flex h-12 w-full items-center justify-center rounded-md bg-as text-[15px] font-medium text-white transition-[transform,background-color,color,filter] active:scale-[0.97] hover:brightness-110"
               >
                 Join the waitlist
               </button>

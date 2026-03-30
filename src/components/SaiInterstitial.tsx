@@ -244,7 +244,7 @@ function FakeChatInput({ typedLen }: { typedLen: number }) {
           </svg>
         </div>
         <div className="flex-1" />
-        <div className={`flex items-center justify-center rounded-full p-1.5 transition-all ${
+        <div className={`flex items-center justify-center rounded-full p-1.5 transition-colors ${
           typedLen >= USER_PROMPT.length ? "bg-ab text-abt" : "text-t4"
         }`}>
           <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -292,7 +292,7 @@ function AnimResultCard() {
       <div className="border-t border-b1 px-3.5 py-3 text-[13px] leading-[1.6] text-t2">
         I compared pricing across Asana, Monday, Notion, ClickUp, and Linear. All offer free tiers. ClickUp is the most affordable at $7/mo for their paid plan.
         {/* Artifact link — matches ArtifactLink: full-width, border-b1, bg-bg3h/50, icon+title+chevron */}
-        <button className="mt-3 flex w-full items-center gap-2.5 rounded-md border border-b1 bg-bg3h/50 px-3 py-2.5 text-left transition-all hover:bg-bg3h hover:border-b2">
+        <button className="mt-3 flex w-full items-center gap-2.5 rounded-md border border-b1 bg-bg3h/50 px-3 py-2.5 text-left transition-colors hover:bg-bg3h hover:border-b2">
           <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-bg3h">
             <IconFileSpreadsheet className="w-4 h-4 text-t1" />
           </div>

@@ -87,15 +87,15 @@ function TeachTaskItem({ task }: { task: Task }) {
   const isRecording = task.status === "running";
 
   return (
-    <div className="group relative flex items-start gap-2 rounded-lg px-2.5 py-2 bg-violet-500/[0.06]">
+    <div className="group relative flex items-start gap-2 rounded-lg px-2.5 py-2 bg-teach/[0.06]">
       <div
         className={`mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full ${
-          isRecording ? "bg-violet-500 animate-pulse" : "bg-violet-500"
+          isRecording ? "bg-teach animate-pulse" : "bg-teach"
         }`}
       />
       <div className="min-w-0 flex-1">
         <div className="truncate text-xs font-medium text-t1">{task.name}</div>
-        <div className="text-[10.5px] text-violet-400">{task.subtitle}</div>
+        <div className="text-[10.5px] text-teach-text">{task.subtitle}</div>
       </div>
       <div className="mt-px shrink-0 font-mono text-[10.5px] text-t4">{task.time}</div>
     </div>

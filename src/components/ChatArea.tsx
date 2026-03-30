@@ -49,7 +49,7 @@ function ArtifactIcon({ format }: { format: string }) {
 /** Clickable artifact reference — shows icon, title, subtitle */
 function ArtifactLink({ artifact }: { artifact: ResultArtifact }) {
   return (
-    <button className="mt-3 flex w-full items-center gap-2.5 rounded-md border border-b1 bg-bg3h/50 px-3 py-2.5 text-left transition-all hover:bg-bg3h hover:border-b2">
+    <button className="mt-3 flex w-full items-center gap-2.5 rounded-md border border-b1 bg-bg3h/50 px-3 py-2.5 text-left transition-colors hover:bg-bg3h hover:border-b2">
       <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-bg3h"><ArtifactIcon format={artifact.format} /></div>
       <div className="min-w-0 flex-1">
         <div className="truncate text-[12.5px] font-medium text-t1">{artifact.title}</div>
@@ -709,7 +709,7 @@ export function ChatArea({
 
   return (
     <div className="relative flex min-w-0 flex-1 flex-col">
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto" aria-live="polite">
         <div className={`mx-auto flex min-h-full max-w-[800px] flex-col gap-8 px-8 max-md:px-4 pt-5 ${authInputService ? "pb-72 max-md:pb-64" : "pb-36 max-md:pb-32"}`}>
 
         {/* Spacer — pushes messages to bottom when they don't fill viewport */}
@@ -739,7 +739,7 @@ export function ChatArea({
                 <button
                   key={task.id}
                   onClick={() => onStartTask?.(task)}
-                  className="rounded-lg border border-b1 bg-bgcard px-3.5 py-2.5 text-left transition-all hover:bg-bg2 animate-fade-in"
+                  className="rounded-lg border border-b1 bg-bgcard px-3.5 py-2.5 text-left transition-colors hover:bg-bg2 animate-fade-in"
                   style={{ animationDelay: `${(i + 1) * 150}ms`, animationFillMode: "backwards" }}
                 >
                   <div className="text-[13px] font-medium leading-[1.4] text-t1">{task.title}</div>
@@ -780,7 +780,7 @@ export function ChatArea({
                           if (obPhase === 0) setTimeout(() => setObPhase(1), 300);
                         }
                       }}
-                      className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-all ${
+                      className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-colors ${
                         obRole === r.id
                           ? "border-as/50 bg-as/10 text-blt"
                           : obPhase > 0
@@ -816,7 +816,7 @@ export function ChatArea({
                         }
                       }}
                       disabled={!obRoleOther.trim()}
-                      className="rounded-md bg-as px-3 py-1.5 text-[12px] font-medium text-white transition-all hover:bg-as2 disabled:opacity-40"
+                      className="rounded-md bg-as px-3 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-as2 disabled:opacity-40"
                     >
                       Continue
                     </button>
@@ -851,7 +851,7 @@ export function ChatArea({
                               prev.includes(a.id) ? prev.filter((x) => x !== a.id) : [...prev, a.id]
                             );
                           }}
-                          className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-all ${
+                          className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-colors ${
                             selected
                               ? "border-as/50 bg-as/10 text-blt"
                               : obPhase > 1
@@ -873,7 +873,7 @@ export function ChatArea({
                           setObAppOther("");
                         }
                       }}
-                      className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-all ${
+                      className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-colors ${
                         obApps.includes("other")
                           ? "border-as/50 bg-as/10 text-blt"
                           : obPhase > 1
@@ -931,7 +931,7 @@ export function ChatArea({
                           setObHandoff(h.id);
                           if (obPhase === 2) setTimeout(() => setObPhase(3), 300);
                         }}
-                        className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-all ${
+                        className={`rounded-md border px-3 py-1.5 text-[13px] font-medium transition-colors ${
                           obHandoff === h.id
                             ? "border-as/50 bg-as/10 text-blt"
                             : obPhase > 2
@@ -970,7 +970,7 @@ export function ChatArea({
                         key={task.id}
                         onClick={() => handleObTaskClick(task)}
                         disabled={obExiting}
-                        className="rounded-lg border border-b1 bg-bgcard px-3.5 py-2.5 text-left transition-all hover:bg-bg2 disabled:pointer-events-none animate-fade-in"
+                        className="rounded-lg border border-b1 bg-bgcard px-3.5 py-2.5 text-left transition-colors hover:bg-bg2 disabled:pointer-events-none animate-fade-in"
                         style={{ animationDelay: `${(i + 1) * 150}ms`, animationFillMode: "backwards" }}
                       >
                         <div className="text-[13px] font-medium leading-[1.4] text-t1">{task.title}</div>
@@ -1051,7 +1051,7 @@ export function ChatArea({
                     </div>
                     <button
                       onClick={() => setFollowUpAccepted(true)}
-                      className="relative mt-1 inline-flex items-center py-1 text-[13px] font-medium text-blt transition-all hover:underline"
+                      className="relative mt-1 inline-flex items-center py-1 text-[13px] font-medium text-blt transition-colors hover:underline"
                     >
                       {firstRunTask.category === "research" ? "Yes, search LinkedIn →" : firstRunTask.category === "crm" ? "Yes, check PitchBook →" : "Yes, schedule them →"}
                     </button>
@@ -1164,15 +1164,15 @@ export function ChatArea({
             {/* ── Recording in progress — live step log ── */}
             {teachPhase === "recording" && (
               <AgentMessage>
-                <div className="rounded-lg border border-violet-500/30 bg-violet-500/[0.03] overflow-hidden">
+                <div className="rounded-lg border border-teach/30 bg-teach/[0.03] overflow-hidden">
                   {/* Header */}
                   <div className="flex items-center gap-2.5 px-3.5 py-2.5">
-                    <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-violet-500/15">
-                      <div className="h-2 w-2 rounded-full bg-violet-500 animate-pulse" />
+                    <div className="flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-teach/15">
+                      <div className="h-2 w-2 rounded-full bg-teach animate-pulse" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="text-[13px] font-semibold text-t1">{teachTaskName || "Recording task"}</div>
-                      <div className="text-[11px] text-violet-400">
+                      <div className="text-[11px] text-teach-text">
                         {teachStepCount === 0 ? "Watching..." : `${teachStepCount} step${teachStepCount === 1 ? "" : "s"} recorded`}
                       </div>
                     </div>
@@ -1180,11 +1180,11 @@ export function ChatArea({
 
                   {/* Step list */}
                   {teachStepCount > 0 && (
-                    <div className="border-t border-violet-500/15 px-3.5 py-2.5">
+                    <div className="border-t border-teach/15 px-3.5 py-2.5">
                       <div className="flex flex-col gap-1.5">
                         {teachRecordedSteps.slice(0, teachStepCount).map((step, i) => (
                           <div key={i} className="flex items-start gap-2 text-[12px] leading-[1.5] text-t2 animate-in fade-in duration-300">
-                            <svg className="mt-[3px] h-3 w-3 shrink-0 text-violet-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <svg className="mt-[3px] h-3 w-3 shrink-0 text-teach" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                               <polyline points="20 6 9 17 4 12" />
                             </svg>
                             <span>{step}</span>
@@ -1192,8 +1192,8 @@ export function ChatArea({
                         ))}
                         {/* Active capture dot when not all steps revealed */}
                         {teachStepCount < teachRecordedSteps.length && (
-                          <div className="flex items-center gap-2 text-[12px] text-violet-400/60 pl-0.5">
-                            <div className="h-1.5 w-1.5 rounded-full bg-violet-500 animate-pulse" />
+                          <div className="flex items-center gap-2 text-[12px] text-teach-text/60 pl-0.5">
+                            <div className="h-1.5 w-1.5 rounded-full bg-teach animate-pulse" />
                             <span className="italic">Watching for next action...</span>
                           </div>
                         )}
@@ -1202,11 +1202,11 @@ export function ChatArea({
                   )}
 
                   {/* Footer actions */}
-                  <div className="flex items-center gap-2 border-t border-violet-500/15 px-3.5 py-2">
+                  <div className="flex items-center gap-2 border-t border-teach/15 px-3.5 py-2">
                     {!workspaceOpen && (
                       <button
                         onClick={() => onOpenWorkspace?.()}
-                        className="rounded-md border border-violet-500/30 bg-violet-500/10 px-2.5 py-1 text-[11px] font-medium text-violet-400 transition-all hover:bg-violet-500/20"
+                        className="rounded-md border border-teach/30 bg-teach-subtle px-2.5 py-1 text-[11px] font-medium text-teach-text transition-colors hover:bg-teach-bg"
                       >
                         Open workspace
                       </button>
@@ -1214,7 +1214,7 @@ export function ChatArea({
                     <div className="flex-1" />
                     <button
                       onClick={() => onStopTeach?.()}
-                      className="rounded-md bg-violet-500 px-3 py-1 text-[11px] font-semibold text-white transition-all hover:bg-violet-600"
+                      className="rounded-md bg-teach px-3 py-1 text-[11px] font-semibold text-lt transition-colors hover:brightness-110"
                     >
                       Done
                     </button>
@@ -1292,9 +1292,9 @@ export function ChatArea({
 
                     {/* Divider at the end of the teach session */}
                     <div className="flex items-center gap-2 py-1">
-                      <div className="h-px flex-1 bg-violet-500/20" />
-                      <span className="text-[10px] font-medium text-violet-400">teach session complete</span>
-                      <div className="h-px flex-1 bg-violet-500/20" />
+                      <div className="h-px flex-1 bg-teach-bg" />
+                      <span className="text-[10px] font-medium text-teach-text">teach session complete</span>
+                      <div className="h-px flex-1 bg-teach-bg" />
                     </div>
                   </>
                 )}
@@ -1412,11 +1412,11 @@ export function ChatArea({
                 <div className="mt-2.5 flex items-center gap-2">
                   <button
                     onClick={() => { setAutoStep(3); scrollToBottom(); cascadeSaiSteps(4); }}
-                    className="rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-all hover:brightness-110"
+                    className="rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-colors hover:brightness-110"
                   >
                     Yes, pull it
                   </button>
-                  <button className="rounded-md border border-b1 px-2.5 py-1 text-xs font-medium text-t2 transition-all hover:border-b2 hover:bg-bg3h hover:text-t1">
+                  <button className="rounded-md border border-b1 px-2.5 py-1 text-xs font-medium text-t2 transition-colors hover:border-b2 hover:bg-bg3h hover:text-t1">
                     Not now
                   </button>
                 </div>
@@ -1592,7 +1592,7 @@ export function ChatArea({
 
             {/* ── Profile disambiguation ── */}
             {showDisambig && (
-              <div className="transition-all duration-500 opacity-100 translate-y-0 animate-in">
+              <div className="transition-[transform,opacity] duration-200 opacity-100 translate-y-0 animate-in">
                 <AgentMessage>
                   <div className="text-sm leading-[1.6] text-t2">
                     I found 3 profiles matching &quot;Daniel Park.&quot; Which one are you looking for?

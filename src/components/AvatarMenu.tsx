@@ -27,6 +27,7 @@ export function AvatarMenu({ open, onClose, onOpenSettings, onOpenCredits, onOpe
   return (
     <div
       ref={ref}
+      role="menu"
       className="absolute right-5 top-[46px] z-50 w-[220px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]"
     >
       {/* Profile */}
@@ -116,8 +117,9 @@ function MenuItem({
 }) {
   return (
     <button
+      role="menuitem"
       onClick={onClick}
-      className="flex w-full items-center gap-3 px-4 py-2 text-[13px] text-t2 transition-all hover:bg-bg3 hover:text-t1"
+      className="flex w-full items-center gap-3 px-4 py-2 text-[13px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
     >
       <span className="text-t3">{icon}</span>
       <span className="flex-1 text-left">{label}</span>

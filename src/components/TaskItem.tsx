@@ -48,18 +48,18 @@ function HoverThumbnail({ task, anchorRef }: { task: Task; anchorRef: React.RefO
       <div className="overflow-hidden rounded-[10px] border border-b2 bg-bg3 shadow-[var(--thumb-shadow)]">
         <div className="relative flex aspect-video items-center justify-center border-b border-b1 bg-bg">
           {isRunning && (
-            <div className="absolute top-1 right-1 flex items-center gap-[3px] rounded-full bg-black/65 px-1.5 py-px text-[8px] font-semibold text-g">
+            <div className="absolute top-1 right-1 flex items-center gap-[3px] rounded-full bg-bg2/80 px-1.5 py-px text-[8px] font-semibold text-g">
               <div className="h-[3px] w-[3px] rounded-full bg-g" />
               LIVE
             </div>
           )}
           {isRecurring && (
-            <div className="absolute top-1 right-1 flex items-center gap-[3px] rounded-full bg-black/65 px-1.5 py-px text-[8px] font-semibold text-am">
+            <div className="absolute top-1 right-1 flex items-center gap-[3px] rounded-full bg-bg2/80 px-1.5 py-px text-[8px] font-semibold text-am">
               LAST RUN
             </div>
           )}
           {isCompleted && (
-            <div className="absolute top-1 right-1 flex items-center gap-[3px] rounded-full bg-black/65 px-1.5 py-px text-[8px] font-semibold text-t3">
+            <div className="absolute top-1 right-1 flex items-center gap-[3px] rounded-full bg-bg2/80 px-1.5 py-px text-[8px] font-semibold text-t3">
               DONE
             </div>
           )}
@@ -87,7 +87,7 @@ export function TaskItem({ task, onClick }: { task: Task; onClick?: () => void }
   return (
     <div
       ref={ref}
-      className="group relative flex cursor-pointer items-start gap-2 rounded-lg px-2.5 py-2 transition-all hover:bg-bg3"
+      className="group relative flex cursor-pointer items-start gap-2 rounded-lg px-2.5 py-2 transition-colors hover:bg-bg3"
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}

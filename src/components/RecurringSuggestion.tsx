@@ -12,7 +12,7 @@ export function RecurringSuggestion() {
         <button className="rounded-md border border-transparent bg-gs px-2.5 py-1 text-[11.5px] font-medium text-gt">
           Sounds good
         </button>
-        <button className="rounded-md border border-b1 bg-transparent px-2.5 py-1 text-[11.5px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1">
+        <button className="rounded-md border border-b1 bg-transparent px-2.5 py-1 text-[11.5px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1">
           Turn off
         </button>
       </div>
