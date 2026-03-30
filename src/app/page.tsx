@@ -507,7 +507,7 @@ export default function Home() {
             { mode: "trial" as const, label: "Trial expiring", icon: <><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></> },
             { mode: "gallery" as const, label: "Card gallery", icon: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>, blue: true },
             { mode: "system" as const, label: "Design system", icon: <><circle cx="13.5" cy="6.5" r=".5" fill="currentColor" /><circle cx="17.5" cy="10.5" r=".5" fill="currentColor" /><circle cx="8.5" cy="7.5" r=".5" fill="currentColor" /><circle cx="6.5" cy="12" r=".5" fill="currentColor" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></>, blue: true },
-          ] as { mode: typeof screen; label: string; icon: React.ReactNode; blue?: boolean }[]).map((opt) => (
+          ] as { mode: Parameters<typeof jumpToDemo>[0]; label: string; icon: React.ReactNode; blue?: boolean }[]).map((opt) => (
             <button
               key={opt.mode}
               onClick={() => jumpToDemo(opt.mode)}
