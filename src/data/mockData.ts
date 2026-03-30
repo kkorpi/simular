@@ -26,6 +26,12 @@ export interface ResultArtifact {
   fullContent?: string;
 }
 
+export interface Upload {
+  name: string;
+  size: string;
+  type: string;
+}
+
 export interface TaskDetail {
   description: string;
   steps?: TaskStep[];
@@ -33,6 +39,8 @@ export interface TaskDetail {
   fullResult?: string;
   resultType?: "briefing" | "text";
   artifact?: ResultArtifact;
+  artifacts?: ResultArtifact[];
+  uploads?: Upload[];
   duration?: string;
   schedule?: string;
   lastRun?: string;
@@ -159,6 +167,15 @@ export const recurringTasks: Task[] = [
         icon: "\uD83D\uDCC4",
         url: "docs.google.com/deal-digest-feb13",
       },
+      artifacts: [
+        { format: "document", title: "Deal Sourcing Digest - Feb 13", subtitle: "Google Docs", url: "docs.google.com/deal-digest-feb13" },
+        { format: "spreadsheet", title: "Deal Pipeline Tracker", subtitle: "22 deals \u00D7 8 cols", url: "docs.google.com/spreadsheets/deal-pipeline" },
+      ],
+      uploads: [
+        { name: "abridge-pitch-deck.pdf", size: "4.2 MB", type: "pdf" },
+        { name: "novatech-founder-profile.pdf", size: "1.1 MB", type: "pdf" },
+        { name: "clearstack-cap-table.xlsx", size: "340 KB", type: "xlsx" },
+      ],
       runHistory: [
         { date: "Today 7:04am", duration: "3m 12s", summary: "3 new deals: Abridge $150M Series C, 2 seed-stage vertical AI" },
         { date: "Yesterday 7:02am", duration: "2m 45s", summary: "1 new deal: Osso Health $100M growth round. 2 key hires at tracked cos." },
@@ -195,6 +212,13 @@ export const recurringTasks: Task[] = [
         subtitle: "Salesforce profile, 4 touchpoints",
         icon: "\uD83D\uDCCB",
       },
+      artifacts: [
+        { format: "briefing", title: "Sequoia Scouts - LP Meeting Prep", subtitle: "Salesforce profile, 4 touchpoints" },
+        { format: "email", title: "Prep Email Draft", subtitle: "Gmail draft, 4 talking points", url: "gmail.com/drafts" },
+      ],
+      uploads: [
+        { name: "sequoia-scouts-lp-profile.pdf", size: "2.8 MB", type: "pdf" },
+      ],
       runHistory: [
         { date: "Today 9:30am", duration: "2m 48s", summary: "Sequoia Scouts briefing, 4 recent touchpoints, prep email drafted" },
         { date: "Yesterday 10:15am", duration: "3m 02s", summary: "CalPERS meeting prep, commitment history pulled, 6 touchpoints" },
@@ -231,6 +255,10 @@ export const recurringTasks: Task[] = [
         icon: "\uD83D\uDCCA",
         url: "docs.google.com/spreadsheets/lp-touchpoints",
       },
+      artifacts: [
+        { format: "spreadsheet", title: "LP Touchpoint Report", subtitle: "18 rows \u00D7 6 cols", url: "docs.google.com/spreadsheets/lp-touchpoints" },
+        { format: "document", title: "Touchpoint Action Plan", subtitle: "Google Docs", url: "docs.google.com/touchpoint-plan" },
+      ],
       runHistory: [
         { date: "Monday 8:02am", duration: "2m 15s", summary: "4 P1 LPs overdue. 3 content shares, 2 event invites suggested." },
         { date: "Feb 3 8:01am", duration: "2m 08s", summary: "2 P1 LPs overdue. 1 event invite, 1 content share suggested." },
@@ -301,6 +329,13 @@ export const completedTasks: Task[] = [
         subtitle: "Salesforce profile, 4 touchpoints",
         icon: "\uD83D\uDCCB",
       },
+      artifacts: [
+        { format: "briefing", title: "Sequoia Scouts - LP Meeting Prep", subtitle: "Salesforce profile, 4 touchpoints" },
+        { format: "email", title: "Prep Email Draft", subtitle: "Gmail draft", url: "gmail.com/drafts" },
+      ],
+      uploads: [
+        { name: "sequoia-scouts-fund-iv-deck.pdf", size: "5.1 MB", type: "pdf" },
+      ],
       steps: [
         { label: "Opened Salesforce LP profile", done: true },
         { label: "Pulled recent notes and touchpoint history", done: true },
@@ -336,6 +371,14 @@ export const completedTasks: Task[] = [
         url: "docs.google.com/calpers-notes-feb12",
         preview: "Meeting: CalPERS LP Review\nDate: Feb 12, 2:00pm\n\nKey Discussion:\n\u2022 Reviewing Fund IV performance\n\u2022 Interest in healthcare AI thesis\n\u2022 Follow-up on co-invest opportunity\n\nAction Items:\n\u2022 Send updated portfolio deck by Friday\n\u2022 Schedule follow-up with investment committee",
       },
+      artifacts: [
+        { format: "document", title: "CalPERS Meeting Notes - Feb 12", subtitle: "Google Docs, 5 action items", url: "docs.google.com/calpers-notes-feb12" },
+        { format: "email", title: "Team Summary Email", subtitle: "Gmail draft", url: "gmail.com/drafts" },
+      ],
+      uploads: [
+        { name: "calpers-granola-transcript.txt", size: "48 KB", type: "txt" },
+        { name: "fund-iv-performance-update.pdf", size: "3.4 MB", type: "pdf" },
+      ],
       steps: [
         { label: "Pulled Granola notes from CalPERS meeting", done: true },
         { label: "Extracted 5 action items and key decisions", done: true },
@@ -371,6 +414,15 @@ export const completedTasks: Task[] = [
         url: "docs.google.com/abridge-one-pager",
         preview: "Abridge (Clinical AI Documentation)\nFounder: Shiv Rao, MD\nStage: Series C ($150M, Lightspeed)\nCustomers: 150+ health systems\n\nThesis Fit: Strong alignment with healthcare AI vertical\nSalesforce Status: Stage 2, previously reviewed Q3 2025",
       },
+      artifacts: [
+        { format: "document", title: "Abridge - Founder One-Pager", subtitle: "Google Docs, 6 sources", url: "docs.google.com/abridge-one-pager" },
+        { format: "link", title: "Abridge on Crunchbase", subtitle: "crunchbase.com", url: "crunchbase.com/organization/abridge" },
+      ],
+      uploads: [
+        { name: "shiv-rao-linkedin-profile.pdf", size: "890 KB", type: "pdf" },
+        { name: "abridge-press-coverage.pdf", size: "1.6 MB", type: "pdf" },
+        { name: "abridge-logo.png", size: "42 KB", type: "png" },
+      ],
       steps: [
         { label: "Searched Crunchbase for funding history", done: true },
         { label: "Pulled LinkedIn profiles for founding team", done: true },
@@ -406,6 +458,11 @@ export const completedTasks: Task[] = [
         icon: "\uD83D\uDCE7",
         url: "gmail.com/drafts",
       },
+      artifacts: [
+        { format: "email", title: "Thank You - GIC Singapore", subtitle: "Gmail draft", url: "gmail.com/drafts" },
+        { format: "email", title: "Thank You - Tiger Global", subtitle: "Gmail draft", url: "gmail.com/drafts" },
+        { format: "email", title: "Thank You - Wellington Mgmt", subtitle: "Gmail draft", url: "gmail.com/drafts" },
+      ],
       steps: [
         { label: "Pulled Granola notes from 3 LP meetings", done: true },
         { label: "Extracted key discussion points per meeting", done: true },
@@ -438,6 +495,14 @@ export const completedTasks: Task[] = [
         subtitle: "3 events, 2 action items",
         icon: "\uD83D\uDCC5",
       },
+      artifacts: [
+        { format: "calendar", title: "3 Events Added to Calendar", subtitle: "Science fair, parent-teacher, spring break" },
+        { format: "text", title: "School Week Summary", subtitle: "3 events, 2 action items" },
+      ],
+      uploads: [
+        { name: "permission-slip-science-fair.pdf", size: "156 KB", type: "pdf" },
+        { name: "volunteer-signup-form.pdf", size: "89 KB", type: "pdf" },
+      ],
       steps: [
         { label: "Scanned inbox for school emails", done: true },
         { label: "Extracted dates and events", done: true },
@@ -857,6 +922,8 @@ export interface FirstRunSequence {
   resultTitle: string;
   resultSummary: string;
   artifact: ResultArtifact;
+  artifacts?: ResultArtifact[];
+  uploads?: Upload[];
 }
 
 export const firstRunSequences: Record<string, FirstRunSequence> = {
@@ -885,6 +952,14 @@ export const firstRunSequences: Record<string, FirstRunSequence> = {
       icon: "📄",
       url: "docs.google.com/founder-research-daniel-park",
     },
+    artifacts: [
+      { format: "document", title: "Founder Research — Daniel Park", subtitle: "Google Docs · 6 sources", url: "docs.google.com/founder-research-daniel-park" },
+      { format: "link", title: "Daniel Park on LinkedIn", subtitle: "linkedin.com", url: "linkedin.com/in/daniel-park" },
+    ],
+    uploads: [
+      { name: "daniel-park-linkedin-export.pdf", size: "720 KB", type: "pdf" },
+      { name: "company-funding-history.csv", size: "18 KB", type: "csv" },
+    ],
   },
   crm: {
     intro: "Sure — I'll check the data and put together an update for you.",
@@ -908,6 +983,13 @@ export const firstRunSequences: Record<string, FirstRunSequence> = {
       icon: "📊",
       url: "docs.google.com/spreadsheets/crm-pipeline-review",
     },
+    artifacts: [
+      { format: "spreadsheet", title: "CRM Pipeline Review", subtitle: "Google Sheets · 12 records", url: "docs.google.com/spreadsheets/crm-pipeline-review" },
+      { format: "document", title: "Stale Deals Action Plan", subtitle: "Google Docs", url: "docs.google.com/stale-deals-plan" },
+    ],
+    uploads: [
+      { name: "pipeline-snapshot-q1.xlsx", size: "256 KB", type: "xlsx" },
+    ],
   },
   email: {
     intro: "On it — I'll pull notes from today's meetings and put together a debrief.",
@@ -931,6 +1013,14 @@ export const firstRunSequences: Record<string, FirstRunSequence> = {
       icon: "📄",
       url: "docs.google.com/daily-meeting-debrief",
     },
+    artifacts: [
+      { format: "document", title: "Daily Meeting Debrief", subtitle: "Google Docs · 3 meetings", url: "docs.google.com/daily-meeting-debrief" },
+      { format: "calendar", title: "3 Follow-Up Events Created", subtitle: "Google Calendar" },
+    ],
+    uploads: [
+      { name: "granola-meeting-notes.txt", size: "32 KB", type: "txt" },
+      { name: "acme-sync-recording.mp4", size: "48 MB", type: "mp4" },
+    ],
   },
 };
 
@@ -944,6 +1034,8 @@ export interface FollowUpSequence {
   resultTitle: string;
   resultSummary: string;
   artifact: ResultArtifact;
+  artifacts?: ResultArtifact[];
+  uploads?: Upload[];
 }
 
 export const followUpSequences: Record<string, FollowUpSequence> = {
@@ -967,6 +1059,12 @@ export const followUpSequences: Record<string, FollowUpSequence> = {
       icon: "📊",
       url: "docs.google.com/spreadsheets/founder-linkedin",
     },
+    artifacts: [
+      { format: "spreadsheet", title: "Founder LinkedIn Profiles", subtitle: "Google Sheets · 3 profiles", url: "docs.google.com/spreadsheets/founder-linkedin" },
+    ],
+    uploads: [
+      { name: "linkedin-profile-screenshots.zip", size: "2.1 MB", type: "zip" },
+    ],
   },
   crm: {
     agentMessage: "Checking PitchBook for funding details now.",
@@ -988,6 +1086,12 @@ export const followUpSequences: Record<string, FollowUpSequence> = {
       icon: "📊",
       url: "docs.google.com/spreadsheets/pitchbook-analysis",
     },
+    artifacts: [
+      { format: "spreadsheet", title: "PitchBook Funding Cross-Reference", subtitle: "Google Sheets · 8 matches", url: "docs.google.com/spreadsheets/pitchbook-analysis" },
+    ],
+    uploads: [
+      { name: "pitchbook-export.xlsx", size: "184 KB", type: "xlsx" },
+    ],
   },
   email: {
     agentMessage: "Sharing the debrief with attendees now.",
@@ -1009,6 +1113,10 @@ export const followUpSequences: Record<string, FollowUpSequence> = {
       icon: "📄",
       url: "docs.google.com/daily-meeting-debrief",
     },
+    artifacts: [
+      { format: "document", title: "Shared Meeting Debrief", subtitle: "Google Docs · shared with 8 attendees", url: "docs.google.com/daily-meeting-debrief" },
+      { format: "email", title: "Notification Emails Sent", subtitle: "Gmail · 8 recipients" },
+    ],
   },
 };
 
@@ -1112,6 +1220,14 @@ export const messyTaskResult = {
     icon: "🔗",
     url: "linkedin.com/posts/fireworks-ai_launch",
   },
+  artifacts: [
+    { format: "link" as const, title: "Fireworks AI Post Link", subtitle: "linkedin.com · permalink copied", url: "linkedin.com/posts/fireworks-ai_launch" },
+    { format: "document" as const, title: "Fireworks AI Funding Summary", subtitle: "Google Docs", url: "docs.google.com/fireworks-ai-summary" },
+  ],
+  uploads: [
+    { name: "fireworks-ai-funding-details.pdf", size: "1.3 MB", type: "pdf" },
+    { name: "competitive-landscape.png", size: "420 KB", type: "png" },
+  ],
 };
 
 /** Collapse step groups into a smart summary — hides thinking, merges retries */

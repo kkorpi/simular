@@ -492,36 +492,33 @@ export default function Home() {
   // ── Demo picker overlay (Cmd+Shift+D) ──
   const demoPicker = demoPickerOpen && (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setDemoPickerOpen(false)}>
-      <div className="w-[340px] max-md:w-[calc(100vw-2rem)] rounded-xl border border-b1 bg-bg2 p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div className="w-[520px] max-md:w-[calc(100vw-2rem)] max-md:max-h-[70dvh] max-md:overflow-y-auto rounded-xl border border-b1 bg-bg2 p-5 shadow-2xl" onClick={(e) => e.stopPropagation()}>
         <div className="mb-1 text-[13px] font-semibold text-t1">Demo Mode</div>
         <div className="mb-4 text-[11px] text-t3">Jump to any state. <span className="font-mono text-t4">Cmd+Shift+D</span></div>
-        <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-2 gap-2 max-md:grid-cols-1">
           {([
-            { mode: "landing" as const, label: "Landing page", desc: "Invite code entry", icon: "🏠" },
-            { mode: "landing-cap" as const, label: "Landing (sold out)", desc: "All codes claimed — waitlist CTA", icon: "✨" },
-            { mode: "onboarding" as const, label: "Onboarding flow", desc: "Landing → signup → in-chat onboarding", icon: "👋" },
-            { mode: "fresh" as const, label: "First run", desc: "Chat with greeting + starter tasks", icon: "🌱" },
-            { mode: "active" as const, label: "Active session", desc: "Auto-play returning user session", icon: "💬" },
-            { mode: "messy" as const, label: "Multi-turn agent", desc: "Clarification, struggle & follow-up", icon: "🔄" },
-            { mode: "gallery" as const, label: "Card gallery", desc: "Browse all 12 card components", icon: "🎴" },
-            { mode: "system" as const, label: "Design system", desc: "Colors, type ramp, tokens", icon: "🎨" },
-            { mode: "teach" as const, label: "Teach flow", desc: "Agent suggests showing it a custom task", icon: "📖" },
-            { mode: "trial" as const, label: "Trial expiring", desc: "1 day left — charge warning dialog", icon: "⚠️" },
-            { mode: "expired" as const, label: "Trial expired", desc: "Cancelled trial — locked out", icon: "🔒" },
-          ]).map((opt) => (
+            { mode: "landing" as const, label: "Landing page", icon: <><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></> },
+            { mode: "landing-cap" as const, label: "Landing (sold out)", icon: <><circle cx="12" cy="12" r="10" /><line x1="4.93" y1="4.93" x2="19.07" y2="19.07" /></> },
+            { mode: "onboarding" as const, label: "Onboarding flow", icon: <><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4-4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 00-3-3.87" /><path d="M16 3.13a4 4 0 010 7.75" /></> },
+            { mode: "fresh" as const, label: "First run", icon: <><path d="M12 2v4" /><path d="M12 18v4" /><path d="M4.93 4.93l2.83 2.83" /><path d="M16.24 16.24l2.83 2.83" /><path d="M2 12h4" /><path d="M18 12h4" /><path d="M4.93 19.07l2.83-2.83" /><path d="M16.24 7.76l2.83-2.83" /></> },
+            { mode: "active" as const, label: "Active session", icon: <><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" /></> },
+            { mode: "messy" as const, label: "Multi-turn agent", icon: <><polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" /><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" /></> },
+            { mode: "teach" as const, label: "Teach flow", icon: <><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" /></> },
+            { mode: "trial" as const, label: "Trial expiring", icon: <><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></> },
+            { mode: "gallery" as const, label: "Card gallery", icon: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></>, blue: true },
+            { mode: "system" as const, label: "Design system", icon: <><circle cx="13.5" cy="6.5" r=".5" fill="currentColor" /><circle cx="17.5" cy="10.5" r=".5" fill="currentColor" /><circle cx="8.5" cy="7.5" r=".5" fill="currentColor" /><circle cx="6.5" cy="12" r=".5" fill="currentColor" /><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" /></>, blue: true },
+          ] as { mode: typeof screen; label: string; icon: React.ReactNode; blue?: boolean }[]).map((opt) => (
             <button
               key={opt.mode}
               onClick={() => jumpToDemo(opt.mode)}
-              className="flex items-center gap-3 rounded-lg border border-b1 bg-bgcard px-3.5 py-3 text-left shadow-[var(--card-shadow)] transition-all hover:border-b2 hover:bg-bg3h"
+              className={`flex items-center gap-2.5 rounded-lg border px-3 py-2.5 text-left transition-all hover:border-b2 hover:bg-bg3h ${
+                screen === opt.mode
+                  ? "border-as bg-as/[0.06]"
+                  : "border-b1 bg-bgcard shadow-[var(--card-shadow)]"
+              }`}
             >
-              <span className="text-[18px]">{opt.icon}</span>
-              <div className="min-w-0 flex-1">
-                <div className="text-[13px] font-medium text-t1">{opt.label}</div>
-                <div className="text-[11px] text-t3">{opt.desc}</div>
-              </div>
-              <svg className="h-4 w-4 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
+              <svg className={`h-4 w-4 shrink-0 ${opt.blue ? "text-blt" : "text-t3"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">{opt.icon}</svg>
+              <span className="text-[13px] font-medium text-t1 whitespace-nowrap">{opt.label}</span>
             </button>
           ))}
         </div>
@@ -1013,8 +1010,8 @@ export default function Home() {
                   <button
                     onClick={() => {
                       setTrialDialogOpen(false);
-                      setSettingsSection("subscription");
-                      setSettingsOpen(true);
+                      setTrialDaysLeft(0);
+                      setTrialCancelled(true);
                     }}
                     className="text-[13px] font-medium text-t3 transition-colors hover:text-t1"
                   >

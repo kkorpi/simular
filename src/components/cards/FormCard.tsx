@@ -229,7 +229,7 @@ export function FormCard({
                         key={opt.value}
                         type="button"
                         onClick={() => { updateValue(field.key, opt.value); setOpenSelect(null); }}
-                        className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors hover:bg-bg3 ${opt.value === values[field.key] ? "text-t1" : "text-t3"}`}
+                        className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors hover:bg-bg3h ${opt.value === values[field.key] ? "text-t1" : "text-t3"}`}
                       >
                         {opt.value === values[field.key] && (
                           <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

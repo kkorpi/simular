@@ -48,6 +48,8 @@ export interface ResultCardProps {
   schedule?: ScheduleBarProps;
   highlighted?: boolean;
   accent?: CardAccent;
+  /** When true, border starts with accent color then fades to default */
+  fadeAccent?: boolean;
   /** When set, renders as a notification card */
   notification?: NotificationMeta;
 }
@@ -64,7 +66,7 @@ const dotColors = {
 const urgencyStyles = {
   info: { dot: "bg-as", text: "text-t3" },
   attention: { dot: "bg-am", text: "text-am" },
-  urgent: { dot: "bg-rdanimate-pulse", text: "text-rd" },
+  urgent: { dot: "bg-am animate-pulse", text: "text-am" },
 } as const;
 
 /* ── Component ── */
@@ -78,6 +80,7 @@ export function ResultCard({
   schedule,
   highlighted,
   accent = "default",
+  fadeAccent = false,
   notification,
 }: ResultCardProps) {
   const urgency = notification?.urgency ?? "info";
@@ -85,6 +88,7 @@ export function ResultCard({
   return (
     <CardShell
       accent={notification ? (urgency === "urgent" ? "amber" : accent) : accent}
+      fadeAccent={fadeAccent}
       className={highlighted ? "shadow-[0_0_0_2px_var(--as)]" : undefined}
     >
       {/* Notification context bar */}

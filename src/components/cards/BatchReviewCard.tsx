@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { CardShell } from "./CardShell";
+import { CardShell, type CardAccent } from "./CardShell";
 import type { CardAction } from "./types";
 
 export type BatchItem = {
@@ -19,12 +19,14 @@ export type BatchResult = {
 export interface BatchReviewCardProps {
   title: string;
   items: BatchItem[];
+  accent?: CardAccent;
   onComplete: (results: BatchResult[]) => void;
 }
 
 export function BatchReviewCard({
   title,
   items,
+  accent,
   onComplete,
 }: BatchReviewCardProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -58,7 +60,7 @@ export function BatchReviewCard({
 
   if (completed) {
     return (
-      <CardShell accent="green">
+      <CardShell accent={accent ?? "green"}>
         <div className="px-3.5 py-3">
           <div className="flex items-center gap-2 text-[13px] font-medium text-t1">
             <svg className="h-4 w-4 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -145,7 +147,7 @@ export function BatchReviewCard({
             <div className="flex-1" />
             <button
               onClick={handleSkipRemaining}
-              className="text-[11px] font-medium text-t4 transition-colors hover:text-t2"
+              className="text-[11px] font-medium text-t4 transition-colors hover:text-t1"
             >
               Skip remaining
             </button>

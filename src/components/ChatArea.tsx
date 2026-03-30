@@ -11,7 +11,7 @@ import { ResultCard as NewResultCard } from "./cards/ResultCard";
 import { PromptCard } from "./cards/PromptCard";
 import { ChoiceCard } from "./cards/ChoiceCard";
 import { DigestCard } from "./cards/DigestCard";
-import { LoginRequestCard } from "./LoginRequestCard";
+
 import { AuthInput, type AuthInputState } from "./AuthInput";
 
 import { runningTaskSteps, linkedinPreLoginSteps, linkedinLoginSteps, linkedinDisambiguatedSteps, disambiguationProfiles, firstRunSequences, followUpSequences, teachRecordedSteps, starterTasks } from "@/data/mockData";
@@ -175,6 +175,7 @@ function FirstRunResult({
             },
           ]}
           accent="green"
+                  fadeAccent
           schedule={madeRecurring ? {
             schedule: "Set as recurring task",
             onEdit: () => onOpenSchedule?.(taskTitle, "Every weekday at 8:00am", "Tomorrow 8:00am"),
@@ -1114,6 +1115,7 @@ export function ChatArea({
                                 },
                               ]}
                               accent="green"
+                  fadeAccent
                             />
                           </AgentMessage>
                         </div>
@@ -1237,6 +1239,7 @@ export function ChatArea({
                     title={teachTaskName || "Recorded task"}
                     subtitle={`${teachRecordedSteps.length} steps recorded`}
                     accent="green"
+                  fadeAccent
                     body={{
                       type: "highlights",
                       items: teachRecordedSteps.map((step) => ({
@@ -1372,6 +1375,7 @@ export function ChatArea({
                   ],
                 }}
                 accent="green"
+                  fadeAccent
                 actions={[
                   { label: "View details", style: "primary", onClick: () => onOpenTaskById?.("3") },
                   {
@@ -1483,6 +1487,7 @@ export function ChatArea({
                   text: <><strong className="font-semibold text-t1">Sequoia Scouts</strong> ($2.5B AUM). P1 LP since Fund II, last touchpoint 45 days ago.{view !== "result-detail" && <> Key contact: <strong className="font-semibold text-t1">Ravi Gupta</strong>, Managing Director. Considering Fund IV commitment.</>}</>,
                 }}
                 accent="green"
+                  fadeAccent
                 highlighted={view === "result-detail"}
                 actions={
                   view === "result-detail"
@@ -1541,6 +1546,7 @@ export function ChatArea({
                   ],
                 }}
                 accent="green"
+                  fadeAccent
                 actions={[
                   { label: "View details", style: "primary", onClick: () => onOpenTaskById?.("5") },
                   {

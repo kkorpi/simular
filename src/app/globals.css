@@ -86,6 +86,33 @@
   --thumb-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+/* ===== Brand Colors (theme-independent) ===== */
+:root {
+  --brand-linkedin: #0A66C2;
+  --brand-gmail: #EA4335;
+  --brand-salesforce: #00A1E0;
+  --brand-crunchbase: #0288D1;
+  --brand-google-blue: #4285F4;
+  --brand-google-green: #34A853;
+  --brand-google-yellow: #FBBC05;
+  --brand-google-red: #EA4335;
+  --brand-google-cal: #4285F4;
+  --brand-apple: #000000;
+  --brand-microsoft-red: #F25022;
+  --brand-microsoft-green: #7FBA00;
+  --brand-microsoft-blue: #00A4EF;
+  --brand-microsoft-yellow: #FFB900;
+  --brand-facebook: #1877F2;
+  --brand-github: #24292F;
+  --brand-slack: #4A154B;
+  --brand-notion: #000000;
+  --brand-hubspot: #FF7A59;
+  --brand-jira: #0052CC;
+  --brand-x: #000000;
+  --brand-granola: #6B4F3F;
+  --brand-pitchbook: #004B87;
+}
+
 /* ===== Tailwind Theme Tokens ===== */
 @theme inline {
   --color-bg: var(--bg);
@@ -121,6 +148,19 @@
   --color-rd: var(--r);
   --color-st: var(--st);
   --color-sb: var(--sb);
+  --color-brand-linkedin: var(--brand-linkedin);
+  --color-brand-gmail: var(--brand-gmail);
+  --color-brand-salesforce: var(--brand-salesforce);
+  --color-brand-crunchbase: var(--brand-crunchbase);
+  --color-brand-google-blue: var(--brand-google-blue);
+  --color-brand-google-green: var(--brand-google-green);
+  --color-brand-google-yellow: var(--brand-google-yellow);
+  --color-brand-google-red: var(--brand-google-red);
+  --color-brand-facebook: var(--brand-facebook);
+  --color-brand-github: var(--brand-github);
+  --color-brand-slack: var(--brand-slack);
+  --color-brand-hubspot: var(--brand-hubspot);
+  --color-brand-jira: var(--brand-jira);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-jetbrains);
 }

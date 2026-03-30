@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { CardShell } from "./CardShell";
+import { CardShell, type CardAccent } from "./CardShell";
 import { ResolvedInline } from "./ResolvedInline";
 import type { CardAction } from "./types";
 
@@ -21,6 +21,7 @@ export interface ErrorCardProps {
   detail: string;
   context?: string;
   actions: CardAction[];
+  accent?: CardAccent;
   resolvedMessage?: string;
 }
 
@@ -76,6 +77,7 @@ export function ErrorCard({
   detail,
   context,
   actions,
+  accent,
   resolvedMessage,
 }: ErrorCardProps) {
   const [contextExpanded, setContextExpanded] = useState(false);
@@ -91,7 +93,7 @@ export function ErrorCard({
   }
 
   return (
-    <CardShell accent={errorType === "rate_limited" || errorType === "scope_too_large" ? "amber" : "default"}>
+    <CardShell accent={accent ?? (errorType === "rate_limited" || errorType === "scope_too_large" ? "amber" : "default")}>
       {/* Header */}
       <div className="flex items-start gap-2.5 px-3.5 py-3">
         <div className="mt-0.5 flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md bg-rd/10 text-rd">
@@ -108,7 +110,7 @@ export function ErrorCard({
         <div className="border-t border-b1 px-3.5 py-2">
           <button
             onClick={() => setContextExpanded(!contextExpanded)}
-            className="flex items-center gap-1.5 text-[11px] font-medium text-t3 transition-colors hover:text-t2"
+            className="flex items-center gap-1.5 text-[11px] font-medium text-t3 transition-colors hover:text-t1"
           >
             <svg
               className={`h-3 w-3 transition-transform ${contextExpanded ? "rotate-90" : ""}`}

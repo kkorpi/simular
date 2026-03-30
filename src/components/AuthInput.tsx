@@ -195,8 +195,8 @@ const OAUTH_PROVIDER_CONFIG: Record<OAuthProvider, { name: string; Logo: React.F
   google: { name: "Google", Logo: GoogleLogo, className: "bg-white text-[#1f1f1f] hover:bg-white/90 shadow-sm" },
   apple: { name: "Apple", Logo: AppleLogo, className: "bg-[#000] text-white hover:bg-[#1a1a1a]" },
   microsoft: { name: "Microsoft", Logo: MicrosoftLogo, className: "bg-white text-[#1f1f1f] hover:bg-white/90 shadow-sm" },
-  github: { name: "GitHub", Logo: GitHubProviderLogo, className: "bg-[#24292F] text-white hover:bg-[#2f363d]" },
-  facebook: { name: "Facebook", Logo: FacebookLogo, className: "bg-[#1877F2] text-white hover:bg-[#1666d4]" },
+  github: { name: "GitHub", Logo: GitHubProviderLogo, className: "bg-brand-github text-white hover:brightness-125" },
+  facebook: { name: "Facebook", Logo: FacebookLogo, className: "bg-brand-facebook text-white hover:brightness-110" },
 };
 
 function OAuthButton({ provider, onClick }: { provider: OAuthProvider; onClick: () => void }) {

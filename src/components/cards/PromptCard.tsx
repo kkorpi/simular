@@ -71,7 +71,7 @@ export function PromptCard({
               onClick={() => handleAction(action)}
               className={
                 action.style === "primary"
-                  ? "rounded-md border border-transparent bg-gs px-2.5 py-1 text-[11.5px] font-medium text-gt"
+                  ? "rounded-md border border-transparent bg-gs px-2.5 py-1 text-[11.5px] font-medium text-gt transition-all hover:brightness-110"
                   : "rounded-md border border-b1 bg-transparent px-2.5 py-1 text-[11.5px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
               }
             >
@@ -152,12 +152,8 @@ export function PromptCard({
                 className={
                   isPrimary
                     ? isDestructive
-                      ? `rounded-md px-2.5 py-1 text-xs font-medium transition-all ${
-                          disabled ? "bg-rd/20 text-rd/40 cursor-not-allowed" : "bg-rd text-white hover:brightness-110"
-                        }`
-                      : `rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-all ${
-                          disabled ? "opacity-40 cursor-not-allowed" : "hover:brightness-110"
-                        }`
+                      ? `rounded-md bg-rd px-2.5 py-1 text-xs font-medium text-white transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed`
+                      : `rounded-md bg-ab px-2.5 py-1 text-xs font-medium text-abt transition-all hover:brightness-110 disabled:opacity-40 disabled:cursor-not-allowed`
                     : action.style === "outline"
                       ? "rounded-md border border-b1 bg-transparent px-2.5 py-1 text-xs font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
                       : "text-[11px] font-medium text-blt transition-all hover:underline"

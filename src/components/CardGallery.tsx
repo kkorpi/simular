@@ -18,13 +18,19 @@ import {
   type FormField,
   type ComparisonAttribute,
 } from "./cards";
-import { LoginRequestCard } from "./LoginRequestCard";
+
 import { RunningTaskDetail } from "./RunningTaskDetail";
+import { ApprovalCard, type Approver } from "./cards/ApprovalCard";
+import { FileUploadCard, type FileUploadStatus } from "./cards/FileUploadCard";
+import { AlertCard, type AlertSeverity } from "./cards/AlertCard";
+import { HandoffCard } from "./cards/HandoffCard";
+import { CostCard } from "./cards/CostCard";
+import { StatusCard, type ConnectionStatus } from "./cards/StatusCard";
 import type { RunningStep } from "@/data/mockData";
 
 /* ── Card type definitions ── */
 
-type CardType = "result" | "digest" | "draft" | "choice" | "prompt" | "batch" | "form" | "progress" | "error" | "notification" | "destructive" | "comparison" | "login";
+type CardType = "result" | "digest" | "draft" | "choice" | "prompt" | "batch" | "form" | "progress" | "error" | "notification" | "destructive" | "comparison" | "approval" | "file-upload" | "alert" | "handoff" | "cost" | "status";
 
 type GalleryEntry = { id: CardType; label: string; description: string; scenario: string };
 
@@ -40,8 +46,14 @@ const cardTypes: GalleryEntry[] = [
   { id: "form", label: "Form Card", description: "Structured input", scenario: "Agent needs structured parameters to proceed — flight search criteria, file renaming rules, monitoring thresholds. Validates before submission." },
   { id: "progress", label: "Task Progress", description: "Live step-by-step tracking", scenario: "Agent is working through a task — researching people, pulling data, checking records. Shows timestamped steps, subtask indicators, and expandable detail log." },
   { id: "error", label: "Error Card", description: "Failure + recovery", scenario: "Something went wrong and agent needs help — expired login, CAPTCHA block, scope too large. Always offers recovery actions, never a dead end." },
-  { id: "login", label: "Login Request", description: "Branded sign-in", scenario: "Agent needs access to a third-party service — LinkedIn, Gmail, Salesforce. Shows branded service card with trust signals. User signs in via workspace." },
+
   { id: "batch", label: "Batch Review", description: "Review multiple items", scenario: "Agent has several items that each need a quick decision — email triage, pending approvals, task review queue. Expandable rows with per-item actions." },
+  { id: "approval", label: "Approval Card", description: "Multi-approver workflow", scenario: "Agent needs sign-off from one or more approvers before proceeding. Shows approval status for each reviewer." },
+  { id: "file-upload", label: "File Upload", description: "Transfer progress", scenario: "Agent is uploading or downloading a file. Shows progress bar with filename, size, and cancel option." },
+  { id: "alert", label: "Alert Card", description: "Warnings & notices", scenario: "Non-error alerts for approaching limits, permission needs, or important notices. Three severity levels." },
+  { id: "handoff", label: "Handoff Card", description: "Agent → user transition", scenario: "Agent hands a task back to the user with context and reason. Used when human action is required." },
+  { id: "cost", label: "Cost Card", description: "Credit usage", scenario: "Notifies user of credit consumption for an action. Shows cost and remaining balance." },
+  { id: "status", label: "Status Card", description: "Integration health", scenario: "Shows connection status for a third-party service. Indicates connected, expired, or disconnected state." },
 ];
 
 /* ── Mock data ── */
@@ -336,8 +348,10 @@ const progressPresets: { label: string; steps: RunningStep[]; subtasks: string[]
       { timestamp: "0:02", label: "Opened Chrome and navigated to LinkedIn", done: true },
       { timestamp: "0:04", label: "Opened LinkedIn founder profile", done: true },
       { timestamp: "0:10", label: "Pulled background, education, and work history", done: true },
+      { timestamp: "0:12", label: "Strong product background — ex-Google, ex-Stripe. Checking Salesforce.", type: "thinking", done: true },
       { timestamp: "0:16", label: "Extracted mutual connections and endorsements", done: true },
       { timestamp: "0:24", label: "Reviewed recent posts on X", done: true },
+      { timestamp: "0:26", label: "Series B at $1.5B valuation — solid signal. Pulling more data.", type: "thinking", done: true },
       { timestamp: "0:30", label: "Pulling Crunchbase company profile...", done: false },
     ],
   },
@@ -435,12 +449,27 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
   const [destructiveKey, setDestructiveKey] = useState(0);
 
   // Login config
-  const [loginConnected, setLoginConnected] = useState(false);
-  const [loginService, setLoginService] = useState<"LinkedIn" | "Gmail" | "Salesforce">("LinkedIn");
 
   // Notification config
   const [notifUrgency, setNotifUrgency] = useState<"info" | "attention" | "urgent">("attention");
 
+  // Approval config
+  const [approvalKey, setApprovalKey] = useState(0);
+
+  // File upload config
+  const [uploadStatus, setUploadStatus] = useState<FileUploadStatus>("uploading");
+  const [uploadProgress, setUploadProgress] = useState(67);
+
+  // Alert config
+  const [alertSeverity, setAlertSeverity] = useState<AlertSeverity>("warning");
+
+  // Handoff config
+  const [handoffKey, setHandoffKey] = useState(0);
+
+  // Cost config (no controls needed, static display)
+
+  // Status config
+  const [statusConnection, setStatusConnection] = useState<ConnectionStatus>("connected");
 
   if (!open) return null;
 
@@ -488,13 +517,6 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
                 <div className="text-[11px] text-t4 max-md:hidden">{ct.description}</div>
               </button>
             ))}
-          </div>
-          {/* Scenario description for selected card (hidden on mobile) */}
-          <div className="mt-auto border-t border-b1 px-5 py-4 max-md:hidden">
-            <div className="text-[10px] font-medium uppercase tracking-wide text-t4 mb-1.5">When to use</div>
-            <div className="text-[11.5px] leading-[1.55] text-t3">
-              {cardTypes.find((ct) => ct.id === activeCard)?.scenario}
-            </div>
           </div>
         </div>
 
@@ -731,15 +753,6 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
                 />
               )}
 
-              {/* Login Request */}
-              {activeCard === "login" && (
-                <LoginRequestCard
-                  key={`login-${loginService}-${loginConnected}`}
-                  service={loginService}
-                  onLogin={() => setLoginConnected(true)}
-                  connected={loginConnected}
-                />
-              )}
 
               {/* Batch */}
               {activeCard === "batch" && (
@@ -791,6 +804,115 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
                 />
               )}
 
+              {/* Approval */}
+              {activeCard === "approval" && (
+                <ApprovalCard
+                  key={`approval-${approvalKey}`}
+                  title="Expense Report #4821"
+                  description="Travel expenses for LP meetings in NYC ($2,340). Requires two approvals before reimbursement is processed."
+                  approvers={[
+                    { name: "Katie Chen", status: "approved" },
+                    { name: "Ravi Gupta", status: "pending" },
+                    { name: "Sarah Lin", status: "pending" },
+                  ]}
+                  accent="amber"
+                  onApprove={() => {}}
+                  onReject={() => {}}
+                />
+              )}
+
+              {/* File Upload */}
+              {activeCard === "file-upload" && (
+                <FileUploadCard
+                  key={`upload-${uploadStatus}-${uploadProgress}`}
+                  filename="Q4_Portfolio_Report_Final.pdf"
+                  size="4.2 MB"
+                  progress={uploadProgress}
+                  status={uploadStatus}
+                  onCancel={() => {}}
+                />
+              )}
+
+              {/* Alert */}
+              {activeCard === "alert" && (
+                <AlertCard
+                  key={`alert-${alertSeverity}`}
+                  severity={alertSeverity}
+                  title={
+                    alertSeverity === "warning"
+                      ? "Credit balance running low"
+                      : alertSeverity === "caution"
+                        ? "LinkedIn session expiring soon"
+                        : "New permissions available"
+                  }
+                  message={
+                    alertSeverity === "warning"
+                      ? "You have 12 credits remaining. Actions requiring web browsing will be paused when credits reach zero."
+                      : alertSeverity === "caution"
+                        ? "Your LinkedIn session expires in 2 hours. Re-authenticate to avoid interrupting scheduled tasks."
+                        : "Google Calendar access has been approved by your workspace admin. You can now create and edit calendar events."
+                  }
+                  actions={[
+                    {
+                      label: alertSeverity === "warning" ? "Add credits" : alertSeverity === "caution" ? "Re-authenticate" : "Enable now",
+                      style: "primary",
+                      onClick: () => {},
+                    },
+                    { label: "Dismiss", style: "text", onClick: () => {} },
+                  ]}
+                />
+              )}
+
+              {/* Handoff */}
+              {activeCard === "handoff" && (
+                <HandoffCard
+                  key={`handoff-${handoffKey}`}
+                  title="Manual verification needed"
+                  reason="The bank website requires two-factor authentication with a hardware key. I can't complete this step automatically."
+                  context="Attempted to log in to Chase business banking at chase.com/business. After entering credentials, the site prompted for a YubiKey tap. This is a physical interaction I cannot perform."
+                  actions={[
+                    { label: "I've completed it", style: "primary", onClick: () => {} },
+                    { label: "Skip this step", style: "outline", onClick: () => {} },
+                  ]}
+                />
+              )}
+
+              {/* Cost */}
+              {activeCard === "cost" && (
+                <CostCard
+                  action="Deep research: Abridge Series C analysis"
+                  cost="3 credits"
+                  balance="47 credits remaining"
+                />
+              )}
+
+              {/* Status */}
+              {activeCard === "status" && (
+                <StatusCard
+                  key={`status-${statusConnection}`}
+                  service="Salesforce CRM"
+                  status={statusConnection}
+                  lastSync={
+                    statusConnection === "connected"
+                      ? "Last synced 5 min ago"
+                      : statusConnection === "expired"
+                        ? "Token expired 2 hours ago"
+                        : "Never connected"
+                  }
+                  onReconnect={() => {}}
+                />
+              )}
+
+            </div>
+          </div>
+
+          {/* When to use */}
+          <div className="shrink-0 border-b border-b1 px-8 py-4">
+            <div className="mx-auto max-w-[620px]">
+              <div className="text-[10px] font-medium uppercase tracking-wide text-t4 mb-1.5">When to use</div>
+              <div className="text-[12px] leading-[1.55] text-t3">
+                {cardTypes.find((ct) => ct.id === activeCard)?.scenario}
+              </div>
             </div>
           </div>
 
@@ -948,22 +1070,6 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
                 </div>
               )}
 
-              {activeCard === "login" && (
-                <div className="flex flex-col gap-4">
-                  <ControlRow label="Service">
-                    <div className="flex gap-1.5">
-                      {(["LinkedIn", "Gmail", "Salesforce"] as const).map((s) => (
-                        <PillButton key={s} active={loginService === s} onClick={() => { setLoginService(s); setLoginConnected(false); }}>
-                          {s}
-                        </PillButton>
-                      ))}
-                    </div>
-                  </ControlRow>
-                  <ControlRow label="Connected">
-                    <ToggleSwitch value={loginConnected} onChange={setLoginConnected} />
-                  </ControlRow>
-                </div>
-              )}
 
               {activeCard === "batch" && (
                 <div className="flex flex-col gap-4">
@@ -976,6 +1082,80 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
               {activeCard === "digest" && (
                 <div className="flex flex-col gap-4">
                   <div className="text-[12px] text-t3">Expand the run list and action items to explore. No configurable options yet.</div>
+                </div>
+              )}
+
+              {activeCard === "approval" && (
+                <div className="flex flex-col gap-4">
+                  <ControlRow label="Reset">
+                    <ResetButton onClick={() => setApprovalKey((k) => k + 1)}>Reset</ResetButton>
+                  </ControlRow>
+                </div>
+              )}
+
+              {activeCard === "file-upload" && (
+                <div className="flex flex-col gap-4">
+                  <ControlRow label="Status">
+                    <div className="flex gap-1.5 flex-wrap">
+                      {(["uploading", "downloading", "complete", "error"] as const).map((s) => (
+                        <PillButton key={s} active={uploadStatus === s} onClick={() => setUploadStatus(s)}>
+                          {s}
+                        </PillButton>
+                      ))}
+                    </div>
+                  </ControlRow>
+                  <ControlRow label="Progress">
+                    <input
+                      type="range"
+                      min={0}
+                      max={100}
+                      value={uploadProgress}
+                      onChange={(e) => setUploadProgress(Number(e.target.value))}
+                      className="w-32 accent-[var(--color-as)]"
+                    />
+                  </ControlRow>
+                </div>
+              )}
+
+              {activeCard === "alert" && (
+                <div className="flex flex-col gap-4">
+                  <ControlRow label="Severity">
+                    <div className="flex gap-1.5">
+                      {(["info", "warning", "caution"] as const).map((s) => (
+                        <PillButton key={s} active={alertSeverity === s} onClick={() => setAlertSeverity(s)}>
+                          {s}
+                        </PillButton>
+                      ))}
+                    </div>
+                  </ControlRow>
+                </div>
+              )}
+
+              {activeCard === "handoff" && (
+                <div className="flex flex-col gap-4">
+                  <ControlRow label="Reset">
+                    <ResetButton onClick={() => setHandoffKey((k) => k + 1)}>Reset</ResetButton>
+                  </ControlRow>
+                </div>
+              )}
+
+              {activeCard === "cost" && (
+                <div className="flex flex-col gap-4">
+                  <div className="text-[12px] text-t3">Static credit usage display. No configurable options.</div>
+                </div>
+              )}
+
+              {activeCard === "status" && (
+                <div className="flex flex-col gap-4">
+                  <ControlRow label="Status">
+                    <div className="flex gap-1.5 flex-wrap">
+                      {(["connected", "expired", "disconnected"] as const).map((s) => (
+                        <PillButton key={s} active={statusConnection === s} onClick={() => setStatusConnection(s)}>
+                          {s}
+                        </PillButton>
+                      ))}
+                    </div>
+                  </ControlRow>
                 </div>
               )}
             </div>

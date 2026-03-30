@@ -6,7 +6,7 @@ import { WorkingIndicator } from "./WorkingIndicator";
 
 /* ── Section definitions ── */
 
-type Section = "colors" | "typography" | "icons" | "spacing" | "radius" | "shadows" | "animations" | "buttons" | "task-list" | "inputs" | "dropdowns" | "badges" | "status";
+type Section = "colors" | "typography" | "icons" | "spacing" | "radius" | "shadows" | "animations" | "buttons" | "task-list" | "inputs" | "dropdowns" | "badges" | "status" | "brand-colors" | "z-index" | "focus-hover" | "disabled" | "scrollbar" | "accessibility";
 
 type SectionEntry = { id: Section; label: string; group: "tokens" | "controls" };
 
@@ -26,6 +26,13 @@ const sections: SectionEntry[] = [
   { id: "dropdowns", label: "Dropdowns", group: "controls" },
   { id: "badges", label: "Badges & Pills", group: "controls" },
   { id: "status", label: "Status Indicators", group: "controls" },
+  // Extended
+  { id: "brand-colors", label: "Brand Colors", group: "tokens" },
+  { id: "z-index", label: "Z-Index Scale", group: "tokens" },
+  { id: "focus-hover", label: "Focus & Hover", group: "controls" },
+  { id: "disabled", label: "Disabled States", group: "controls" },
+  { id: "scrollbar", label: "Scrollbar", group: "tokens" },
+  { id: "accessibility", label: "Accessibility", group: "tokens" },
 ];
 
 /* ── Color token groups ── */
@@ -532,15 +539,38 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
           <span className="text-[14px] font-semibold text-t1">Design System</span>
           <span className="rounded-full bg-bg3h px-2 py-0.5 text-[10px] font-medium text-t3">{sections.length} sections</span>
         </div>
-        <button
-          onClick={onClose}
-          className="flex h-8 w-8 items-center justify-center rounded-md text-t3 transition-all hover:bg-bg3 hover:text-t1"
-        >
-          <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18" />
-            <line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => {
+              const el = document.documentElement;
+              const current = el.getAttribute("data-theme");
+              el.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+            }}
+            className="flex items-center gap-2 rounded-md border border-b1 px-3 py-1.5 text-[11px] font-medium text-t2 transition-all hover:bg-bg3h hover:text-t1"
+          >
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+            Toggle theme
+          </button>
+          <button
+            onClick={onClose}
+            className="flex h-8 w-8 items-center justify-center rounded-md text-t3 transition-all hover:bg-bg3h hover:text-t1"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       {/* Body */}
@@ -1422,6 +1452,353 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                     <div className="text-[11px] text-t3 mt-0.5">Typing cursor blink for streaming text responses.</div>
                     <div className="text-[10px] font-mono text-t4 mt-1">0.8s steps(2) infinite</div>
                   </div>
+                </div>
+
+                {/* step-log-enter */}
+                <div className="flex items-center gap-6 rounded-lg border border-b1 bg-bgcard px-5 py-4">
+                  <div className="flex h-[40px] w-[60px] shrink-0 items-center justify-center">
+                    <div className="flex flex-col gap-1 w-full">
+                      <div className="h-1.5 w-full rounded-full bg-violet-500/30" style={{ animation: "step-log-enter 0.3s ease-out" }} />
+                      <div className="h-1.5 w-3/4 rounded-full bg-violet-500/20" style={{ animation: "step-log-enter 0.3s ease-out 0.1s both" }} />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[12px] font-medium text-t1">step-log-enter</div>
+                    <div className="text-[11px] text-t3 mt-0.5">Step list entry animation. Slides in from left with opacity fade.</div>
+                    <div className="text-[10px] font-mono text-t4 mt-1">0.3s ease-out</div>
+                  </div>
+                </div>
+
+                {/* collapsible */}
+                <div className="flex items-center gap-6 rounded-lg border border-b1 bg-bgcard px-5 py-4">
+                  <div className="flex h-[40px] w-[60px] shrink-0 items-center justify-center">
+                    <div className="w-full overflow-hidden" style={{ display: "grid", gridTemplateRows: "1fr", animation: "collapsible 0.3s ease-out" }}>
+                      <div className="min-h-0">
+                        <div className="h-2 w-full rounded-full bg-as/20 mb-1" />
+                        <div className="h-2 w-3/4 rounded-full bg-as/15" />
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-[12px] font-medium text-t1">collapsible</div>
+                    <div className="text-[11px] text-t3 mt-0.5">Grid-based expand/collapse. Uses grid-template-rows for smooth height animation.</div>
+                    <div className="text-[10px] font-mono text-t4 mt-1">0.3s ease-out, grid-template-rows</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Brand Colors ── */}
+          {activeSection === "brand-colors" && (
+            <div className="space-y-8">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Brand Color Tokens</div>
+                <div className="grid grid-cols-4 gap-6 max-md:grid-cols-3 max-sm:grid-cols-2">
+                  {[
+                    { name: "LinkedIn", var: "--brand-linkedin", hex: "#0A66C2" },
+                    { name: "Gmail", var: "--brand-gmail", hex: "#EA4335" },
+                    { name: "Salesforce", var: "--brand-salesforce", hex: "#00A1E0" },
+                    { name: "Crunchbase", var: "--brand-crunchbase", hex: "#0288D1" },
+                    { name: "Google Blue", var: "--brand-google-blue", hex: "#4285F4" },
+                    { name: "Google Green", var: "--brand-google-green", hex: "#34A853" },
+                    { name: "Google Yellow", var: "--brand-google-yellow", hex: "#FBBC05" },
+                    { name: "Google Red", var: "--brand-google-red", hex: "#EA4335" },
+                    { name: "Facebook", var: "--brand-facebook", hex: "#1877F2" },
+                    { name: "GitHub", var: "--brand-github", hex: "#24292F" },
+                    { name: "Slack", var: "--brand-slack", hex: "#4A154B" },
+                    { name: "HubSpot", var: "--brand-hubspot", hex: "#FF7A59" },
+                    { name: "Jira", var: "--brand-jira", hex: "#0052CC" },
+                  ].map((brand) => (
+                    <div key={brand.name} className="flex flex-col items-center gap-2">
+                      <div
+                        className="h-12 w-12 rounded-full border border-b1"
+                        style={{ backgroundColor: `var(${brand.var})` }}
+                      />
+                      <div className="text-[11px] font-medium text-t2">{brand.name}</div>
+                      <div className="text-[10px] font-mono text-t4">{brand.hex}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Z-Index Scale ── */}
+          {activeSection === "z-index" && (
+            <div className="space-y-8">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Stacking Context</div>
+                <div className="flex flex-col gap-3">
+                  {[
+                    { label: "Base", value: "z-0", usage: "Default content", width: "20%" },
+                    { label: "Dropdown", value: "z-10", usage: "Dropdowns, tooltips", width: "30%" },
+                    { label: "Sticky", value: "z-20", usage: "Sticky headers", width: "38%" },
+                    { label: "Overlay", value: "z-[60]", usage: "Settings, modals", width: "55%" },
+                    { label: "Design System", value: "z-[70]", usage: "Design system overlay", width: "62%" },
+                    { label: "Modal", value: "z-[80]", usage: "Trial dialog", width: "70%" },
+                    { label: "Lockout", value: "z-[90]", usage: "Trial expired", width: "82%" },
+                    { label: "Picker", value: "z-[100]", usage: "Demo picker", width: "100%" },
+                  ].map((level) => (
+                    <div key={level.label} className="flex items-center gap-4">
+                      <div
+                        className="flex h-9 items-center rounded-md bg-as/15 border border-as/30 px-3"
+                        style={{ width: level.width }}
+                      >
+                        <span className="text-[11px] font-mono font-medium text-as">{level.value}</span>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="text-[12px] font-medium text-t1">{level.label}</span>
+                        <span className="text-[11px] text-t3">{level.usage}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Focus & Hover States ── */}
+          {activeSection === "focus-hover" && (
+            <div className="space-y-10">
+              {/* Focus states */}
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Focus States</div>
+                <div className="grid grid-cols-2 gap-6 max-md:grid-cols-1">
+                  {/* Input focus */}
+                  <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                    <div className="text-[11px] font-medium text-t3 mb-3">Input — Focus Border</div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Default</div>
+                        <input
+                          type="text"
+                          readOnly
+                          value="Unfocused"
+                          className="h-9 w-40 rounded-lg border border-b1 bg-bg3 px-3 text-[12px] text-t2"
+                        />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Focused</div>
+                        <input
+                          type="text"
+                          readOnly
+                          value="Focused"
+                          className="h-9 w-40 rounded-lg border border-as bg-bg3 px-3 text-[12px] text-t1 ring-1 ring-as/30"
+                        />
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-mono text-t4 mt-3">focus:border-as</div>
+                  </div>
+                  {/* Button focus ring */}
+                  <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                    <div className="text-[11px] font-medium text-t3 mb-3">Button — Focus Ring</div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Default</div>
+                        <button className="h-9 rounded-lg bg-ab px-4 text-[12px] font-medium text-abt">Submit</button>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Focused</div>
+                        <button className="h-9 rounded-lg bg-ab px-4 text-[12px] font-medium text-abt ring-2 ring-as/40 ring-offset-2 ring-offset-bg">Submit</button>
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-mono text-t4 mt-3">focus:ring-2 ring-as/40 ring-offset-2</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Hover states */}
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Hover States</div>
+                <div className="grid grid-cols-2 gap-6 max-md:grid-cols-1">
+                  {/* Button hover */}
+                  <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                    <div className="text-[11px] font-medium text-t3 mb-3">Button — Brightness</div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Default</div>
+                        <button className="h-9 rounded-lg bg-ab px-4 text-[12px] font-medium text-abt">Button</button>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Hovered</div>
+                        <button className="h-9 rounded-lg bg-ab px-4 text-[12px] font-medium text-abt brightness-110">Button</button>
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-mono text-t4 mt-3">hover:brightness-110</div>
+                  </div>
+                  {/* Card hover */}
+                  <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                    <div className="text-[11px] font-medium text-t3 mb-3">Card — Border + Background</div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Default</div>
+                        <div className="h-16 w-32 rounded-lg border border-b1 bg-bgcard flex items-center justify-center text-[11px] text-t3">Card</div>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Hovered</div>
+                        <div className="h-16 w-32 rounded-lg border border-b2 bg-bg3h flex items-center justify-center text-[11px] text-t1">Card</div>
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-mono text-t4 mt-3">hover:border-b2 hover:bg-bg3h</div>
+                  </div>
+                  {/* Link hover */}
+                  <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                    <div className="text-[11px] font-medium text-t3 mb-3">Link — Text Color</div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Default</div>
+                        <span className="text-[12px] text-t3 underline">Link text</span>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Hovered</div>
+                        <span className="text-[12px] text-t1 underline">Link text</span>
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-mono text-t4 mt-3">hover:text-t1</div>
+                  </div>
+                  {/* Ghost button hover */}
+                  <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                    <div className="text-[11px] font-medium text-t3 mb-3">Ghost Button — Background</div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Default</div>
+                        <button className="h-9 rounded-lg px-4 text-[12px] font-medium text-t2">Ghost</button>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Hovered</div>
+                        <button className="h-9 rounded-lg bg-bg3h px-4 text-[12px] font-medium text-t1">Ghost</button>
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-mono text-t4 mt-3">hover:bg-bg3h</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Disabled States ── */}
+          {activeSection === "disabled" && (
+            <div className="space-y-8">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Disabled Controls</div>
+                <div className="grid grid-cols-2 gap-6 max-md:grid-cols-1">
+                  {/* Primary button disabled */}
+                  <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                    <div className="text-[11px] font-medium text-t3 mb-3">Primary Button</div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Enabled</div>
+                        <button className="h-9 rounded-lg bg-ab px-4 text-[12px] font-medium text-abt">Submit</button>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Disabled</div>
+                        <button className="h-9 rounded-lg bg-ab px-4 text-[12px] font-medium text-abt opacity-40 cursor-not-allowed">Submit</button>
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-mono text-t4 mt-3">opacity-40 cursor-not-allowed</div>
+                  </div>
+                  {/* Outline button disabled */}
+                  <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                    <div className="text-[11px] font-medium text-t3 mb-3">Outline Button</div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Enabled</div>
+                        <button className="h-9 rounded-lg border border-b1 bg-bg3 px-4 text-[12px] font-medium text-t2">Cancel</button>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Disabled</div>
+                        <button className="h-9 rounded-lg border border-b1 bg-bg3 px-4 text-[12px] font-medium text-t2 opacity-40 cursor-not-allowed">Cancel</button>
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-mono text-t4 mt-3">opacity-40 cursor-not-allowed</div>
+                  </div>
+                  {/* Text input disabled */}
+                  <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                    <div className="text-[11px] font-medium text-t3 mb-3">Text Input</div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Enabled</div>
+                        <input type="text" readOnly value="Editable" className="h-9 w-36 rounded-lg border border-b1 bg-bg3 px-3 text-[12px] text-t2" />
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Disabled</div>
+                        <input type="text" readOnly value="Read only" className="h-9 w-36 rounded-lg border border-b1 bg-bg3 px-3 text-[12px] text-t2 opacity-40 cursor-not-allowed" />
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-mono text-t4 mt-3">opacity-40 cursor-not-allowed</div>
+                  </div>
+                  {/* Toggle disabled */}
+                  <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                    <div className="text-[11px] font-medium text-t3 mb-3">Toggle Switch</div>
+                    <div className="flex items-center gap-4">
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Enabled</div>
+                        <div className="flex h-5 w-9 items-center rounded-full bg-as px-0.5">
+                          <div className="h-4 w-4 translate-x-4 rounded-full bg-white transition-transform" />
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        <div className="text-[10px] text-t4">Disabled</div>
+                        <div className="flex h-5 w-9 items-center rounded-full bg-as px-0.5 opacity-40 cursor-not-allowed">
+                          <div className="h-4 w-4 translate-x-4 rounded-full bg-white transition-transform" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-[10px] font-mono text-t4 mt-3">opacity-40 cursor-not-allowed</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Scrollbar Styling ── */}
+          {activeSection === "scrollbar" && (
+            <div className="space-y-8">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">Custom Scrollbar</div>
+                <div className="rounded-lg border border-b1 bg-bgcard p-5">
+                  <div className="text-[11px] font-medium text-t3 mb-3">Scrollbar Appearance</div>
+                  <div className="text-[11px] text-t3 mb-4">
+                    Thin scrollbar with semi-transparent thumb. Track is transparent, thumb uses <span className="font-mono text-t4">rgba(255,255,255,0.12)</span> with hover brightening. Applied globally via <span className="font-mono text-t4">scrollbar-thin</span> and <span className="font-mono text-t4">scrollbar-thumb-white/12</span>.
+                  </div>
+                  <div className="h-48 w-full overflow-y-auto rounded-lg border border-b1 bg-bg2 p-4 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/12">
+                    {Array.from({ length: 30 }, (_, i) => (
+                      <div key={i} className="py-1.5 text-[12px] text-t3 border-b border-b1/30">
+                        Scrollable content line {i + 1} — demonstrating the custom scrollbar styling
+                      </div>
+                    ))}
+                  </div>
+                  <div className="text-[10px] font-mono text-t4 mt-3">scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/12</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Accessibility ── */}
+          {activeSection === "accessibility" && (
+            <div className="space-y-8">
+              <div>
+                <div className="text-[10px] font-medium uppercase tracking-[0.08em] text-t4 mb-6">WCAG Contrast Pairs</div>
+                <div className="flex flex-col gap-4">
+                  {[
+                    { fg: "var(--t1)", fgLabel: "t1", bg: "var(--bg)", bgLabel: "bg", desc: "Primary text", rating: "AAA", ratingColor: "text-g" },
+                    { fg: "var(--t2)", fgLabel: "t2", bg: "var(--bg)", bgLabel: "bg", desc: "Secondary text", rating: "AA", ratingColor: "text-g" },
+                    { fg: "var(--t3)", fgLabel: "t3", bg: "var(--bg)", bgLabel: "bg", desc: "Tertiary text", rating: "Check", ratingColor: "text-am" },
+                    { fg: "var(--t4)", fgLabel: "t4", bg: "var(--bg)", bgLabel: "bg", desc: "Quaternary text", rating: "May fail", ratingColor: "text-red-400" },
+                    { fg: "#FFFFFF", fgLabel: "White", bg: "var(--ab)", bgLabel: "ab (accent)", desc: "Accent button text", rating: "Check", ratingColor: "text-am" },
+                  ].map((pair) => (
+                    <div key={pair.fgLabel + pair.bgLabel} className="flex items-center gap-4 rounded-lg border border-b1 bg-bgcard px-5 py-4">
+                      <div className="flex h-12 w-20 items-center justify-center rounded-md border border-b1" style={{ backgroundColor: pair.bg }}>
+                        <span className="text-[14px] font-semibold" style={{ color: pair.fg }}>Aa</span>
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-[12px] font-medium text-t1">{pair.fgLabel} on {pair.bgLabel}</div>
+                        <div className="text-[11px] text-t3 mt-0.5">{pair.desc}</div>
+                      </div>
+                      <div className={`text-[12px] font-semibold ${pair.ratingColor}`}>{pair.rating}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

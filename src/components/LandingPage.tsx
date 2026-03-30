@@ -73,7 +73,7 @@ export function LandingPage({
           Your AI coworker.<br />
           Always working.
         </h1>
-        <p className="mt-4 text-center text-[15px] leading-[1.7] text-t3">
+        <p className="mt-4 text-center text-[15px] leading-[1.7] text-t2">
           Sai runs on a real machine, uses real apps, and does
           real work, even while you&apos;re away.
         </p>
@@ -137,8 +137,8 @@ export function LandingPage({
                 disabled={!code.trim()}
                 className={`mt-4 flex h-12 w-full items-center justify-center rounded-md text-[15px] font-medium transition-all ${
                   code.trim()
-                    ? "bg-as text-white hover:bg-as2"
-                    : "bg-bg3 text-t4 cursor-not-allowed"
+                    ? "bg-as text-white hover:brightness-110"
+                    : "bg-bg3 text-t4 disabled:opacity-40 disabled:cursor-not-allowed"
                 }`}
               >
                 Claim my spot
@@ -171,7 +171,7 @@ export function LandingPage({
               {/* Waitlist button */}
               <button
                 onClick={onGoToWaitlist}
-                className="mt-6 flex h-12 w-full items-center justify-center rounded-md bg-as text-[15px] font-medium text-white transition-all hover:bg-as2"
+                className="mt-6 flex h-12 w-full items-center justify-center rounded-md bg-as text-[15px] font-medium text-white transition-all hover:brightness-110"
               >
                 Join the waitlist
               </button>
@@ -188,7 +188,7 @@ export function LandingPage({
         </button>
 
         {/* Trust signals */}
-        <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-t4">
+        <div className="mt-4 flex items-center justify-center gap-4 text-[11px] text-t3">
           <div className="flex items-center gap-1.5">
             <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" />
@@ -208,7 +208,7 @@ export function LandingPage({
       {/* Demo invite code pill */}
       <button
         onClick={handleCopyDemo}
-        className="fixed bottom-4 left-4 flex items-center gap-1.5 rounded-full border border-b1 bg-bg2 px-3 py-1.5 text-[11px] transition-colors hover:bg-bg3"
+        className="fixed bottom-4 left-4 flex items-center gap-1.5 rounded-full border border-b1 bg-bg2 px-3 py-1.5 text-[11px] transition-colors hover:bg-bg3h"
       >
         {copied ? (
           <span className="text-g">Copied!</span>

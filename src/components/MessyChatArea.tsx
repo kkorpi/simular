@@ -616,6 +616,7 @@ export function MessyChatArea({ onTaskStart, onStepChange, onDone, onAllTurnsDon
                             },
                           ]}
                           accent="green"
+                          fadeAccent
                         />
                       </AgentMessage>
                     </div>

@@ -170,7 +170,7 @@ export function ProgressCard({
               <div className="flex-1" />
               <button
                 onClick={onCancel}
-                className="text-[11px] font-medium text-t4 transition-colors hover:text-t2"
+                className="text-[11px] font-medium text-t4 transition-colors hover:text-t1"
               >
                 Cancel
               </button>

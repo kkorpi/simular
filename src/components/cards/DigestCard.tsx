@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { CardShell } from "./CardShell";
+import { CardShell, type CardAccent } from "./CardShell";
 import { ScheduleBar, type ScheduleBarProps } from "./ScheduleBar";
 
 export interface DigestRun {
@@ -24,6 +24,7 @@ export interface DigestCardProps {
   actionItems?: DigestActionItem[];
   runs: DigestRun[];
   schedule?: ScheduleBarProps;
+  accent?: CardAccent;
   onViewTask?: () => void;
 }
 
@@ -35,12 +36,13 @@ export function DigestCard({
   actionItems,
   runs,
   schedule,
+  accent = "default",
   onViewTask,
 }: DigestCardProps) {
   const [showRuns, setShowRuns] = useState(false);
 
   return (
-    <CardShell accent="default">
+    <CardShell accent={accent}>
       {/* Header */}
       <div className="px-3.5 pt-3 pb-2.5">
         <div className="flex items-start gap-2.5">
@@ -123,7 +125,7 @@ export function DigestCard({
               {runs.map((run, i) => (
                 <div
                   key={i}
-                  className="flex items-start gap-2 rounded-md px-2 py-1.5 hover:bg-bg3"
+                  className="flex items-start gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-bg3h"
                 >
                   <div
                     className={`mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full ${

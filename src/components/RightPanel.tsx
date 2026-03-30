@@ -52,6 +52,8 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean,
         nextRun: "Tomorrow 8:00am",
         result: seq.resultSummary,
         artifact: seq.artifact,
+        artifacts: seq.artifacts,
+        uploads: seq.uploads,
         runHistory: [
           { date: "Just now", duration: "28s", summary: seq.resultSummary },
         ],
@@ -80,7 +82,7 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean,
       description: task.description,
       duration: done ? "28s" : undefined,
       steps: visibleSteps,
-      ...(done ? { result: seq.resultSummary, artifact: seq.artifact } : {}),
+      ...(done ? { result: seq.resultSummary, artifact: seq.artifact, artifacts: seq.artifacts, uploads: seq.uploads } : {}),
     },
   };
 }
@@ -119,6 +121,8 @@ function FirstRunTaskList({
           steps: fuSeq.steps.map((s) => ({ label: s.label, done: true })),
           result: fuSeq.resultSummary,
           artifact: fuSeq.artifact,
+          artifacts: fuSeq.artifacts,
+          uploads: fuSeq.uploads,
         },
       }
     : {
@@ -134,6 +138,8 @@ function FirstRunTaskList({
           steps: seq.steps.map((s) => ({ label: s.label, done: true })),
           result: seq.resultSummary,
           artifact: seq.artifact,
+          artifacts: seq.artifacts,
+          uploads: seq.uploads,
         },
       };
 
@@ -277,6 +283,8 @@ export function RightPanel({
           duration: "18s",
           result: fuSeq.resultSummary,
           artifact: fuSeq.artifact,
+          artifacts: fuSeq.artifacts,
+          uploads: fuSeq.uploads,
           steps: fuSeq.steps.map(s => ({ label: s.label, done: true })),
         },
       });

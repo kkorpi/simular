@@ -10,4 +10,10 @@ export { FormCard, type FormCardProps, type FormField, type FormValues } from ".
 export { ProgressCard, type ProgressCardProps, type ProgressStep, type ProgressStepStatus } from "./ProgressCard";
 export { ErrorCard, type ErrorCardProps, type ErrorType } from "./ErrorCard";
 export { DigestCard, type DigestCardProps, type DigestRun, type DigestActionItem } from "./DigestCard";
+export { ApprovalCard, type ApprovalCardProps, type Approver } from "./ApprovalCard";
+export { FileUploadCard, type FileUploadCardProps, type FileUploadStatus } from "./FileUploadCard";
+export { AlertCard, type AlertCardProps, type AlertSeverity } from "./AlertCard";
+export { HandoffCard, type HandoffCardProps } from "./HandoffCard";
+export { CostCard, type CostCardProps } from "./CostCard";
+export { StatusCard, type StatusCardProps, type ConnectionStatus } from "./StatusCard";
 export type { CardAction } from "./types";

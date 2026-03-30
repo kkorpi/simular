@@ -32,7 +32,7 @@ export const serviceRegistry: Record<string, ServiceConfig> = {
     id: "linkedin",
     name: "LinkedIn",
     accentColor: "blue",
-    brandColor: "#0A66C2",
+    brandColor: "var(--brand-linkedin)",
     fields: [
       { key: "email", label: "Email", type: "email", placeholder: "you@example.com", autoComplete: "email" },
       { key: "password", label: "Password", type: "password", placeholder: "", autoComplete: "current-password" },
@@ -45,7 +45,7 @@ export const serviceRegistry: Record<string, ServiceConfig> = {
     id: "gmail",
     name: "Gmail",
     accentColor: "default",
-    brandColor: "#EA4335",
+    brandColor: "var(--brand-gmail)",
     fields: [
       { key: "email", label: "Email", type: "email", placeholder: "you@gmail.com", autoComplete: "email" },
       { key: "password", label: "Password", type: "password", placeholder: "", autoComplete: "current-password" },
@@ -57,7 +57,7 @@ export const serviceRegistry: Record<string, ServiceConfig> = {
     id: "salesforce",
     name: "Salesforce",
     accentColor: "blue",
-    brandColor: "#00A1E0",
+    brandColor: "var(--brand-salesforce)",
     fields: [
       { key: "username", label: "Username", type: "text", placeholder: "user@company.com", autoComplete: "username" },
       { key: "password", label: "Password", type: "password", placeholder: "", autoComplete: "current-password" },
