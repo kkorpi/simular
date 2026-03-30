@@ -38,11 +38,59 @@ const SETUP_DURATIONS = [4000, 3500, 4000, 4500]; // ~16s total — slower per P
 const VALID_SCREENS = new Set<AppScreen>(["landing", "waitlist-signup", "signup-sso", "signup-payment", "onboarding", "waitlist", "main-app"]);
 const VALID_VIEWS = new Set<ViewState>(["zero-state", "task-hover", "result-detail"]);
 
-function parseHash(): { screen: AppScreen; view?: ViewState; overlay?: string } {
+/** URL-friendly slug → jumpToDemo mode. Used for #demo/slug deep links and ?demo=slug. */
+type DemoMode = "fresh" | "active" | "gallery" | "landing" | "landing-cap" | "teach" | "trial" | "system" | "expired" | "onboarding" | "messy";
+const DEMO_SLUGS: Record<string, DemoMode> = {
+  "landing": "landing",
+  "landing-cap": "landing-cap",
+  "sold-out": "landing-cap",
+  "onboarding": "onboarding",
+  "first-run": "fresh",
+  "fresh": "fresh",
+  "active": "active",
+  "active-session": "active",
+  "multi-turn": "messy",
+  "messy": "messy",
+  "teach": "teach",
+  "teach-flow": "teach",
+  "trial": "trial",
+  "trial-expiring": "trial",
+  "expired": "expired",
+  "gallery": "gallery",
+  "card-gallery": "gallery",
+  "system": "system",
+  "design-system": "system",
+};
+/** Reverse: mode → preferred slug for URL */
+const MODE_TO_SLUG: Record<DemoMode, string> = {
+  "landing": "landing",
+  "landing-cap": "landing-cap",
+  "fresh": "first-run",
+  "active": "active-session",
+  "gallery": "card-gallery",
+  "teach": "teach-flow",
+  "trial": "trial-expiring",
+  "system": "design-system",
+  "expired": "expired",
+  "onboarding": "onboarding",
+  "messy": "multi-turn",
+};
+
+function parseHash(): { screen: AppScreen; view?: ViewState; overlay?: string; demo?: DemoMode } {
   if (typeof window === "undefined") return { screen: "landing" };
   const raw = window.location.hash.replace(/^#\/?/, "");
   if (!raw) return { screen: "landing" };
   const parts = raw.split("/");
+
+  // #demo/slug deep links
+  if (parts[0] === "demo" && parts[1] && DEMO_SLUGS[parts[1]]) {
+    return { screen: "landing", demo: DEMO_SLUGS[parts[1]] };
+  }
+  // Also support bare #slug for convenience (e.g. #onboarding, #first-run)
+  if (parts.length === 1 && DEMO_SLUGS[parts[0]]) {
+    return { screen: "landing", demo: DEMO_SLUGS[parts[0]] };
+  }
+
   const s = parts[0] as AppScreen;
   if (!VALID_SCREENS.has(s)) return { screen: "landing" };
   const v = parts[1] as ViewState | undefined;
@@ -127,36 +175,25 @@ export default function Home() {
   const pipDragStartX = useRef(0);
   const pipDragStartWidth = useRef(PIP_DEFAULT_WIDTH);
 
-  // ── Read URL params: ?ref=CODE and ?demo=MODE ──
+  // ── Read URL params: ?ref=CODE and ?demo=MODE, plus #hash deep links ──
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const ref = params.get("ref");
     if (ref) setInviteCode(ref.toUpperCase());
 
-    const demo = params.get("demo");
-    if (demo === "fresh") {
-      setUserProfile({ role: "vc" });
-      setScreen("main-app");
-      setActiveView("zero-state");
-    } else if (demo === "active") {
-      setUserProfile({ role: "vc" });
-      setScreen("main-app");
-      setActiveView("task-hover");
-      setIsAutoPlay(true);
-    } else if (demo === "gallery") {
-      setUserProfile({ role: "vc" });
-      setScreen("main-app");
-      setCardGalleryOpen(true);
-    } else if (demo === "system") {
-      setUserProfile({ role: "vc" });
-      setScreen("main-app");
-      setDesignSystemOpen(true);
-    } else if (demo === "messy") {
-      jumpToDemo("messy");
+    // ?demo=slug takes priority
+    const demoParam = params.get("demo");
+    const demoMode = demoParam ? DEMO_SLUGS[demoParam] : initial.demo;
+    if (demoMode) {
+      // Use requestAnimationFrame so jumpToDemo runs after initial render
+      requestAnimationFrame(() => jumpToDemo(demoMode));
     }
   }, []);
 
-  // ── Hash deep-link: apply overlay on mount, sync hash on changes ──
+  // Track which demo mode is active (for hash sync)
+  const currentDemoRef = useRef<DemoMode | null>(null);
+
+  // ── Hash deep-link: apply overlay on mount ──
   useEffect(() => {
     const h = parseHash();
     if (h.overlay === "card-gallery") setCardGalleryOpen(true);
@@ -166,15 +203,35 @@ export default function Home() {
     if (h.screen === "main-app") setUserProfile((p) => p.role ? p : { ...p, role: "vc" });
   }, []);
 
-  // Sync hash when screen or view changes
+  // Sync hash when screen or view changes — use demo slug when a demo is active
   useEffect(() => {
-    const base = screen;
-    const sub = screen === "main-app" && activeView !== "zero-state" ? `/${activeView}` : "";
-    const newHash = `#${base}${sub}`;
-    if (window.location.hash !== newHash) {
-      window.history.replaceState(null, "", newHash);
+    if (currentDemoRef.current) {
+      const slug = MODE_TO_SLUG[currentDemoRef.current];
+      const newHash = `#${slug}`;
+      if (window.location.hash !== newHash) {
+        window.history.replaceState(null, "", newHash);
+      }
+    } else {
+      const base = screen;
+      const sub = screen === "main-app" && activeView !== "zero-state" ? `/${activeView}` : "";
+      const newHash = `#${base}${sub}`;
+      if (window.location.hash !== newHash) {
+        window.history.replaceState(null, "", newHash);
+      }
     }
   }, [screen, activeView]);
+
+  // ── Listen for hashchange (browser back/forward) ──
+  useEffect(() => {
+    const handleHashChange = () => {
+      const h = parseHash();
+      if (h.demo) {
+        jumpToDemo(h.demo);
+      }
+    };
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
 
   // ── Cmd+Shift+D → demo mode picker ──
   useEffect(() => {
@@ -191,7 +248,13 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [demoPickerOpen]);
 
-  const jumpToDemo = (mode: "fresh" | "active" | "gallery" | "landing" | "landing-cap" | "teach" | "trial" | "system" | "expired" | "onboarding" | "messy") => {
+  const jumpToDemo = (mode: DemoMode) => {
+    currentDemoRef.current = mode;
+    // Update hash immediately so it's visible in the URL bar
+    const slug = MODE_TO_SLUG[mode];
+    if (window.location.hash !== `#${slug}`) {
+      window.history.replaceState(null, "", `#${slug}`);
+    }
     setDemoPickerOpen(false);
     setFirstRunTask(null);
     setFirstRunDone(false);
