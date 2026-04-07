@@ -2,10 +2,11 @@
 
 import { CardShell, type CardAccent } from "./CardShell";
 import type { CardAction } from "./types";
+import { Hand } from "lucide-react";
 
 /* ── Types ── */
 
-export type ProgressStepStatus = "pending" | "running" | "done" | "error";
+export type ProgressStepStatus = "pending" | "running" | "done" | "error" | "guardrail";
 
 export type ProgressStep = {
   label: string;
@@ -46,6 +47,9 @@ const statusIcon: Record<ProgressStepStatus, React.ReactNode> = {
       <line x1="9" y1="9" x2="15" y2="15" />
     </svg>
   ),
+  guardrail: (
+    <Hand className="h-3.5 w-3.5 text-am animate-pulse" />
+  ),
 };
 
 const statusText: Record<ProgressStepStatus, string> = {
@@ -53,6 +57,7 @@ const statusText: Record<ProgressStepStatus, string> = {
   running: "text-t1 font-medium",
   done: "text-t3",
   error: "text-rd",
+  guardrail: "text-am font-medium",
 };
 
 /* ── Component ── */

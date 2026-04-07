@@ -872,6 +872,15 @@ export default function Home() {
               autoStep={autoStep}
               firstRunStep={firstRunStep}
               showCaptcha={authInputState === "captcha"}
+              guardrailLabel={
+                firstRunTask && !firstRunDone && firstRunStep === 2 && !linkedinConnected
+                  ? authInputState === "captcha"
+                    ? "Complete CAPTCHA verification"
+                    : authPhase === "waiting"
+                      ? "Waiting for sign in"
+                      : undefined
+                  : undefined
+              }
             />
           </div>
 

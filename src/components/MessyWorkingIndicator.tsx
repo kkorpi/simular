@@ -1,16 +1,19 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Hand } from "lucide-react";
 
 export function MessyWorkingIndicator({
   label,
   done,
   authWaiting,
+  guardrail,
   struggling,
 }: {
   label: string;
   done?: boolean;
   authWaiting?: boolean;
+  guardrail?: boolean;
   struggling?: boolean;
 }) {
   const [displayLabel, setDisplayLabel] = useState(label);
@@ -55,6 +58,8 @@ export function MessyWorkingIndicator({
           <rect x="3" y="11" width="18" height="11" rx="2" />
           <path d="M7 11V7a5 5 0 0110 0v4" />
         </svg>
+      ) : guardrail ? (
+        <Hand className="mr-1.5 h-3.5 w-3.5 shrink-0 text-am animate-pulse" />
       ) : struggling ? (
         /* Amber spinner for struggling state */
         <div className="mr-2 h-[14px] w-[14px] shrink-0 rounded-full border-2 border-am/30 border-t-am animate-spin" />
@@ -66,9 +71,11 @@ export function MessyWorkingIndicator({
         className={`text-[13px] font-medium transition-opacity duration-200 ${
           done
             ? "text-t2"
-            : struggling
+            : guardrail
               ? "text-am shimmer-text-amber"
-              : "text-t3 shimmer-text"
+              : struggling
+                ? "text-am shimmer-text-amber"
+                : "text-t3 shimmer-text"
         } ${fading ? "opacity-0" : "opacity-100"}`}
       >
         {displayLabel}

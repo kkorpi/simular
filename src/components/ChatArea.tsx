@@ -1000,10 +1000,22 @@ export function ChatArea({
             <AgentMessage>
               <div className="text-sm leading-[1.6] text-t2">{seq.intro}</div>
               <RunningTaskDetail
-                steps={seq.steps.slice(0, firstRunStep).map((s, i): RunningStep => ({
-                  ...s,
-                  done: firstRunDone ? true : i < firstRunStep - 1,
-                }))}
+                steps={(() => {
+                  const base = seq.steps.slice(0, firstRunStep).map((s, i): RunningStep => ({
+                    ...s,
+                    done: firstRunDone ? true : i < firstRunStep - 1,
+                  }));
+                  // Inject a guardrail step when auth/captcha is blocking
+                  const isAtLoginGate = firstRunStep === FIRST_RUN_LOGIN_GATE && !linkedinConnected;
+                  if (!firstRunDone && isAtLoginGate) {
+                    if (authInputState === "captcha") {
+                      base.push({ timestamp: "", label: "Complete CAPTCHA verification", done: false, type: "guardrail", status: "guardrail" });
+                    } else if (authPhase === "waiting") {
+                      base.push({ timestamp: "", label: "Waiting for sign in", done: false, type: "guardrail", status: "guardrail" });
+                    }
+                  }
+                  return base;
+                })()}
                 subtasks={[seq.subtask]}
                 onViewActivityLog={onViewActivityLog}
                 done={firstRunDone}

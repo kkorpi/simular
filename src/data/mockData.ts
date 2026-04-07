@@ -3,6 +3,8 @@ export type ViewState = "zero-state" | "task-hover" | "result-detail";
 export interface TaskStep {
   label: string;
   done: boolean;
+  /** When true, this step represents a guardrail requiring user intervention */
+  guardrail?: boolean;
 }
 
 export interface RunHistoryEntry {
@@ -565,8 +567,8 @@ export const talkingPoints = [
 
 // ===== Running Task Step Log =====
 
-export type StepType = "action" | "error" | "thinking" | "user";
-export type StepStatus = "done" | "active" | "failed";
+export type StepType = "action" | "error" | "thinking" | "user" | "guardrail";
+export type StepStatus = "done" | "active" | "failed" | "guardrail";
 
 export interface RunningStep {
   timestamp: string;
@@ -606,7 +608,7 @@ export const runningTaskSteps: RunningStep[] = [
 
 export interface WorkspaceStep {
   label: string;
-  status: "done" | "active" | "pending";
+  status: "done" | "active" | "pending" | "guardrail";
 }
 
 export const workspaceSteps: WorkspaceStep[] = [
@@ -623,7 +625,7 @@ export const workspaceSteps: WorkspaceStep[] = [
 export const linkedinPreLoginSteps: RunningStep[] = [
   { timestamp: "0:01", label: "Opened Chrome", done: true },
   { timestamp: "0:03", label: "Navigated to linkedin.com/login", site: "linkedin.com", done: true },
-  { timestamp: "0:05", label: "Signing in to LinkedIn...", done: false },
+  { timestamp: "0:05", label: "Signing in to LinkedIn...", done: false, type: "guardrail", status: "guardrail" },
 ];
 
 export const linkedinLoginSteps: RunningStep[] = [
@@ -639,7 +641,7 @@ export const linkedinLoginSteps: RunningStep[] = [
 export const loginSteps: WorkspaceStep[] = [
   { label: "Received task: check LinkedIn profile viewers", status: "done" },
   { label: "LinkedIn access required", status: "done" },
-  { label: "Waiting for sign in", status: "active" },
+  { label: "Waiting for sign in", status: "guardrail" },
   { label: "Pull profile viewer list", status: "pending" },
   { label: "Research viewer backgrounds", status: "pending" },
 ];
@@ -650,6 +652,22 @@ export const loginSuccessSteps: WorkspaceStep[] = [
   { label: "Signed in to LinkedIn", status: "done" },
   { label: "Pulling profile viewer list", status: "active" },
   { label: "Research viewer backgrounds", status: "pending" },
+];
+
+export const captchaSteps: WorkspaceStep[] = [
+  { label: "Navigated to Salesforce login", status: "done" },
+  { label: "Entered credentials", status: "done" },
+  { label: "Complete CAPTCHA verification", status: "guardrail" },
+  { label: "Pull active deal records and stages", status: "pending" },
+  { label: "Analyze pipeline data", status: "pending" },
+];
+
+export const captchaSuccessSteps: WorkspaceStep[] = [
+  { label: "Navigated to Salesforce login", status: "done" },
+  { label: "Entered credentials", status: "done" },
+  { label: "CAPTCHA verified", status: "done" },
+  { label: "Pulling active deal records and stages", status: "active" },
+  { label: "Analyze pipeline data", status: "pending" },
 ];
 
 // ===== LinkedIn Profile Disambiguation =====
