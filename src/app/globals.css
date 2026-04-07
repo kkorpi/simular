@@ -89,7 +89,7 @@
   --lt: #fff;
   --r: #dc2626;
   --sc: 0 2px 8px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
+  --card-shadow: none;
   --mg: radial-gradient(ellipse at 30% 0%, rgba(24, 135, 90, 0.06) 0%, transparent 50%);
   --st: #1a1a1e;
   --sb: #d0d0cc;

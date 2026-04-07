@@ -10,7 +10,7 @@ import { TaskDetail } from "./TaskDetail";
 import { TaskSettingsPanel } from "./TaskSettingsPanel";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { firstRunSequences, followUpSequences, activeTasks as defaultActiveTasks, recurringTasks as defaultRecurringTasks, completedTasks as defaultCompletedTasks } from "@/data/mockData";
-import type { ViewState, Task, StarterTask, TeachPhase } from "@/data/mockData";
+import type { ViewState, Task, StarterTask, TeachPhase, TaskStep } from "@/data/mockData";
 
 const SETUP_STEPS = [
   "Setting up your workspace",
@@ -62,7 +62,7 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean,
   }
 
   // When running, only show steps up to stepProgress, with last one not done
-  const visibleSteps = done
+  const visibleSteps: TaskStep[] = done
     ? seq.steps.map((s) => ({ label: s.label, done: true }))
     : seq.steps.slice(0, stepProgress).map((s, i) => ({
         label: s.label,
@@ -251,7 +251,7 @@ export function RightPanel({
 }) {
   const isMobile = useIsMobile();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [panelWidth, setPanelWidth] = useState(470);
+  const [panelWidth, setPanelWidth] = useState(350);
   const [isDragging, setIsDragging] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -343,7 +343,7 @@ export function RightPanel({
 
   // ── Result-detail view (desktop only — mobile doesn't show briefing in sidebar) ──
   if (!isMobile && view === "result-detail") {
-    const effectiveWidth = Math.max(panelWidth, 520);
+    const effectiveWidth = Math.max(panelWidth, 280);
     return (
       <div
         className={`relative flex shrink-0 flex-col border-l border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}
