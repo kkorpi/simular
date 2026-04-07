@@ -22,6 +22,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const theme = resolveTheme(preference, systemDark);
 
+  // Read persisted preference on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem("theme-preference") as ThemePreference | null;
+      if (stored && (stored === "dark" || stored === "light" || stored === "system")) {
+        setPreferenceState(stored);
+      }
+    } catch {}
+  }, []);
+
   // Apply theme to DOM
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
@@ -38,6 +48,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   const setPreference = useCallback((p: ThemePreference) => {
     setPreferenceState(p);
+    try { localStorage.setItem("theme-preference", p); } catch {}
   }, []);
 
   return (
