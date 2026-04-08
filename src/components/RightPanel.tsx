@@ -336,7 +336,7 @@ export function RightPanel({
     const effectiveWidth = Math.max(panelWidth, 520);
     return (
       <div
-        className={`relative flex shrink-0 flex-col border-l border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}
+        className={`relative flex flex-none flex-col border-l border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}
         style={{ width: effectiveWidth }}
       >
         <ResizeHandle onResize={handleResize} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
@@ -887,7 +887,7 @@ export function RightPanel({
     <div
       role="complementary"
       aria-label="Tasks panel"
-      className={`relative flex shrink-0 flex-col overflow-hidden border-l border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}
+      className={`relative flex flex-none flex-col overflow-hidden border-l border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}
       style={{ width: panelWidth }}
     >
       <ResizeHandle onResize={handleResize} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
