@@ -91,7 +91,7 @@ export function PromptCard({
         {/* Icon + message */}
         <div className="flex items-start gap-2.5 px-3.5 py-3">
           <div className={`mt-0.5 flex h-[28px] w-[28px] shrink-0 items-center justify-center rounded-md ${
-            isDestructive ? "bg-rd/10 text-rd" : severity === "warning" ? "bg-am/10 text-am" : "bg-bg3h text-t3"
+            isDestructive ? "bg-rd/10 text-rd" : severity === "warning" ? "bg-am/10 text-amt" : "bg-bg3h text-t3"
           }`}>
             {icon ?? (
               isDestructive ? (
@@ -115,7 +115,7 @@ export function PromptCard({
               <div className={`mt-2 rounded-md px-3 py-2 text-[12px] leading-[1.5] ${
                 isDestructive
                   ? "bg-rd/[0.06] text-rd/80 border border-rd/10"
-                  : "bg-am/[0.06] text-am border border-am/10"
+                  : "bg-am/[0.06] text-amt border border-am/10"
               }`}>
                 {consequence}
               </div>

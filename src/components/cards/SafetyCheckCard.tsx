@@ -54,7 +54,7 @@ export function SafetyCheckCard({
           <ShieldAlert className="h-4 w-4" />
         </div>
         <div className="min-w-0 flex-1 text-[13px] font-semibold text-t1">{actionLabel}</div>
-        <span className="shrink-0 rounded-full bg-am/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-am">
+        <span className="shrink-0 rounded-full bg-am/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amt">
           {badge}
         </span>
       </div>
@@ -82,7 +82,7 @@ export function SafetyCheckCard({
         </button>
         <button
           onClick={handleAllow}
-          className="rounded-md border border-am/40 bg-am/10 px-2.5 py-1 text-xs font-medium text-am transition-colors hover:bg-am/20"
+          className="rounded-md border border-am/40 bg-am/10 px-2.5 py-1 text-xs font-medium text-amt transition-colors hover:bg-am/20"
         >
           Always Allow
         </button>

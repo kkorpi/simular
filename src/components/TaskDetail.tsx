@@ -27,8 +27,8 @@ function ArtifactIcon({ format }: { format: string }) {
 function StatusBadge({ status }: { status: Task["status"] }) {
   const styles = {
     running: "bg-gs text-gt",
-    queued: "bg-ams text-am",
-    recurring: "bg-ams text-am",
+    queued: "bg-ams text-amt",
+    recurring: "bg-ams text-amt",
     completed: "bg-bg3h text-t3",
   };
   const labels = {
@@ -360,7 +360,7 @@ export function TaskDetail({
                       <div className="h-[5px] w-[5px] rounded-full bg-t4" />
                     </div>
                   )}
-                  <span className={`text-[12.5px] ${isGuardrail ? "text-am font-medium" : step.done ? "text-t2" : isActive ? "text-t1 font-medium" : "text-t3"}`}>
+                  <span className={`text-[12.5px] ${isGuardrail ? "text-amt font-medium" : step.done ? "text-t2" : isActive ? "text-t1 font-medium" : "text-t3"}`}>
                     {step.label}
                   </span>
                 </div>

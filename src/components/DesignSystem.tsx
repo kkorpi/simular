@@ -1782,9 +1782,9 @@ export function DesignSystem({ open, onClose }: { open: boolean; onClose: () => 
                   {[
                     { fg: "var(--t1)", fgLabel: "t1", bg: "var(--bg)", bgLabel: "bg", desc: "Primary text", rating: "AAA", ratingColor: "text-g" },
                     { fg: "var(--t2)", fgLabel: "t2", bg: "var(--bg)", bgLabel: "bg", desc: "Secondary text", rating: "AA", ratingColor: "text-g" },
-                    { fg: "var(--t3)", fgLabel: "t3", bg: "var(--bg)", bgLabel: "bg", desc: "Tertiary text", rating: "Check", ratingColor: "text-am" },
+                    { fg: "var(--t3)", fgLabel: "t3", bg: "var(--bg)", bgLabel: "bg", desc: "Tertiary text", rating: "Check", ratingColor: "text-amt" },
                     { fg: "var(--t4)", fgLabel: "t4", bg: "var(--bg)", bgLabel: "bg", desc: "Quaternary text", rating: "May fail", ratingColor: "text-red-400" },
-                    { fg: "#FFFFFF", fgLabel: "White", bg: "var(--ab)", bgLabel: "ab (accent)", desc: "Accent button text", rating: "Check", ratingColor: "text-am" },
+                    { fg: "#FFFFFF", fgLabel: "White", bg: "var(--ab)", bgLabel: "ab (accent)", desc: "Accent button text", rating: "Check", ratingColor: "text-amt" },
                   ].map((pair) => (
                     <div key={pair.fgLabel + pair.bgLabel} className="flex items-center gap-4 rounded-lg border border-b1 bg-bgcard px-5 py-4">
                       <div className="flex h-12 w-20 items-center justify-center rounded-md border border-b1" style={{ backgroundColor: pair.bg }}>

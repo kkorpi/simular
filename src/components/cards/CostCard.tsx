@@ -33,7 +33,7 @@ export function CostCard({
         <div className="min-w-0 flex-1">
           <div className="text-[13px] font-semibold text-t1">{action}</div>
           <div className="mt-1.5 flex items-center gap-2">
-            <span className="rounded-md bg-am/10 px-2 py-0.5 text-[11px] font-medium text-am">
+            <span className="rounded-md bg-am/10 px-2 py-0.5 text-[11px] font-medium text-amt">
               {cost}
             </span>
             <span className="text-[11px] text-t3">{balance}</span>

@@ -551,13 +551,13 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
       {/* Cancelled banner */}
       {trialCancelled && trialDaysLeft > 0 && (
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/[0.04] px-4 py-3.5">
-          <div className="text-[13px] font-medium text-am">Trial cancelled</div>
+          <div className="text-[13px] font-medium text-amt">Trial cancelled</div>
           <div className="mt-1 text-[12px] text-t3">
             Your workspace stays active for {trialDaysLeft} more day{trialDaysLeft !== 1 ? "s" : ""}. After that, you&apos;ll lose access.
           </div>
           <button
             onClick={onReactivateTrial}
-            className="mt-3 flex h-8 w-full items-center justify-center rounded-md border border-amber-500/30 text-[12px] font-medium text-am transition-colors hover:bg-amber-500/10"
+            className="mt-3 flex h-8 w-full items-center justify-center rounded-md border border-amber-500/30 text-[12px] font-medium text-amt transition-colors hover:bg-amber-500/10"
           >
             Reactivate trial
           </button>
@@ -582,7 +582,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
               >
                 {plans[p].name}
                 {p === "plus" && (
-                  <span className={`ml-1.5 text-[9px] font-semibold ${trialCancelled ? "text-am" : "text-blt"}`}>{trialCancelled ? "CANCELLED" : "CURRENT"}</span>
+                  <span className={`ml-1.5 text-[9px] font-semibold ${trialCancelled ? "text-amt" : "text-blt"}`}>{trialCancelled ? "CANCELLED" : "CURRENT"}</span>
                 )}
               </button>
             ))}
@@ -600,7 +600,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
                       CANCELLED
                     </span>
                   ) : (
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${isUrgent ? "bg-amber-500/15 text-am" : "bg-as/15 text-blt"}`}>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${isUrgent ? "bg-amber-500/15 text-amt" : "bg-as/15 text-blt"}`}>
                       {isUrgent ? "EXPIRES TOMORROW" : "TRIAL"}
                     </span>
                   )
@@ -644,7 +644,7 @@ function SubscriptionSettings({ trialDaysLeft = 6, trialCancelled, onCancelTrial
             <div className="mt-3">
               <div className="flex items-center justify-between text-[10px] text-t3 mb-1">
                 <span>Day {trialDay} of 14</span>
-                <span className={trialCancelled ? "font-medium text-t4" : isUrgent ? "font-medium text-am" : ""}>{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} left</span>
+                <span className={trialCancelled ? "font-medium text-t4" : isUrgent ? "font-medium text-amt" : ""}>{trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} left</span>
               </div>
               <div className="h-1.5 rounded-full bg-b1">
                 <div className={`h-1.5 rounded-full ${trialCancelled ? "bg-t4" : isUrgent ? "bg-am" : "bg-as"}`} style={{ width: `${trialPct}%` }} />

@@ -72,9 +72,9 @@ export function MessyWorkingIndicator({
           done
             ? "text-t2"
             : guardrail
-              ? "text-am shimmer-text-amber"
+              ? "text-amt shimmer-text-amber"
               : struggling
-                ? "text-am shimmer-text-amber"
+                ? "text-amt shimmer-text-amber"
                 : "text-t3 shimmer-text"
         } ${fading ? "opacity-0" : "opacity-100"}`}
       >

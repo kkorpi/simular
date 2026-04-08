@@ -42,8 +42,8 @@ const severityIcons: Record<AlertSeverity, ReactNode> = {
 
 const severityColors: Record<AlertSeverity, { bg: string; text: string }> = {
   info: { bg: "bg-as/10", text: "text-as" },
-  warning: { bg: "bg-am/10", text: "text-am" },
-  caution: { bg: "bg-am/10", text: "text-am" },
+  warning: { bg: "bg-am/10", text: "text-amt" },
+  caution: { bg: "bg-am/10", text: "text-amt" },
 };
 
 /* ── Component ── */

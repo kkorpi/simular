@@ -65,8 +65,8 @@ const dotColors = {
 
 const urgencyStyles = {
   info: { dot: "bg-as", text: "text-t3" },
-  attention: { dot: "bg-am", text: "text-am" },
-  urgent: { dot: "bg-am animate-pulse", text: "text-am" },
+  attention: { dot: "bg-am", text: "text-amt" },
+  urgent: { dot: "bg-am animate-pulse", text: "text-amt" },
 } as const;
 
 /* ── Component ── */

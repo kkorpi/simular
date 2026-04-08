@@ -85,7 +85,7 @@ function StepRow({ step }: { step: RunningStep }) {
       </span>
       <div className="min-w-0 flex-1">
         <div className="text-[12px] leading-[1.5] text-t2">
-          <span className={isFailed ? "text-t3" : isGuardrail ? "text-am font-medium" : isUser ? "text-blt" : ""}>
+          <span className={isFailed ? "text-t3" : isGuardrail ? "text-amt font-medium" : isUser ? "text-blt" : ""}>
             {step.label}
           </span>
           {(step.userAction || isUser) && (
@@ -180,7 +180,7 @@ export function MessyTaskDetail({
         </button>
         <span
           className={`text-[11px] transition-opacity duration-200 ${
-            isStruggling ? "text-am" : "text-t4"
+            isStruggling ? "text-amt" : "text-t4"
           } ${expanded ? "opacity-0" : "opacity-100"}`}
         >
           {done

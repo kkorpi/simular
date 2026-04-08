@@ -57,7 +57,7 @@ const statusText: Record<ProgressStepStatus, string> = {
   running: "text-t1 font-medium",
   done: "text-t3",
   error: "text-rd",
-  guardrail: "text-am font-medium",
+  guardrail: "text-amt font-medium",
 };
 
 /* ── Component ── */

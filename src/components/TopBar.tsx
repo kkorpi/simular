@@ -56,7 +56,7 @@ export function TopBar({
             }`}
           >
             <div className={`h-1.5 w-1.5 rounded-full ${trialDaysLeft <= 1 ? "bg-am" : "bg-as"}`} />
-            <span className={`font-mono text-[11px] max-md:text-[10px] ${trialDaysLeft <= 1 ? "text-am" : "text-t3"}`}>
+            <span className={`font-mono text-[11px] max-md:text-[10px] ${trialDaysLeft <= 1 ? "text-amt" : "text-t3"}`}>
               <span className="max-md:hidden">Pro trial &ndash; {trialDaysLeft}d left</span>
               <span className="hidden max-md:inline">{trialDaysLeft}d left</span>
             </span>

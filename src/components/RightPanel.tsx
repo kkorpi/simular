@@ -523,7 +523,7 @@ export function RightPanel({
           ) : (
             <div className={`h-[7px] w-[7px] rounded-full ${showCaptcha ? "bg-am animate-pulse" : isOnboarding && !workspaceSetupDone ? "bg-am" : workspaceConnecting ? "bg-am" : "bg-g"}`} />
           )}
-          <span className={`font-mono text-[11.5px] ${showCaptcha ? "text-am" : "text-t3"}`}>{showCaptcha ? "Action needed" : isFreshState ? "Ready" : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace") : workspaceConnecting ? "Setting up workspace" : hasActiveTask ? `Working${elapsedStr ? ` · ${elapsedStr}` : ""}` : (isAutoPlay && autoStep >= 10) ? "Ready" : (firstRunTask && firstRunDone) ? "Ready" : "Working \u00B7 3.2 hrs"}</span>
+          <span className={`font-mono text-[11.5px] ${showCaptcha ? "text-amt" : "text-t3"}`}>{showCaptcha ? "Action needed" : isFreshState ? "Ready" : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace") : workspaceConnecting ? "Setting up workspace" : hasActiveTask ? `Working${elapsedStr ? ` · ${elapsedStr}` : ""}` : (isAutoPlay && autoStep >= 10) ? "Ready" : (firstRunTask && firstRunDone) ? "Ready" : "Working \u00B7 3.2 hrs"}</span>
         </div>
         <button
           onClick={onToggleCollapse}
@@ -579,7 +579,7 @@ export function RightPanel({
                     <div className="flex-1 mx-2 h-[14px] rounded-sm bg-bg3 flex items-center px-2">
                       <span className="text-[8px] text-t4 truncate">{addressUrl}</span>
                     </div>
-                    <div className={`flex items-center gap-1 rounded-full px-1.5 py-px text-[7px] font-semibold ${showCaptcha ? "bg-am/10 text-am" : "bg-g/10 text-g"}`}>
+                    <div className={`flex items-center gap-1 rounded-full px-1.5 py-px text-[7px] font-semibold ${showCaptcha ? "bg-am/10 text-amt" : "bg-g/10 text-g"}`}>
                       <div className={`h-1 w-1 rounded-full ${showCaptcha ? "bg-am animate-pulse" : "bg-g"}`} />
                       {showCaptcha ? "PAUSED" : "LIVE"}
                     </div>
@@ -632,7 +632,7 @@ export function RightPanel({
                         <div className="mt-1.5 text-[6px] text-t3 text-center">Select all squares with traffic lights</div>
                       </div>
                       {/* Amber pulsing label */}
-                      <div className="flex items-center gap-1.5 text-[9px] text-am font-medium">
+                      <div className="flex items-center gap-1.5 text-[9px] text-amt font-medium">
                         <div className="h-1 w-1 rounded-full bg-am animate-pulse" />
                         Waiting for you
                       </div>
@@ -716,7 +716,7 @@ export function RightPanel({
         </div>
         {/* Current step indicator below preview */}
         {currentStepLabel && (
-          <div className={`mt-1.5 flex items-center gap-1.5 px-1 text-[10px] truncate ${guardrailLabel ? "text-am" : "text-t3"}`}>
+          <div className={`mt-1.5 flex items-center gap-1.5 px-1 text-[10px] truncate ${guardrailLabel ? "text-amt" : "text-t3"}`}>
             <div className={`h-1 w-1 shrink-0 rounded-full animate-pulse ${guardrailLabel ? "bg-am" : "bg-g"}`} />
             {currentStepLabel}
           </div>

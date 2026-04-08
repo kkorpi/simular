@@ -54,7 +54,7 @@ function HoverThumbnail({ task, anchorRef }: { task: Task; anchorRef: React.RefO
             </div>
           )}
           {isRecurring && (
-            <div className="absolute top-1 right-1 flex items-center gap-[3px] rounded-full bg-bg2/80 px-1.5 py-px text-[8px] font-semibold text-am">
+            <div className="absolute top-1 right-1 flex items-center gap-[3px] rounded-full bg-bg2/80 px-1.5 py-px text-[8px] font-semibold text-amt">
               LAST RUN
             </div>
           )}

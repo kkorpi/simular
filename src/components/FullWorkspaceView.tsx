@@ -377,7 +377,7 @@ export function FullWorkspaceView({
               REC
             </div>
           ) : mode === "captcha" ? (
-            <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-am">
+            <div className="flex items-center gap-1.5 px-3 py-2 text-[11px] font-semibold text-amt">
               <div className="h-2 w-2 rounded-full bg-am animate-pulse" />
               PAUSED
             </div>
@@ -703,7 +703,7 @@ export function FullWorkspaceView({
                         step.status === "done"
                           ? "text-t3"
                           : step.status === "guardrail"
-                            ? "text-am font-medium"
+                            ? "text-amt font-medium"
                             : step.status === "active"
                               ? "text-t1 font-medium"
                               : "text-t4"

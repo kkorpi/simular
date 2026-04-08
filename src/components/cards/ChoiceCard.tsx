@@ -34,7 +34,7 @@ export interface ChoiceCardProps {
 }
 
 const badgeColors = {
-  amber: "bg-ams text-am",
+  amber: "bg-ams text-amt",
   green: "bg-gs text-gt",
   blue: "bg-ab text-abt",
   neutral: "bg-bg3h text-t3",
@@ -274,7 +274,7 @@ export function ChoiceCard({
                             attr.highlight === "best"
                               ? "font-semibold text-g"
                               : attr.highlight === "worst"
-                                ? "text-am"
+                                ? "text-amt"
                                 : "text-t2"
                           }>
                             {attr.value}{attr.unit ? ` ${attr.unit}` : ""}

@@ -34,7 +34,7 @@ export function WorkingIndicator({ label, done, authWaiting, guardrail }: { labe
         <div className="mr-2 h-[14px] w-[14px] shrink-0 rounded-full border-2 border-g/30 border-t-g animate-spin" />
       )}
       <span
-        className={`text-[13px] font-medium transition-opacity duration-200 ${done ? "text-t2" : guardrail ? "text-am shimmer-text-amber" : "text-t3 shimmer-text"} ${fading ? "opacity-0" : "opacity-100"}`}
+        className={`text-[13px] font-medium transition-opacity duration-200 ${done ? "text-t2" : guardrail ? "text-amt shimmer-text-amber" : "text-t3 shimmer-text"} ${fading ? "opacity-0" : "opacity-100"}`}
       >
         {displayLabel}
       </span>

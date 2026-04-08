@@ -64,7 +64,7 @@ export function DigestCard({
       {/* Action items */}
       {actionItems && actionItems.length > 0 && (
         <div className="border-t border-b1 px-3.5 py-2.5">
-          <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.05em] text-am">
+          <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.05em] text-amt">
             Needs attention ({actionItems.length})
           </div>
           <div className="flex flex-col gap-2.5">

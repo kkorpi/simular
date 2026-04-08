@@ -138,7 +138,7 @@ export function RunningTaskDetail({
                       {step.timestamp}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className={`text-[12px] leading-[1.5] ${isThinking ? "italic text-t4" : (step.type === "guardrail" || step.status === "guardrail") ? "text-am font-medium" : "text-t2"}`}>
+                      <div className={`text-[12px] leading-[1.5] ${isThinking ? "italic text-t4" : (step.type === "guardrail" || step.status === "guardrail") ? "text-amt font-medium" : "text-t2"}`}>
                         <span>
                           {step.label}
                         </span>

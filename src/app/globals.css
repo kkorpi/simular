@@ -28,6 +28,7 @@
   --gg: rgba(61, 214, 140, 0.22);
   --gt: #3dd68c;
   --am: #f59e0b;
+  --amt: #f59e0b;
   --ams: #fef3c7;
   --bl: #346E96;
   --bls: rgba(52, 110, 150, 0.12);
@@ -81,6 +82,7 @@
   --gg: rgba(24, 135, 90, 0.18);
   --gt: #15704a;
   --am: #f59e0b;
+  --amt: #b45309;
   --ams: #fef3c7;
   --bl: #2c6084;
   --bls: rgba(44, 96, 132, 0.12);
@@ -159,6 +161,7 @@
   --color-gg: var(--gg);
   --color-gt: var(--gt);
   --color-am: var(--am);
+  --color-amt: var(--amt);
   --color-ams: var(--ams);
   --color-bl: var(--bl);
   --color-bls: var(--bls);
