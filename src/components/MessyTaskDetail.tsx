@@ -25,10 +25,15 @@ const WINDOW_H = VISIBLE_COUNT * ROW_H;
 
 function StepDot({ step }: { step: RunningStep }) {
   const isFailed = step.status === "failed" || step.type === "error";
+  const isGuardrail = step.type === "guardrail" || step.status === "guardrail";
   const isUser = step.type === "user";
   const isThinking = step.type === "thinking";
 
   if (isThinking) return null; // no dot for thinking steps
+
+  if (isGuardrail) {
+    return <div className="h-[7px] w-[7px] rounded-full bg-am animate-pulse" />;
+  }
 
   if (isUser) {
     return <div className="h-[7px] w-[7px] rounded-full bg-blt" />;
@@ -47,6 +52,7 @@ function StepDot({ step }: { step: RunningStep }) {
 
 function StepRow({ step }: { step: RunningStep }) {
   const isFailed = step.status === "failed" || step.type === "error";
+  const isGuardrail = step.type === "guardrail" || step.status === "guardrail";
   const isUser = step.type === "user";
   const isThinking = step.type === "thinking";
 
@@ -79,7 +85,7 @@ function StepRow({ step }: { step: RunningStep }) {
       </span>
       <div className="min-w-0 flex-1">
         <div className="text-[12px] leading-[1.5] text-t2">
-          <span className={isFailed ? "text-t3" : isUser ? "text-blt" : ""}>
+          <span className={isFailed ? "text-t3" : isGuardrail ? "text-am font-medium" : isUser ? "text-blt" : ""}>
             {step.label}
           </span>
           {(step.userAction || isUser) && (
@@ -148,6 +154,7 @@ export function MessyTaskDetail({
         <MessyWorkingIndicator
           label={indicatorLabel}
           done={done}
+          guardrail={!done && !isStruggling && !!currentStep && (currentStep.type === "guardrail" || currentStep.status === "guardrail")}
           struggling={isStruggling}
         />
       </div>

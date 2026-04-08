@@ -257,7 +257,7 @@ export function TaskInput({ onSlashCommand, onSend, prefillText }: { onSlashComm
   };
 
   return (
-    <div className="relative flex flex-col rounded-lg border border-b1 bg-bgcard transition-colors focus-within:border-b2">
+    <div className="relative flex flex-col rounded-lg border border-b1 bg-bgcard shadow-[var(--sc)] transition-colors focus-within:border-b2">
       {/* Slash command menu */}
       {showMenu && filteredCommands.length > 0 && (
         <div

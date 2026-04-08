@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Hand } from "lucide-react";
 import type { Task, ResultArtifact, Upload } from "@/data/mockData";
 
 /** Lucide icon for artifact format */
@@ -333,9 +334,12 @@ export function TaskDetail({
             <div className="flex flex-col gap-1">
               {d.steps.map((step, i) => {
                 const isActive = !step.done && task.status === "running" && d.steps!.findIndex((s) => !s.done) === i;
+                const isGuardrail = step.guardrail && !step.done;
                 return (
                 <div key={i} className="flex items-center gap-2 py-0.5">
-                  {step.done ? (
+                  {isGuardrail ? (
+                    <Hand className="h-3.5 w-3.5 shrink-0 text-am animate-pulse" />
+                  ) : step.done ? (
                     <svg
                       className="h-3.5 w-3.5 shrink-0 text-g"
                       viewBox="0 0 24 24"
@@ -356,7 +360,7 @@ export function TaskDetail({
                       <div className="h-[5px] w-[5px] rounded-full bg-t4" />
                     </div>
                   )}
-                  <span className={`text-[12.5px] ${step.done ? "text-t2" : isActive ? "text-t1 font-medium" : "text-t3"}`}>
+                  <span className={`text-[12.5px] ${isGuardrail ? "text-am font-medium" : step.done ? "text-t2" : isActive ? "text-t1 font-medium" : "text-t3"}`}>
                     {step.label}
                   </span>
                 </div>

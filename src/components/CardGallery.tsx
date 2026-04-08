@@ -26,11 +26,12 @@ import { AlertCard, type AlertSeverity } from "./cards/AlertCard";
 import { HandoffCard } from "./cards/HandoffCard";
 import { CostCard } from "./cards/CostCard";
 import { StatusCard, type ConnectionStatus } from "./cards/StatusCard";
+import { SafetyCheckCard } from "./cards/SafetyCheckCard";
 import type { RunningStep } from "@/data/mockData";
 
 /* ── Card type definitions ── */
 
-type CardType = "result" | "digest" | "draft" | "choice" | "prompt" | "batch" | "form" | "progress" | "error" | "notification" | "destructive" | "comparison" | "approval" | "file-upload" | "alert" | "handoff" | "cost" | "status";
+type CardType = "result" | "digest" | "draft" | "choice" | "prompt" | "batch" | "form" | "progress" | "error" | "notification" | "destructive" | "safety-check" | "comparison" | "approval" | "file-upload" | "alert" | "handoff" | "cost" | "status";
 
 type GalleryEntry = { id: CardType; label: string; description: string; scenario: string };
 
@@ -43,6 +44,7 @@ const cardTypes: GalleryEntry[] = [
   { id: "comparison", label: "Comparison", description: "Side-by-side options", scenario: "Agent presents structured alternatives for the user to compare — flight options, vendor quotes, pricing tiers. Highlights best/worst attributes." },
   { id: "prompt", label: "Prompt Card", description: "Agent suggests action", scenario: "Agent proactively offers to do something — pull a briefing, set up a recurring task, enable a feature. Standard and compact variants." },
   { id: "destructive", label: "Destructive", description: "Confirm risky action", scenario: "Agent needs explicit confirmation for an irreversible action — mass unsubscribe, bulk delete, account changes. Requires typing confirmation text." },
+  { id: "safety-check", label: "Safety Check", description: "Irreversible action gate", scenario: "Agent detects a risky or irreversible action while working — checkout, send to a large audience, delete data, change permissions. Pauses for explicit user confirmation before proceeding." },
   { id: "form", label: "Form Card", description: "Structured input", scenario: "Agent needs structured parameters to proceed — flight search criteria, file renaming rules, monitoring thresholds. Validates before submission." },
   { id: "progress", label: "Task Progress", description: "Live step-by-step tracking", scenario: "Agent is working through a task — researching people, pulling data, checking records. Shows timestamped steps, subtask indicators, and expandable detail log." },
   { id: "error", label: "Error Card", description: "Failure + recovery", scenario: "Something went wrong and agent needs help — expired login, CAPTCHA block, scope too large. Always offers recovery actions, never a dead end." },
@@ -448,6 +450,16 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
   // Destructive config
   const [destructiveKey, setDestructiveKey] = useState(0);
 
+  // Safety Check config
+  const [safetyPreset, setSafetyPreset] = useState(0);
+  const [safetyKey, setSafetyKey] = useState(0);
+  const safetyPresets = [
+    { actionLabel: "Complete checkout on Amazon", reason: "This will place an order for Systane Ultra Eye Drops ($14.99) and charge your Visa ending in 4242." },
+    { actionLabel: "Send email to 48 recipients", reason: "This will send a message to the entire Sales team distribution list. Sent emails cannot be recalled." },
+    { actionLabel: "Delete 14 archived threads", reason: "This will permanently delete 14 email threads from your archive. This action cannot be undone." },
+    { actionLabel: "Make repository public", reason: "This will make acme/internal-tools visible to everyone on the internet. All code and history will be exposed." },
+  ];
+
   // Login config
 
   // Notification config
@@ -695,6 +707,18 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
                     { label: "Unsubscribe all", style: "primary", onClick: () => {} },
                   ]}
                   resolvedMessage="Unsubscribed from 27 mailing lists"
+                />
+              )}
+
+              {/* Safety Check */}
+              {activeCard === "safety-check" && (
+                <SafetyCheckCard
+                  key={`safety-${safetyPreset}-${safetyKey}`}
+                  actionLabel={safetyPresets[safetyPreset].actionLabel}
+                  reason={safetyPresets[safetyPreset].reason}
+                  onDeny={() => {}}
+                  onAllow={() => {}}
+                  resolvedMessage="Action allowed"
                 />
               )}
 
@@ -1018,6 +1042,23 @@ export function CardGallery({ open, onClose }: { open: boolean; onClose: () => v
                 <div className="flex flex-col gap-4">
                   <ControlRow label="Reset">
                     <ResetButton onClick={() => setDestructiveKey((k) => k + 1)}>Reset</ResetButton>
+                  </ControlRow>
+                </div>
+              )}
+
+              {activeCard === "safety-check" && (
+                <div className="flex flex-col gap-4">
+                  <ControlRow label="Preset">
+                    <div className="flex gap-1.5 flex-wrap">
+                      {(["Checkout", "Send Email", "Delete", "Make Public"] as const).map((label, i) => (
+                        <PillButton key={label} active={safetyPreset === i} onClick={() => { setSafetyPreset(i); setSafetyKey((k) => k + 1); }}>
+                          {label}
+                        </PillButton>
+                      ))}
+                    </div>
+                  </ControlRow>
+                  <ControlRow label="Reset">
+                    <ResetButton onClick={() => setSafetyKey((k) => k + 1)}>Reset</ResetButton>
                   </ControlRow>
                 </div>
               )}

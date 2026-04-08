@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var d=document.documentElement;d.setAttribute("data-theme",window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light")}catch(e){d.setAttribute("data-theme","dark")}})()` }} />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var d=document.documentElement,p=localStorage.getItem("theme-preference"),t=p==="dark"||p==="light"?p:window.matchMedia("(prefers-color-scheme:dark)").matches?"dark":"light";d.setAttribute("data-theme",t)}catch(e){document.documentElement.setAttribute("data-theme","dark")}})()` }} />
       </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
         <ThemeProvider>{children}</ThemeProvider>

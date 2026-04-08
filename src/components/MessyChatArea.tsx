@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { MessyTaskDetail } from "./MessyTaskDetail";
 import { ResultCard } from "./cards/ResultCard";
 import { DraftCard, type DraftField } from "./cards/DraftCard";
+import { SafetyCheckCard } from "./cards/SafetyCheckCard";
 import { fireworksScenario } from "@/data/mockData";
 import type { RunningStep, PillOption, Intervention, MessyScenario, ResultArtifact } from "@/data/mockData";
 
@@ -194,7 +195,8 @@ type TranscriptEntry =
   | { type: "user-response"; text: string }
   | { type: "agent-ack"; text: string }
   | { type: "result-card" }
-  | { type: "draft-card" };
+  | { type: "draft-card" }
+  | { type: "safety-check-card"; actionLabel: string; reason: string };
 
 /* ── Phase machine ── */
 
@@ -428,6 +430,29 @@ export function MessyChatArea({ onTaskStart, onStepChange, onDone, onAllTurnsDon
       return;
     }
 
+    // Special handling: "Post to #product-updates" shows a SafetyCheckCard
+    if (pill.value === "slack" && phase === "post-asking") {
+      pushTranscript({ type: "agent-ack", text: "Before I post, let me flag this —" });
+      // Inject guardrail step into visible steps
+      const ts = computeUserTimestamp();
+      setVisibleSteps((prev) => [...prev, {
+        timestamp: ts,
+        label: "Confirm post to #product-updates",
+        done: false,
+        type: "guardrail" as const,
+        status: "guardrail" as const,
+      }]);
+      setTimeout(() => {
+        pushTranscript({
+          type: "safety-check-card",
+          actionLabel: "Post to #product-updates",
+          reason: "This will send a message to 142 channel members. Posted messages cannot be unsent.",
+        });
+        setPhase("done");
+      }, ACK_DELAY);
+      return;
+    }
+
     // Show ack
     const ackText = getAckText(intervention, pill.value);
     const currentPhase = phase;
@@ -639,6 +664,33 @@ export function MessyChatArea({ onTaskStart, onStepChange, onDone, onAllTurnsDon
                         onApprove={() => setAllTurnsDone(true)}
                         onDeny={() => setAllTurnsDone(true)}
                         resolvedMessage="Email sent to product-team@company.com"
+                      />
+                    </AgentMessage>
+                  </div>
+                );
+
+              case "safety-check-card":
+                return (
+                  <div key={i} className="animate-fade-in">
+                    <AgentMessage>
+                      <SafetyCheckCard
+                        actionLabel={entry.actionLabel}
+                        reason={entry.reason}
+                        onDeny={() => {
+                          // Resolve the guardrail step as denied
+                          setVisibleSteps((prev) => prev.map((s) =>
+                            s.type === "guardrail" && !s.done ? { ...s, done: true, label: "Post denied by user", type: "user" as const, status: "done" as const, userAction: true } : s
+                          ));
+                          setAllTurnsDone(true);
+                        }}
+                        onAllow={() => {
+                          // Resolve the guardrail step as completed
+                          setVisibleSteps((prev) => prev.map((s) =>
+                            s.type === "guardrail" && !s.done ? { ...s, done: true, label: "Posted to #product-updates", type: "user" as const, status: "done" as const, userAction: true } : s
+                          ));
+                          setAllTurnsDone(true);
+                        }}
+                        resolvedMessage="Posted to #product-updates"
                       />
                     </AgentMessage>
                   </div>

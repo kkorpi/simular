@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
-import { workspaceSteps, loginSteps, loginSuccessSteps, teachSteps } from "@/data/mockData";
+import { workspaceSteps, loginSteps, loginSuccessSteps, captchaSteps, captchaSuccessSteps, teachSteps } from "@/data/mockData";
+import { Hand } from "lucide-react";
 
 type Corner = "top-left" | "top-right" | "bottom-left" | "bottom-right";
 
@@ -104,12 +105,14 @@ export function FullWorkspaceView({
 
   const activeSteps = mode === "teach"
     ? teachSteps
-    : mode === "login" || mode === "captcha"
-      ? (loginSuccess ? loginSuccessSteps : loginSteps)
-      : workspaceSteps;
+    : mode === "captcha"
+      ? (loginSuccess ? captchaSuccessSteps : captchaSteps)
+      : mode === "login"
+        ? (loginSuccess ? loginSuccessSteps : loginSteps)
+        : workspaceSteps;
 
-  // Only show done + active steps (we don't know future steps)
-  const visibleSteps = activeSteps.filter((s) => s.status === "done" || s.status === "active");
+  // Only show done + active + guardrail steps (we don't know future steps)
+  const visibleSteps = activeSteps.filter((s) => s.status === "done" || s.status === "active" || s.status === "guardrail");
   const stepsOverflow = visibleSteps.length > STEP_VISIBLE;
   const completedStepCount = activeSteps.filter((s) => s.status === "done").length;
 
@@ -680,6 +683,10 @@ export function FullWorkspaceView({
                       <svg className={`h-3.5 w-3.5 shrink-0 ${mode === "teach" ? "text-teach" : "text-g"}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="20 6 9 17 4 12" />
                       </svg>
+                    ) : step.status === "guardrail" ? (
+                      <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
+                        <Hand className="h-3 w-3 text-am animate-pulse" />
+                      </div>
                     ) : step.status === "active" ? (
                       <div className="flex h-3.5 w-3.5 shrink-0 items-center justify-center">
                         <div
@@ -695,9 +702,11 @@ export function FullWorkspaceView({
                       className={`text-[11.5px] leading-snug ${
                         step.status === "done"
                           ? "text-t3"
-                          : step.status === "active"
-                            ? "text-t1 font-medium"
-                            : "text-t4"
+                          : step.status === "guardrail"
+                            ? "text-am font-medium"
+                            : step.status === "active"
+                              ? "text-t1 font-medium"
+                              : "text-t4"
                       }`}
                     >
                       {step.label}

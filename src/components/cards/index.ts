@@ -16,4 +16,5 @@ export { AlertCard, type AlertCardProps, type AlertSeverity } from "./AlertCard"
 export { HandoffCard, type HandoffCardProps } from "./HandoffCard";
 export { CostCard, type CostCardProps } from "./CostCard";
 export { StatusCard, type StatusCardProps, type ConnectionStatus } from "./StatusCard";
+export { SafetyCheckCard, type SafetyCheckCardProps } from "./SafetyCheckCard";
 export type { CardAction } from "./types";

@@ -10,7 +10,7 @@ import { TaskDetail } from "./TaskDetail";
 import { TaskSettingsPanel } from "./TaskSettingsPanel";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { firstRunSequences, followUpSequences, activeTasks as defaultActiveTasks, recurringTasks as defaultRecurringTasks, completedTasks as defaultCompletedTasks } from "@/data/mockData";
-import type { ViewState, Task, StarterTask, TeachPhase } from "@/data/mockData";
+import type { ViewState, Task, StarterTask, TeachPhase, TaskStep } from "@/data/mockData";
 
 const SETUP_STEPS = [
   "Setting up your workspace",
@@ -31,7 +31,7 @@ const INTEGRATION_URLS: Record<string, string> = {
 };
 
 /** Build a Task object for the first-run task based on its current state */
-function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean, stepProgress = 0): Task {
+function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean, stepProgress = 0, guardrailLabel?: string): Task {
   const seq = firstRunSequences[task.category] ?? firstRunSequences.research;
 
   if (recurring) {
@@ -62,12 +62,17 @@ function buildFirstRunTask(task: StarterTask, done: boolean, recurring: boolean,
   }
 
   // When running, only show steps up to stepProgress, with last one not done
-  const visibleSteps = done
+  const visibleSteps: TaskStep[] = done
     ? seq.steps.map((s) => ({ label: s.label, done: true }))
     : seq.steps.slice(0, stepProgress).map((s, i) => ({
         label: s.label,
         done: i < stepProgress - 1, // all done except the last visible one
       }));
+
+  // Inject a guardrail step when auth/captcha is blocking
+  if (!done && guardrailLabel) {
+    visibleSteps.push({ label: guardrailLabel, done: false, guardrail: true });
+  }
 
   return {
     id: "first-run",
@@ -94,6 +99,7 @@ function FirstRunTaskList({
   firstRunRecurring,
   firstRunStep,
   onSelectTask,
+  guardrailLabel,
 }: {
   firstRunTask: StarterTask;
   firstRunDone: boolean;
@@ -101,8 +107,9 @@ function FirstRunTaskList({
   firstRunRecurring: boolean;
   firstRunStep: number;
   onSelectTask: (task: Task) => void;
+  guardrailLabel?: string;
 }) {
-  const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring, firstRunStep);
+  const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring, firstRunStep, guardrailLabel);
   const seq = firstRunSequences[firstRunTask.category] ?? firstRunSequences.research;
   const fuSeq = followUpSequences[firstRunTask.category] ?? followUpSequences.research;
 
@@ -203,6 +210,7 @@ export function RightPanel({
   autoStep = -1,
   firstRunStep = 0,
   showCaptcha = false,
+  guardrailLabel,
 }: {
   view: ViewState;
   onViewChange: (v: ViewState) => void;
@@ -238,10 +246,12 @@ export function RightPanel({
   firstRunStep?: number;
   /** True when CAPTCHA challenge is active — shows CAPTCHA visual in workspace preview */
   showCaptcha?: boolean;
+  /** Guardrail label for user intervention — shown as amber step in task detail */
+  guardrailLabel?: string;
 }) {
   const isMobile = useIsMobile();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [panelWidth, setPanelWidth] = useState(470);
+  const [panelWidth, setPanelWidth] = useState(350);
   const [isDragging, setIsDragging] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -253,18 +263,18 @@ export function RightPanel({
   // Auto-select first-run task when "View details" clicked in chat
   useEffect(() => {
     if (openFirstRunDetail && firstRunTask) {
-      const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring, firstRunStep);
+      const task = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring, firstRunStep, guardrailLabel);
       setSelectedTask(task);
     }
-  }, [openFirstRunDetail, firstRunTask, firstRunDone, firstRunRecurring, firstRunStep]);
+  }, [openFirstRunDetail, firstRunTask, firstRunDone, firstRunRecurring, firstRunStep, guardrailLabel]);
 
   // Keep selectedTask in sync when it's the first-run task and step/done state changes
   useEffect(() => {
     if (!selectedTask || !firstRunTask) return;
     if (selectedTask.id !== "first-run" && selectedTask.id !== "first-run-recurring") return;
-    const updated = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring, firstRunStep);
+    const updated = buildFirstRunTask(firstRunTask, firstRunDone, firstRunRecurring, firstRunStep, guardrailLabel);
     setSelectedTask(updated);
-  }, [firstRunStep, firstRunDone, firstRunRecurring, firstRunTask]);
+  }, [firstRunStep, firstRunDone, firstRunRecurring, firstRunTask, guardrailLabel]);
 
   // Auto-select a task by ID (e.g. from digest card "View report")
   useEffect(() => {
@@ -333,7 +343,7 @@ export function RightPanel({
 
   // ── Result-detail view (desktop only — mobile doesn't show briefing in sidebar) ──
   if (!isMobile && view === "result-detail") {
-    const effectiveWidth = Math.max(panelWidth, 520);
+    const effectiveWidth = Math.max(panelWidth, 280);
     return (
       <div
         className={`relative flex flex-none flex-col border-l border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}
@@ -490,6 +500,9 @@ export function RightPanel({
   const currentStepLabel = (() => {
     if (!hasActiveTask) return "";
     if (firstRunTask && !firstRunDone) {
+      if (guardrailLabel) {
+        return guardrailLabel;
+      }
       const seq = firstRunSequences[firstRunTask.category] ?? firstRunSequences.research;
       const stepIdx = Math.min(firstRunStep - 1, seq.steps.length - 1);
       if (stepIdx >= 0) {
@@ -703,8 +716,8 @@ export function RightPanel({
         </div>
         {/* Current step indicator below preview */}
         {currentStepLabel && (
-          <div className="mt-1.5 flex items-center gap-1.5 px-1 text-[10px] text-t3 truncate">
-            <div className="h-1 w-1 shrink-0 rounded-full bg-g animate-pulse" />
+          <div className={`mt-1.5 flex items-center gap-1.5 px-1 text-[10px] truncate ${guardrailLabel ? "text-am" : "text-t3"}`}>
+            <div className={`h-1 w-1 shrink-0 rounded-full animate-pulse ${guardrailLabel ? "bg-am" : "bg-g"}`} />
             {currentStepLabel}
           </div>
         )}
@@ -756,6 +769,7 @@ export function RightPanel({
             firstRunRecurring={firstRunRecurring}
             firstRunStep={firstRunStep}
             onSelectTask={handleSelectTask}
+            guardrailLabel={guardrailLabel}
           />
         ) : (
           <TasksTab

@@ -62,10 +62,11 @@ export function RunningTaskDetail({
         {subtasks.map((fallbackLabel, i) => {
           const isAuthWaiting = authPhase === "waiting";
           const currentStep = !done ? steps.find((s) => !s.done) : undefined;
+          const isGuardrail = !done && !isAuthWaiting && currentStep && (currentStep.type === "guardrail" || currentStep.status === "guardrail");
           const label = isAuthWaiting
             ? "Waiting for LinkedIn credentials"
             : currentStep ? currentStep.label.replace(/\.{2,}$/, "") : fallbackLabel;
-          return <WorkingIndicator key={i} label={label} done={done} authWaiting={isAuthWaiting} />;
+          return <WorkingIndicator key={i} label={label} done={done} authWaiting={isAuthWaiting} guardrail={!!isGuardrail} />;
         })}
       </div>
 
@@ -124,7 +125,9 @@ export function RunningTaskDetail({
                   >
                     {!isThinking && (
                       <div className="mt-[5px] shrink-0">
-                        {step.done ? (
+                        {step.type === "guardrail" || step.status === "guardrail" ? (
+                          <div className="h-[7px] w-[7px] rounded-full bg-am animate-pulse" />
+                        ) : step.done ? (
                           <div className="h-[7px] w-[7px] rounded-full bg-g" />
                         ) : (
                           <div className="h-[7px] w-[7px] rounded-full bg-g animate-pulse" />
@@ -135,7 +138,7 @@ export function RunningTaskDetail({
                       {step.timestamp}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className={`text-[12px] leading-[1.5] ${isThinking ? "italic text-t4" : "text-t2"}`}>
+                      <div className={`text-[12px] leading-[1.5] ${isThinking ? "italic text-t4" : (step.type === "guardrail" || step.status === "guardrail") ? "text-am font-medium" : "text-t2"}`}>
                         <span>
                           {step.label}
                         </span>
