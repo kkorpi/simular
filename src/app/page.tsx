@@ -591,7 +591,7 @@ export default function Home() {
   };
 
   const handleOpenSettingsServices = () => {
-    setSettingsSection("services");
+    setSettingsSection("workspaces");
     setSettingsOpen(true);
   };
 
@@ -602,7 +602,7 @@ export default function Home() {
         setSettingsOpen(true);
         break;
       case "integrations":
-        setSettingsSection("integrations");
+        setSettingsSection("workspaces");
         setSettingsOpen(true);
         break;
       case "settings":
