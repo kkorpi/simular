@@ -26,20 +26,20 @@ interface SettingsOverlayProps {
 
 type SettingsSection =
   | "appearance"
-  | "workspace"
-  | "integrations"
-  | "services"
+  | "workspaces"
   | "skills"
+  | "messaging"
   | "subscription"
   | "credits"
   | "about";
 
+type WorkspaceSubSection = "integrations" | "accounts" | "agent" | "info";
+
 const sections: { id: SettingsSection; label: string }[] = [
   { id: "appearance", label: "Appearance" },
-  { id: "workspace", label: "Workspace" },
-  { id: "integrations", label: "Integrations" },
-  { id: "services", label: "Signed-in Accounts" },
+  { id: "workspaces", label: "Workspaces" },
   { id: "skills", label: "Skills" },
+  { id: "messaging", label: "Messaging" },
   { id: "subscription", label: "Subscription" },
   { id: "credits", label: "Credits" },
   { id: "about", label: "About" },
@@ -49,11 +49,18 @@ export { type SettingsSection };
 
 export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGallery, onOpenDesignSystem, trialDaysLeft = 6, trialCancelled, onCancelTrial, onReactivateTrial, connectedServices = [], onSignOut, onSignOutAll }: SettingsOverlayProps) {
   const [active, setActive] = useState<SettingsSection>(initialSection || "appearance");
+  const [selectedWsId, setSelectedWsId] = useState<string | null>(null);
+  const [wsSubSection, setWsSubSection] = useState<WorkspaceSubSection>("integrations");
 
   // Sync when initialSection changes (e.g., from slash command)
   useEffect(() => {
-    if (initialSection && open) setActive(initialSection);
+    if (initialSection && open) {
+      setActive(initialSection);
+      setSelectedWsId(null);
+    }
   }, [initialSection, open]);
+
+  const isWorkspaceDetail = active === "workspaces" && selectedWsId !== null;
 
   if (!open) return null;
 
@@ -121,9 +128,17 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
             <div className="flex items-center gap-2 text-[13px] text-t3">
               <span>Settings</span>
               <span className="text-t4">/</span>
-              <span className="font-medium text-t1">
-                {sections.find((s) => s.id === active)?.label}
-              </span>
+              {isWorkspaceDetail ? (
+                <>
+                  <button onClick={() => setSelectedWsId(null)} className="transition-colors hover:text-t1">Workspaces</button>
+                  <span className="text-t4">/</span>
+                  <span className="font-medium text-t1">{selectedWsId}</span>
+                </>
+              ) : (
+                <span className="font-medium text-t1">
+                  {sections.find((s) => s.id === active)?.label}
+                </span>
+              )}
             </div>
             <button
               onClick={onClose}
@@ -139,11 +154,24 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
           {/* Content */}
           <div role="tabpanel" className="flex-1 px-6 py-5">
             {active === "appearance" && <AppearanceSettings />}
-            {active === "workspace" && <WorkspaceSettings />}
-            {active === "integrations" && <IntegrationsSettings />}
-            {active === "services" && <SignedInAccountsSettings services={connectedServices} onSignOut={onSignOut} onSignOutAll={onSignOutAll} />}
+
+            {active === "workspaces" && !isWorkspaceDetail && (
+              <WorkspacesListView onSelectWorkspace={(id) => { setSelectedWsId(id); setWsSubSection("integrations"); }} />
+            )}
+            {isWorkspaceDetail && (
+              <WorkspaceDetailView
+                workspaceId={selectedWsId!}
+                subSection={wsSubSection}
+                onSubSectionChange={setWsSubSection}
+                onBack={() => setSelectedWsId(null)}
+                connectedServices={connectedServices}
+                onSignOut={onSignOut}
+                onSignOutAll={onSignOutAll}
+              />
+            )}
 
             {active === "skills" && <SkillsSettings />}
+            {active === "messaging" && <MessagingSettings />}
             {active === "subscription" && <SubscriptionSettings trialDaysLeft={trialDaysLeft} trialCancelled={trialCancelled} onCancelTrial={onCancelTrial} onReactivateTrial={onReactivateTrial} />}
             {active === "credits" && <CreditsSettings />}
             {active === "about" && <AboutSettings />}
@@ -180,8 +208,150 @@ function AppearanceSettings() {
   );
 }
 
-/* ── Workspace (unified agent settings) ── */
-function WorkspaceSettings() {
+/* ── Workspaces List ── */
+function WorkspacesListView({ onSelectWorkspace }: { onSelectWorkspace: (id: string) => void }) {
+  const workspaces = [
+    { id: "Cloud Workspace", status: "active", platform: "Windows", isDevice: false },
+    { id: "Dev Environment", status: "active", platform: "Windows", isDevice: false },
+    { id: "Kevin's MacBook", status: "active", platform: "macOS", isDevice: true },
+  ];
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="text-[14px] font-semibold text-t1">Workspaces</div>
+          <div className="mt-1 text-[12.5px] text-t3">Your cloud workspaces and connected devices.</div>
+        </div>
+        <button className="flex items-center gap-2 rounded-md border border-b1 px-3 py-2 text-[12px] font-medium text-t2 transition-colors hover:border-b2 hover:bg-bg3 hover:text-t1">
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          Add Workspace
+        </button>
+      </div>
+      <div className="flex flex-col gap-2">
+        {workspaces.map((ws) => (
+          <button
+            key={ws.id}
+            onClick={() => onSelectWorkspace(ws.id)}
+            className="flex items-center gap-3 rounded-lg border border-b1 bg-bg3/50 px-4 py-3 text-left transition-colors hover:border-b2 hover:bg-bg3"
+          >
+            <svg className="h-5 w-5 shrink-0 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              {ws.isDevice ? (
+                <><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="2" y1="20" x2="22" y2="20" /><line x1="12" y1="17" x2="12" y2="20" /></>
+              ) : (
+                <><rect x="2" y="3" width="20" height="14" rx="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></>
+              )}
+            </svg>
+            <div className="min-w-0 flex-1">
+              <div className="text-[13px] font-medium text-t1">{ws.id}</div>
+              <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-t3">
+                <div className={`h-1.5 w-1.5 rounded-full ${ws.status === "active" ? "bg-g" : "bg-t4"}`} />
+                {ws.status === "active" ? "Active" : "Offline"}
+                <span className="text-t4">·</span>
+                {ws.platform}
+              </div>
+            </div>
+            <svg className="h-4 w-4 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Workspace Detail ── */
+function WorkspaceDetailView({
+  workspaceId,
+  subSection,
+  onSubSectionChange,
+  onBack,
+  connectedServices,
+  onSignOut,
+  onSignOutAll,
+}: {
+  workspaceId: string;
+  subSection: WorkspaceSubSection;
+  onSubSectionChange: (s: WorkspaceSubSection) => void;
+  onBack: () => void;
+  connectedServices: ConnectedServiceInfo[];
+  onSignOut?: (id: string) => void;
+  onSignOutAll?: () => void;
+}) {
+  const subSections: { id: WorkspaceSubSection; label: string }[] = [
+    { id: "integrations", label: "Integrations" },
+    { id: "accounts", label: "Accounts" },
+    { id: "agent", label: "Agent" },
+    { id: "info", label: "Info" },
+  ];
+
+  return (
+    <div className="flex flex-col gap-5">
+      {/* Back + sub-nav */}
+      <div className="flex items-center gap-4">
+        <button onClick={onBack} className="flex items-center gap-1 text-[12px] text-t3 transition-colors hover:text-t1">
+          <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+          Back
+        </button>
+        <div className="h-4 w-px bg-b1" />
+        <div className="flex gap-1">
+          {subSections.map((s) => (
+            <button
+              key={s.id}
+              onClick={() => onSubSectionChange(s.id)}
+              className={`rounded-md px-3 py-1.5 text-[12px] font-medium transition-colors ${
+                subSection === s.id ? "bg-bg3 text-t1" : "text-t3 hover:text-t2 hover:bg-bg3/50"
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Sub-section content */}
+      {subSection === "integrations" && <IntegrationsSettings />}
+      {subSection === "accounts" && <SignedInAccountsSettings services={connectedServices} onSignOut={onSignOut} onSignOutAll={onSignOutAll} />}
+      {subSection === "agent" && <AgentSettings />}
+      {subSection === "info" && <WorkspaceInfoSettings workspaceId={workspaceId} />}
+    </div>
+  );
+}
+
+/* ── Workspace Info ── */
+function WorkspaceInfoSettings({ workspaceId }: { workspaceId: string }) {
+  const isDevice = workspaceId === "Kevin's MacBook";
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Workspace Details</div>
+        <div className="mt-4 flex flex-col gap-3">
+          <div className="flex justify-between text-[13px]"><span className="text-t3">Name</span><span className="text-t1">{workspaceId}</span></div>
+          <div className="flex justify-between text-[13px]"><span className="text-t3">Platform</span><span className="text-t1">{isDevice ? "macOS" : "Windows"}</span></div>
+          <div className="flex justify-between text-[13px]"><span className="text-t3">Type</span><span className="text-t1">{isDevice ? "Your Device" : "Cloud VM"}</span></div>
+          <div className="flex justify-between text-[13px]"><span className="text-t3">Status</span><span className="flex items-center gap-1.5 text-t1"><div className="h-1.5 w-1.5 rounded-full bg-g" />Active</span></div>
+        </div>
+      </div>
+      <div className="h-px bg-b1" />
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Danger Zone</div>
+        <div className="mt-3 flex items-center justify-between">
+          <div>
+            <div className="text-[13px] text-t2">Delete this workspace</div>
+            <div className="mt-0.5 text-[12px] text-t4">Permanently remove this workspace and all its data.</div>
+          </div>
+          <button className="flex items-center gap-2 rounded-md border border-rd/30 px-3 py-1.5 text-[12px] font-medium text-rd transition-colors hover:bg-rd/10">
+            <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ── Agent Settings (per-workspace) ── */
+function AgentSettings() {
+  const [guardrails, setGuardrails] = useState(true);
   const [devMode, setDevMode] = useState(true);
   const [thinkingStrength, setThinkingStrength] = useState("Medium");
   const [thinkingOpen, setThinkingOpen] = useState(false);
@@ -218,13 +388,13 @@ function WorkspaceSettings() {
                 </svg>
               </button>
               {thinkingOpen && (
-                <div className="absolute right-0 top-[calc(100%+4px)] z-10 origin-top-right w-[120px] rounded-md border border-b1 bg-bg2 py-1 shadow-lg">
+                <div className="absolute right-0 top-[calc(100%+4px)] z-10 origin-top-right w-[120px] rounded-md border border-b1 bg-bg2 p-1 shadow-lg">
                   {thinkingOptions.map((opt) => (
                     <button
                       key={opt}
                       type="button"
                       onClick={() => { setThinkingStrength(opt); setThinkingOpen(false); }}
-                      className={`flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12px] transition-colors hover:bg-bg3 ${opt === thinkingStrength ? "text-t1" : "text-t3"}`}
+                      className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-[12px] transition-colors hover:bg-bg3 ${opt === thinkingStrength ? "text-t1" : "text-t3"}`}
                     >
                       {opt === thinkingStrength && (
                         <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -248,6 +418,28 @@ function WorkspaceSettings() {
             />
           </SettingRow>
 
+          <SettingRow label="Guardrail checks" hint>
+            <button
+              onClick={() => setGuardrails(!guardrails)}
+              className={`relative h-[24px] w-[44px] rounded-full transition-all ${
+                guardrails ? "bg-t1" : "bg-b2"
+              }`}
+            >
+              <div
+                className={`absolute top-[2px] h-[20px] w-[20px] rounded-full bg-bg transition-all ${
+                  guardrails ? "left-[22px]" : "left-[2px]"
+                }`}
+              />
+            </button>
+          </SettingRow>
+        </div>
+      </div>
+
+      <div className="h-px bg-b1" />
+
+      <div>
+        <div className="text-[11px] font-semibold uppercase tracking-wide text-t3">Advanced</div>
+        <div className="mt-3 flex flex-col gap-4">
           <SettingRow label="Dev mode" hint>
             <button
               onClick={() => setDevMode(!devMode)}
@@ -502,6 +694,108 @@ function SkillsSettings() {
             </button>
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+/* ── Messaging ── */
+function MessagingSettings() {
+  const [notifType, setNotifType] = useState("Final answer only");
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Messaging</div>
+        <div className="mt-1 text-[12.5px] text-t3">How Sai keeps you in the loop.</div>
+      </div>
+
+      <SettingRow label="What to send" hint>
+        <div className="relative" ref={notifRef}>
+          <button
+            type="button"
+            onClick={() => setNotifOpen((o) => !o)}
+            className="flex items-center gap-1.5 rounded-md border border-b1 bg-bg3 px-3 py-1.5 text-[13px] text-t1 outline-none transition-colors hover:border-b2"
+          >
+            {notifType}
+            <svg className={`h-3 w-3 text-t4 transition-transform ${notifOpen ? "rotate-180" : ""}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+          {notifOpen && (
+            <div className="absolute right-0 top-[calc(100%+4px)] z-10 w-[180px] rounded-md border border-b1 bg-bg2 p-1 shadow-lg">
+              {["Final answer only", "All updates", "Errors only"].map((opt) => (
+                <button
+                  key={opt}
+                  onClick={() => { setNotifType(opt); setNotifOpen(false); }}
+                  className={`flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-[12px] transition-colors hover:bg-bg3 ${opt === notifType ? "text-t1" : "text-t3"}`}
+                >
+                  {opt === notifType && (
+                    <svg className="h-3 w-3 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+                  )}
+                  {opt !== notifType && <span className="w-3" />}
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </SettingRow>
+
+      <div className="h-px bg-b1" />
+
+      {/* Text Message */}
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Text Message</div>
+        <div className="mt-1 text-[12.5px] text-t3">Chat with your agent via text message.</div>
+        <div className="mt-3 rounded-lg border border-b1 bg-bg3/30 px-4 py-3">
+          <div className="flex items-center gap-2 text-[12.5px] text-t3">
+            <svg className="h-4 w-4 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z" />
+            </svg>
+            Link your phone number to chat with Sai via Text Message. You can also approve or deny requests by replying to text messages.
+          </div>
+        </div>
+        <div className="mt-3">
+          <label className="text-[12px] text-t3">Phone number</label>
+          <input
+            type="tel"
+            placeholder="(555) 123-4567"
+            className="mt-1 w-full rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none placeholder:text-t4"
+          />
+        </div>
+        <button className="mt-3 w-full rounded-md bg-bg3 py-2.5 text-[13px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1">
+          Link Phone Number
+        </button>
+      </div>
+
+      <div className="h-px bg-b1" />
+
+      {/* Telegram */}
+      <div>
+        <div className="text-[14px] font-semibold text-t1">Telegram</div>
+        <div className="mt-1 text-[12.5px] text-t3">Chat with your agent via Telegram.</div>
+        <div className="mt-3 rounded-lg border border-b1 bg-bg3/30 px-4 py-3">
+          <div className="flex items-center gap-2 text-[12.5px] text-t3">
+            <svg className="h-4 w-4 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+            </svg>
+            Link your Telegram account to chat with Sai. You can also approve or deny requests by replying in Telegram.
+          </div>
+        </div>
+        <button className="mt-3 w-full rounded-md bg-bg3 py-2.5 text-[13px] font-medium text-t2 transition-colors hover:bg-bg3h hover:text-t1">
+          Link Telegram
+        </button>
       </div>
     </div>
   );

@@ -95,7 +95,7 @@ export function ChoiceCard({
       {/* ── Cards layout ── */}
       {layout === "cards" && (
         <div className="flex gap-2">
-          {options.map((opt) => {
+          {options.map((opt, idx) => {
             const isSelected = selected.includes(opt.id);
             const hasSelection = selected.length > 0;
             return (
@@ -115,7 +115,7 @@ export function ChoiceCard({
                     {opt.icon}
                   </div>
                 )}
-                <div className="text-[13px] font-semibold text-t1">{opt.title}</div>
+                <div className="text-[13px] font-semibold text-t1">{idx + 1}. {opt.title}</div>
                 {opt.subtitle && (
                   <div className="mt-0.5 text-[11px] text-t3">{opt.subtitle}</div>
                 )}
@@ -137,7 +137,7 @@ export function ChoiceCard({
       {layout === "list" && (
         <CardShell>
           <div className="divide-y divide-b1">
-            {options.map((opt) => {
+            {options.map((opt, idx) => {
               const isSelected = selected.includes(opt.id);
               return (
                 <button
@@ -164,7 +164,7 @@ export function ChoiceCard({
                     </div>
                   )}
                   <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-t1">{opt.title}</div>
+                    <div className="text-[13px] font-medium text-t1">{idx + 1}. {opt.title}</div>
                     {opt.subtitle && (
                       <div className="text-[11px] text-t3">{opt.subtitle}</div>
                     )}
@@ -202,7 +202,7 @@ export function ChoiceCard({
       {layout === "pills" && (
         <div>
           <div className="flex flex-wrap gap-2">
-            {options.map((opt) => {
+            {options.map((opt, idx) => {
               const isSelected = selected.includes(opt.id);
               return (
                 <button
@@ -214,7 +214,7 @@ export function ChoiceCard({
                       : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h"
                   }`}
                 >
-                  {opt.title}
+                  {idx + 1}. {opt.title}
                 </button>
               );
             })}
@@ -247,11 +247,11 @@ export function ChoiceCard({
               <thead>
                 <tr className="border-y border-b1 bg-bg3h">
                   <th className="px-3 py-2 text-left font-medium text-t4 w-[100px]" />
-                  {options.map((opt) => {
+                  {options.map((opt, idx) => {
                     const isSelected = selected.includes(opt.id);
                     return (
                       <th key={opt.id} className="px-3 py-2 text-left min-w-[120px]">
-                        <div className={`font-semibold ${isSelected ? "text-blt" : "text-t1"}`}>{opt.title}</div>
+                        <div className={`font-semibold ${isSelected ? "text-blt" : "text-t1"}`}>{idx + 1}. {opt.title}</div>
                         {opt.subtitle && <div className="mt-0.5 font-normal text-t3">{opt.subtitle}</div>}
                       </th>
                     );

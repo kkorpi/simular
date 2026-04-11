@@ -338,19 +338,28 @@ export function RightPanel({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasActiveTask]);
 
-  // Desktop: completely unmount when collapsed (existing behavior)
-  if (!isMobile && collapsed) return null;
+  // Desktop: animate in/out via width + opacity transition
+  if (!isMobile && collapsed) {
+    return (
+      <div
+        className="flex flex-none flex-col overflow-hidden transition-[width,opacity] duration-200 ease-out"
+        style={{ width: 0, opacity: 0 }}
+      />
+    );
+  }
 
   // ── Result-detail view (desktop only — mobile doesn't show briefing in sidebar) ──
   if (!isMobile && view === "result-detail") {
     const effectiveWidth = Math.max(panelWidth, 280);
     return (
       <div
-        className={`relative flex flex-none flex-col border-l border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}
-        style={{ width: effectiveWidth }}
+        className="flex flex-none flex-col p-4 transition-[width,opacity] duration-200 ease-out"
+        style={{ width: effectiveWidth, opacity: 1 }}
       >
-        <ResizeHandle onResize={handleResize} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
-        <BriefingDetail onBack={() => onViewChange("task-hover")} />
+        <div className={`relative flex flex-1 flex-col overflow-hidden rounded-lg border border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}>
+          <ResizeHandle onResize={handleResize} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
+          <BriefingDetail onBack={() => onViewChange("task-hover")} />
+        </div>
       </div>
     );
   }
@@ -523,26 +532,26 @@ export function RightPanel({
           ) : (
             <div className={`h-[7px] w-[7px] rounded-full ${showCaptcha ? "bg-am animate-pulse" : isOnboarding && !workspaceSetupDone ? "bg-am" : workspaceConnecting ? "bg-am" : "bg-g"}`} />
           )}
-          <span className={`font-mono text-[11.5px] ${showCaptcha ? "text-amt" : "text-t3"}`}>{showCaptcha ? "Action needed" : isFreshState ? "Ready" : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace") : workspaceConnecting ? "Setting up workspace" : hasActiveTask ? `Working${elapsedStr ? ` · ${elapsedStr}` : ""}` : (isAutoPlay && autoStep >= 10) ? "Ready" : (firstRunTask && firstRunDone) ? "Ready" : "Working \u00B7 3.2 hrs"}</span>
+          <span className={`font-mono text-[11.5px] ${showCaptcha ? "text-amt" : "text-t3"}`}>{
+            showCaptcha ? "Action needed"
+            : isFreshState ? "Ready"
+            : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace")
+            : workspaceConnecting ? "Setting up workspace"
+            : hasActiveTask ? (firstRunTask ? `${firstRunTask.title}${elapsedStr ? ` · ${elapsedStr}` : ""}` : `Working${elapsedStr ? ` · ${elapsedStr}` : ""}`)
+            : "Ready"
+          }</span>
         </div>
-        <button
-          onClick={onToggleCollapse}
-          className="flex items-center justify-center rounded-md p-1 text-t4 transition-colors hover:bg-bg3 hover:text-t2"
-          title="Close panel"
-        >
-          {isMobile ? (
+        {isMobile && (
+          <button
+            onClick={onToggleCollapse}
+            className="flex items-center justify-center rounded-md p-1 text-t4 transition-colors hover:bg-bg3 hover:text-t2"
+          >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="18" y1="6" x2="6" y2="18" />
               <line x1="6" y1="6" x2="18" y2="18" />
             </svg>
-          ) : (
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <rect width="18" height="18" x="3" y="3" rx="2" />
-              <path d="M15 3v18" />
-              <path d="m8 9 3 3-3 3" />
-            </svg>
-          )}
-        </button>
+          </button>
+        )}
       </div>
 
       {/* Live workspace preview */}
@@ -901,11 +910,13 @@ export function RightPanel({
     <div
       role="complementary"
       aria-label="Tasks panel"
-      className={`relative flex flex-none flex-col overflow-hidden border-l border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}
-      style={{ width: panelWidth }}
+      className="flex flex-none flex-col p-4 transition-[width,opacity] duration-200 ease-out"
+      style={{ width: panelWidth, opacity: 1 }}
     >
-      <ResizeHandle onResize={handleResize} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
-      {panelContent}
+      <div className={`relative flex flex-1 flex-col overflow-hidden rounded-lg border border-b1 bg-bg2 ${isDragging ? "" : "transition-[width] duration-200"}`}>
+        <ResizeHandle onResize={handleResize} onDragStart={handleDragStart} onDragEnd={handleDragEnd} />
+        {panelContent}
+      </div>
     </div>
   );
 }

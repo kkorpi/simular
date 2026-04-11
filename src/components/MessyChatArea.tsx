@@ -56,7 +56,7 @@ function PillBar({
 }) {
   return (
     <div className="mt-3 flex flex-wrap gap-2">
-      {pills.map((pill) => (
+      {pills.map((pill, idx) => (
         <button
           key={pill.value}
           onClick={() => onSelect(pill)}
@@ -71,7 +71,7 @@ function PillBar({
                   : "border-b1 bg-bg3 text-t2 hover:border-b2 hover:bg-bg3h cursor-pointer"
           }`}
         >
-          {pill.label}
+          {idx + 1}. {pill.label}
         </button>
       ))}
     </div>
@@ -471,6 +471,13 @@ export function MessyChatArea({ onTaskStart, onStepChange, onDone, onAllTurnsDon
   const handleFreeText = (text: string) => {
     const intervention = getCurrentIntervention();
     if (!intervention) return;
+
+    // Check if input is a number matching a pill option
+    const num = parseInt(text.trim(), 10);
+    if (!isNaN(num) && num >= 1 && num <= intervention.pills.length) {
+      handlePillSelect(intervention.id, intervention.pills[num - 1]);
+      return;
+    }
 
     // Create a synthetic pill from the free text
     const syntheticPill: PillOption = {

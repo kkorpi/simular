@@ -46,7 +46,7 @@ export function AvatarMenu({ open, onClose, onOpenSettings, onOpenCredits, onOpe
       <div className="h-px bg-b1" />
 
       {/* Menu items */}
-      <div className="py-1.5">
+      <div className="p-1">
         <MenuItem
           icon={
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -80,7 +80,7 @@ export function AvatarMenu({ open, onClose, onOpenSettings, onOpenCredits, onOpe
       <div className="h-px bg-b1" />
 
       {/* Demo picker */}
-      <div className="py-1.5">
+      <div className="p-1">
         <MenuItem
           icon={
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -119,7 +119,7 @@ function MenuItem({
     <button
       role="menuitem"
       onClick={onClick}
-      className="flex w-full items-center gap-3 px-4 py-2 text-[13px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
+      className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-[13px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
     >
       <span className="text-t3">{icon}</span>
       <span className="flex-1 text-left">{label}</span>

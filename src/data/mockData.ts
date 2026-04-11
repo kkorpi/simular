@@ -1390,3 +1390,89 @@ export const fireworksScenario: MessyScenario = {
     },
   },
 };
+
+// ── Workspaces ──
+
+export interface Workspace {
+  id: string;
+  name: string;
+  status: "active" | "offline" | "setup";
+  isDevice?: boolean;
+}
+
+export const mockWorkspaces: Workspace[] = [
+  { id: "ws-1", name: "Cloud Workspace", status: "active" },
+  { id: "ws-2", name: "Dev Environment", status: "active" },
+  { id: "ws-3", name: "Kevin's MacBook", status: "active", isDevice: true },
+];
+
+// ── Conversations ──
+
+export interface Conversation {
+  id: string;
+  workspaceId: string;
+  title: string;
+  status: "active" | "completed" | "empty";
+  demoConfig?: {
+    activeView?: ViewState;
+    firstRunTask?: StarterTask | null;
+    isAutoPlay?: boolean;
+    messyMode?: boolean;
+    teachPhase?: TeachPhase;
+    teachTaskName?: string;
+  };
+}
+
+export const mockConversations: Conversation[] = [
+  {
+    id: "conv-1",
+    workspaceId: "ws-default",
+    title: "Research inbound founder",
+    status: "active",
+    demoConfig: {
+      activeView: "task-hover",
+      isAutoPlay: true,
+      firstRunTask: {
+        id: "vc-1",
+        title: "Build a founder dossier before your next meeting",
+        description: "Pull their LinkedIn, Crunchbase, and recent X posts. Cross-reference with your Salesforce deal notes and compile a one-pager.",
+        trustLevel: "needs-auth",
+        trustLabel: "LinkedIn · Salesforce sign in",
+        icon: "🔍",
+        category: "research",
+        roles: ["vc"],
+        apps: ["LinkedIn", "Crunchbase", "X", "Salesforce"],
+      },
+    },
+  },
+  {
+    id: "conv-2",
+    workspaceId: "ws-default",
+    title: "Weekly competitor digest",
+    status: "completed",
+    demoConfig: {
+      activeView: "task-hover",
+      isAutoPlay: true,
+      firstRunTask: {
+        id: "vc-digest",
+        title: "Compile weekly competitor digest",
+        description: "Scan Crunchbase, TechCrunch, and X for competitor activity. Summarize into a weekly briefing.",
+        trustLevel: "medium",
+        trustLabel: "Supervised",
+        icon: "📊",
+        category: "research",
+      },
+    },
+  },
+  {
+    id: "conv-3",
+    workspaceId: "ws-default",
+    title: "Forward Asana digest to Slack",
+    status: "completed",
+    demoConfig: {
+      activeView: "task-hover",
+      teachPhase: "complete",
+      teachTaskName: TEACH_TASK_NAME,
+    },
+  },
+];

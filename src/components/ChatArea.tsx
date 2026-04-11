@@ -709,6 +709,8 @@ export function ChatArea({
 
   return (
     <div className="relative flex min-w-0 flex-1 flex-col">
+      {/* Fade gradient at top — chat scrolls beneath title bar */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 h-6 bg-gradient-to-b from-bg to-transparent" />
       <div ref={scrollContainerRef} className="flex-1 overflow-y-auto" aria-live="polite">
         <div className={`mx-auto flex min-h-full max-w-[800px] flex-col gap-8 px-8 max-md:px-4 pt-5 ${authInputService ? "pb-72 max-md:pb-64" : "pb-36 max-md:pb-32"}`}>
 

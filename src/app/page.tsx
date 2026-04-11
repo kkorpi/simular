@@ -18,11 +18,12 @@ import { WaitlistConfirmation } from "@/components/WaitlistConfirmation";
 import { OnboardingScreen, type OnboardingProfile } from "@/components/OnboardingScreen";
 import { SaiInterstitial } from "@/components/SaiInterstitial";
 import type { AuthInputState } from "@/components/AuthInput";
-import { SEATS_REMAINING_INIT, TEACH_TASK_NAME, type ViewState, type StarterTask, type TeachPhase } from "@/data/mockData";
-
-const PIP_MIN_WIDTH = 200;
-const PIP_MAX_WIDTH = 520;
-const PIP_DEFAULT_WIDTH = 320;
+import { LeftSidebar } from "@/components/LeftSidebar";
+import { ConversationTitleBar, type TaskStatus } from "@/components/ConversationTitleBar";
+import { CommandPalette } from "@/components/CommandPalette";
+import { ArtifactsPage } from "@/components/ArtifactsPage";
+import { UploadsPage } from "@/components/UploadsPage";
+import { SEATS_REMAINING_INIT, TEACH_TASK_NAME, type ViewState, type StarterTask, type TeachPhase, mockConversations, type Conversation, mockWorkspaces } from "@/data/mockData";
 
 type AppScreen = "landing" | "waitlist-signup" | "signup-sso" | "signup-payment" | "onboarding" | "waitlist" | "main-app";
 
@@ -164,16 +165,20 @@ export default function Home() {
   const [workspaceSetupStep, setWorkspaceSetupStep] = useState(0);
   const [workspaceSetupDone, setWorkspaceSetupDone] = useState(false);
 
+  // ── Conversations sidebar ──
+  const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
+  const [selectedConversationId, setSelectedConversationId] = useState("conv-1");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [sidebarView, setSidebarView] = useState<"chat" | "artifacts" | "uploads">("chat");
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(mockWorkspaces[0].id);
+
   // ── ChatArea remount key & auto-play ──
   const [chatKey, setChatKey] = useState(0);
   const [isAutoPlay, setIsAutoPlay] = useState(false);
   const [autoStep, setAutoStep] = useState(-1);
   const [firstRunStep, setFirstRunStep] = useState(0);
 
-  const [pipWidth, setPipWidth] = useState(PIP_DEFAULT_WIDTH);
-  const pipDragging = useRef(false);
-  const pipDragStartX = useRef(0);
-  const pipDragStartWidth = useRef(PIP_DEFAULT_WIDTH);
 
   // ── Read URL params: ?ref=CODE and ?demo=MODE, plus #hash deep links ──
   useEffect(() => {
@@ -264,6 +269,110 @@ export default function Home() {
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [demoPickerOpen]);
+
+  // ── Command palette (⌘K) ──
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setCommandPaletteOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, []);
+
+  // ── Conversation switching ──
+  const resetDemoState = useCallback(() => {
+    setFirstRunTask(null);
+    setFirstRunDone(false);
+    setFirstRunRecurring(false);
+    setLinkedinConnected(false);
+    setWorkspaceConnecting(false);
+    setAuthInputService(undefined);
+    setAuthInputState(undefined);
+    setAuthInputError(undefined);
+    setAuthPhase(null);
+    setWorkspaceOpen(false);
+    setWorkspaceMode("default");
+    setWorkspaceService("");
+    setMessyMode(false);
+    setTeachPhase("idle");
+    setTeachTaskName("");
+    setIsOnboarding(false);
+    setIsAutoPlay(false);
+    setShowNewTaskCard(false);
+    setFollowUpDone(false);
+  }, []);
+
+  const handleConversationSelect = useCallback((id: string) => {
+    setSidebarView("chat");
+    if (id === selectedConversationId) return;
+    const conv = conversations.find((c) => c.id === id);
+    if (!conv) return;
+
+    setSelectedConversationId(id);
+    resetDemoState();
+
+    // Apply conversation's demo config
+    const cfg = conv.demoConfig;
+    setActiveView(cfg?.activeView ?? "zero-state");
+    setIsAutoPlay(cfg?.isAutoPlay ?? false);
+    setMessyMode(cfg?.messyMode ?? false);
+    if (cfg?.firstRunTask) setFirstRunTask(cfg.firstRunTask);
+    if (cfg?.teachPhase) setTeachPhase(cfg.teachPhase);
+    if (cfg?.teachTaskName) setTeachTaskName(cfg.teachTaskName);
+
+    // Expand right panel for active conversations, collapse for empty
+    const shouldExpandPanel = conv.status !== "empty";
+    setPanelCollapsed(!shouldExpandPanel);
+    if (shouldExpandPanel) setSidebarCollapsed(true);
+
+    // Remount ChatArea
+    setChatKey((k) => k + 1);
+  }, [selectedConversationId, conversations, resetDemoState]);
+
+  const handleNewConversation = useCallback(() => {
+    setSidebarView("chat");
+    const newConv: Conversation = {
+      id: `conv-${Date.now()}`,
+      workspaceId: "ws-default",
+      title: "New chat",
+      status: "empty",
+      demoConfig: { activeView: "zero-state" },
+    };
+    setConversations((prev) => [newConv, ...prev]);
+    setSelectedConversationId(newConv.id);
+    resetDemoState();
+    setActiveView("zero-state");
+    setPanelCollapsed(true);
+    setChatKey((k) => k + 1);
+  }, [resetDemoState]);
+
+  const handleDeleteConversation = useCallback((id: string) => {
+    setConversations((prev) => {
+      const next = prev.filter((c) => c.id !== id);
+      if (next.length === 0) return prev; // don't delete last conversation
+      if (id === selectedConversationId) {
+        // Select the next conversation
+        const idx = prev.findIndex((c) => c.id === id);
+        const nextConv = next[Math.min(idx, next.length - 1)];
+        setSelectedConversationId(nextConv.id);
+        resetDemoState();
+        const cfg = nextConv.demoConfig;
+        setActiveView(cfg?.activeView ?? "zero-state");
+        setIsAutoPlay(cfg?.isAutoPlay ?? false);
+        setMessyMode(cfg?.messyMode ?? false);
+        if (cfg?.firstRunTask) setFirstRunTask(cfg.firstRunTask);
+        if (cfg?.teachPhase) setTeachPhase(cfg.teachPhase);
+        if (cfg?.teachTaskName) setTeachTaskName(cfg.teachTaskName);
+        setPanelCollapsed(nextConv.status === "empty");
+        setChatKey((k) => k + 1);
+      }
+      return next;
+    });
+  }, [selectedConversationId, resetDemoState]);
 
   const jumpToDemo = (mode: DemoMode) => {
     currentDemoRef.current = mode;
@@ -530,38 +639,6 @@ export default function Home() {
     setTeachTaskName("");
   };
 
-  const showPip = panelCollapsed && (activeView !== "zero-state" || isOnboarding || firstRunTask || workspaceConnecting);
-
-  const handlePipResizeStart = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    pipDragging.current = true;
-    pipDragStartX.current = e.clientX;
-    pipDragStartWidth.current = pipWidth;
-    document.body.style.cursor = "nesw-resize";
-    document.body.style.userSelect = "none";
-  }, [pipWidth]);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!pipDragging.current) return;
-      const deltaX = pipDragStartX.current - e.clientX;
-      const newWidth = Math.max(PIP_MIN_WIDTH, Math.min(PIP_MAX_WIDTH, pipDragStartWidth.current + deltaX));
-      setPipWidth(newWidth);
-    };
-    const handleMouseUp = () => {
-      if (!pipDragging.current) return;
-      pipDragging.current = false;
-      document.body.style.cursor = "";
-      document.body.style.userSelect = "";
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, []);
 
   // ── Demo picker hint (always visible) ──
   const demoHint = !demoPickerOpen && (
@@ -749,18 +826,71 @@ export default function Home() {
               </div>
             </div>
           )}
-          <TopBar
-            isZeroState={activeView === "zero-state" && !isOnboarding}
-            onOpenSettings={() => setSettingsOpen(true)}
-            onGoHome={() => { setActiveView("zero-state"); setFirstRunTask(null); setTeachPhase("idle"); setTeachTaskName(""); setIsAutoPlay(false); setChatKey((k) => k + 1); }}
-            onOpenSubscription={() => { setSettingsSection("subscription"); setSettingsOpen(true); }}
-            onOpenCredits={() => { setSettingsSection("credits"); setSettingsOpen(true); }}
-            onOpenDemoPicker={() => setDemoPickerOpen(true)}
-            onOpenPanel={() => setPanelCollapsed(false)}
-            trialDaysLeft={trialDaysLeft}
-            workspaceSetupLabel={undefined}
-          />
           <div className="flex flex-1 overflow-hidden">
+            <LeftSidebar
+              conversations={conversations}
+              selectedId={selectedConversationId}
+              collapsed={sidebarCollapsed}
+              onSelect={handleConversationSelect}
+              onNewConversation={handleNewConversation}
+              onToggleCollapse={() => setSidebarCollapsed((c) => !c)}
+              onDeleteConversation={handleDeleteConversation}
+              onRenameConversation={(id, newTitle) => {
+                if (!newTitle.trim()) return;
+                setConversations((prev) => prev.map((c) => c.id === id ? { ...c, title: newTitle.trim() } : c));
+              }}
+              onGoHome={() => { setActiveView("zero-state"); setFirstRunTask(null); setTeachPhase("idle"); setTeachTaskName(""); setIsAutoPlay(false); setChatKey((k) => k + 1); }}
+              onOpenSettings={() => setSettingsOpen(true)}
+              onOpenCredits={() => { setSettingsSection("credits"); setSettingsOpen(true); }}
+              onOpenDemoPicker={() => setDemoPickerOpen(true)}
+              onOpenCommandPalette={() => setCommandPaletteOpen(true)}
+              onOpenArtifacts={() => setSidebarView("artifacts")}
+              onOpenUploads={() => setSidebarView("uploads")}
+              activeView={sidebarView}
+              trialDaysLeft={trialDaysLeft}
+              mobileOpen={mobileSidebarOpen}
+              onCloseMobile={() => setMobileSidebarOpen(false)}
+              workspaces={mockWorkspaces}
+              selectedWorkspaceId={selectedWorkspaceId}
+              onSelectWorkspace={setSelectedWorkspaceId}
+            />
+            {sidebarView === "artifacts" ? (
+              <ArtifactsPage />
+            ) : sidebarView === "uploads" ? (
+              <UploadsPage />
+            ) : (
+            <div className="flex min-w-0 flex-1 flex-col">
+              <ConversationTitleBar
+                title={conversations.find((c) => c.id === selectedConversationId)?.title ?? "New chat"}
+                panelOpen={!panelCollapsed}
+                taskStatus={
+                  workspaceConnecting || (isOnboarding && !workspaceSetupDone)
+                    ? { label: "Setting up workspace", state: "setup" } as TaskStatus
+                    : firstRunTask && !firstRunDone
+                      ? { label: firstRunTask.title, state: "working" } as TaskStatus
+                      : isAutoPlay && autoStep < 10
+                        ? { label: "Working", state: "working" } as TaskStatus
+                        : activeView !== "zero-state"
+                          ? { label: "Ready", state: "ready" } as TaskStatus
+                          : undefined
+                }
+                onDelete={() => handleDeleteConversation(selectedConversationId)}
+                onRename={() => {
+                  const current = conversations.find((c) => c.id === selectedConversationId);
+                  const newName = window.prompt("Rename chat", current?.title ?? "");
+                  if (newName?.trim()) {
+                    setConversations((prev) => prev.map((c) => c.id === selectedConversationId ? { ...c, title: newName.trim() } : c));
+                  }
+                }}
+                onTogglePanel={() => {
+                  setPanelCollapsed((c) => {
+                    if (c) setSidebarCollapsed(true);
+                    return !c;
+                  });
+                }}
+                onOpenSidebar={() => setMobileSidebarOpen(true)}
+              />
+              <div className="flex flex-1 overflow-hidden">
             {messyMode ? (
               <MessyChatArea
                 key={chatKey}
@@ -852,7 +982,12 @@ export default function Home() {
               onViewChange={setActiveView}
               onOpenWorkspace={() => setWorkspaceOpen(true)}
               collapsed={panelCollapsed}
-              onToggleCollapse={() => setPanelCollapsed((c) => !c)}
+              onToggleCollapse={() => {
+                setPanelCollapsed((c) => {
+                  if (c) setSidebarCollapsed(true); // expanding right panel → collapse left
+                  return !c;
+                });
+              }}
               workspaceConnecting={workspaceConnecting}
               firstRunTask={firstRunTask}
               firstRunDone={firstRunDone}
@@ -882,82 +1017,9 @@ export default function Home() {
                   : undefined
               }
             />
-          </div>
-
-          {/* Floating PiP workspace when sidebar is collapsed (desktop only) */}
-          <div
-            className={`group fixed top-[54px] right-4 z-40 overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-2xl transition-[opacity,transform] duration-300 ease-out max-md:hidden ${
-              showPip ? "translate-y-0 opacity-100" : "-translate-y-2 pointer-events-none opacity-0"
-            }`}
-            style={{ width: pipWidth }}
-          >
-            {/* Header: task info + expand */}
-            <div className="flex items-center gap-2 px-3 py-2">
-              <div className="flex items-center gap-2 flex-1 min-w-0">
-                <div className={`h-1.5 w-1.5 shrink-0 rounded-full ${workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? "bg-am" : "bg-g animate-pulse"}`} />
-                <div className="truncate text-[11px] font-medium text-t1">
-                  {workspaceConnecting ? "Connecting to workspace..." : isOnboarding && !workspaceSetupDone ? "Setting up workspace..." : (firstRunTask?.title ?? "Research inbound founder")}
-                </div>
               </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setPanelCollapsed(false);
-                }}
-                className="flex items-center justify-center rounded-md p-1 text-t4 transition-colors hover:bg-bg3 hover:text-t2"
-                title="Expand panel"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <rect width="18" height="18" x="3" y="3" rx="2" />
-                  <path d="M15 3v18" />
-                  <path d="m10 15-3-3 3-3" />
-                </svg>
-              </button>
             </div>
-            {/* Screen preview */}
-            <div
-              onClick={() => !workspaceConnecting && !(isOnboarding && !workspaceSetupDone) && setWorkspaceOpen(true)}
-              className={`relative flex aspect-video items-center justify-center bg-bg3 transition-colors ${workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? "" : "cursor-pointer hover:brightness-110"}`}
-            >
-              {workspaceConnecting || (isOnboarding && !workspaceSetupDone) ? (
-                <div className="flex flex-col items-center gap-2 text-center">
-                  <div className="flex gap-1">
-                    <div className="h-1.5 w-1.5 rounded-full bg-am animate-bounce [animation-delay:0ms]" />
-                    <div className="h-1.5 w-1.5 rounded-full bg-am animate-bounce [animation-delay:150ms]" />
-                    <div className="h-1.5 w-1.5 rounded-full bg-am animate-bounce [animation-delay:300ms]" />
-                  </div>
-                  <span className="text-[10px] text-t3">{isOnboarding ? "Setting up..." : "Connecting..."}</span>
-                </div>
-              ) : (
-                <>
-                  <div className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded-full bg-bg2/90 px-[7px] py-0.5 text-[9px] font-semibold text-g backdrop-blur-sm">
-                    <div className="h-1 w-1 rounded-full bg-g" />
-                    LIVE
-                  </div>
-                  <div className="absolute bottom-1.5 right-1.5 flex items-center justify-center rounded-md bg-bg2/80 p-0.5 backdrop-blur-sm">
-                    <svg className="h-4 w-4 text-t3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="15 3 21 3 21 9" />
-                      <polyline points="9 21 3 21 3 15" />
-                      <line x1="21" y1="3" x2="14" y2="10" />
-                      <line x1="3" y1="21" x2="10" y2="14" />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 text-center text-[11px] text-t4">
-                    <svg className="h-4 w-4 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z" /><rect x="2" y="9" width="4" height="12" /><circle cx="4" cy="4" r="2" /></svg>
-                    <span>LinkedIn{"\n"}Founder profile</span>
-                  </div>
-                </>
-              )}
-            </div>
-            {/* Bottom-left corner resize handle */}
-            <div
-              onMouseDown={handlePipResizeStart}
-              className="absolute bottom-0 left-0 z-10 h-5 w-5 cursor-nesw-resize p-1"
-            >
-              <svg width="8" height="8" viewBox="0 0 8 8" className="text-t4 opacity-0 transition-opacity group-hover:opacity-100">
-                <path d="M0 0L8 8M0 4L4 8" stroke="currentColor" strokeWidth="1.2" />
-              </svg>
-            </div>
+            )}
           </div>
 
           <FullWorkspaceView
@@ -985,6 +1047,18 @@ export default function Home() {
             teachTaskName={teachTaskName || undefined}
             onDoneTeach={handleStopTeach}
             instruction={undefined}
+          />
+          <CommandPalette
+            open={commandPaletteOpen}
+            onClose={() => setCommandPaletteOpen(false)}
+            conversations={conversations}
+            onNewChat={() => { handleNewConversation(); setCommandPaletteOpen(false); }}
+            onSelectConversation={(id) => { handleConversationSelect(id); setCommandPaletteOpen(false); }}
+            onOpenSettings={(section) => {
+              setCommandPaletteOpen(false);
+              if (section) setSettingsSection(section as SettingsSection);
+              setSettingsOpen(true);
+            }}
           />
           <SettingsOverlay
             open={settingsOpen}
