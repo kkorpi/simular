@@ -405,9 +405,16 @@ export function LeftSidebar({
             <Tooltip text={selectedWorkspace.name}>
               <button
                 onClick={() => { setWsDropdownOpen(!wsDropdownOpen); setWsMenuOpenId(null); }}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-t3 transition-colors hover:bg-bg3h hover:text-t1"
+                className="relative flex h-9 w-9 items-center justify-center rounded-lg text-t3 transition-colors hover:bg-bg3h hover:text-t1"
               >
                 {selectedWorkspace.isDevice ? <Laptop className="h-4 w-4" /> : <Monitor className="h-4 w-4" />}
+                <span className="absolute bottom-1 right-1">
+                  {isWorkspaceWorking ? (
+                    <span className="block h-[8px] w-[8px] rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+                  ) : (
+                    <span className={`block h-[6px] w-[6px] rounded-full ${selectedWorkspace.status === "active" ? "bg-g" : selectedWorkspace.status === "setup" ? "bg-am" : "bg-t4"}`} />
+                  )}
+                </span>
               </button>
             </Tooltip>
             {wsDropdownOpen && (
