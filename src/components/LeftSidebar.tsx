@@ -219,7 +219,11 @@ export function LeftSidebar({
                       onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
                     >
                       {ws.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0 text-t3" /> : <Monitor className="h-3.5 w-3.5 shrink-0 text-t3" />}
-                      <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+                      {isWorkspaceWorking && ws.id === selectedWorkspaceId ? (
+                        <div className="h-[10px] w-[10px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+                      ) : (
+                        <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+                      )}
                       <span className="flex-1 truncate text-left">{ws.name}</span>
                       <div className="relative shrink-0">
                         <span
@@ -427,7 +431,11 @@ export function LeftSidebar({
                       className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[12px] transition-colors hover:bg-bg3 ${ws.id === selectedWorkspaceId ? "text-t1 bg-bg3/50" : "text-t2"}`}
                     >
                       {ws.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0 text-t3" /> : <Monitor className="h-3.5 w-3.5 shrink-0 text-t3" />}
-                      <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+                      {isWorkspaceWorking && ws.id === selectedWorkspaceId ? (
+                        <div className="h-[10px] w-[10px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+                      ) : (
+                        <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+                      )}
                       <span className="flex-1 truncate text-left">{ws.name}</span>
                       {ws.id === selectedWorkspaceId && (
                         <svg className="h-3.5 w-3.5 shrink-0 text-as" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
@@ -475,7 +483,11 @@ export function LeftSidebar({
                       onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
                     >
                       {ws.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0 text-t3" /> : <Monitor className="h-3.5 w-3.5 shrink-0 text-t3" />}
-                      <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+                      {isWorkspaceWorking && ws.id === selectedWorkspaceId ? (
+                        <div className="h-[10px] w-[10px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+                      ) : (
+                        <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+                      )}
                       <span className="flex-1 truncate text-left">{ws.name}</span>
                       <div className="relative shrink-0">
                         <span
