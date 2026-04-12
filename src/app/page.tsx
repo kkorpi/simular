@@ -168,7 +168,7 @@ export default function Home() {
   // ── Conversations sidebar ──
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [selectedConversationId, setSelectedConversationId] = useState("conv-1");
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarView, setSidebarView] = useState<"chat" | "artifacts" | "uploads">("chat");
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(mockWorkspaces[0].id);
@@ -325,9 +325,7 @@ export default function Home() {
     if (cfg?.teachTaskName) setTeachTaskName(cfg.teachTaskName);
 
     // Expand right panel for active conversations, collapse for empty
-    const shouldExpandPanel = conv.status !== "empty";
-    setPanelCollapsed(!shouldExpandPanel);
-    if (shouldExpandPanel) setSidebarCollapsed(true);
+    setPanelCollapsed(conv.status === "empty");
 
     // Remount ChatArea
     setChatKey((k) => k + 1);
@@ -382,6 +380,7 @@ export default function Home() {
       window.history.replaceState(null, "", `#${slug}`);
     }
     setDemoPickerOpen(false);
+    setSidebarCollapsed(false); // Demos show sidebar expanded
     setFirstRunTask(null);
     setFirstRunDone(false);
     setFirstRunRecurring(false);
@@ -884,10 +883,7 @@ export default function Home() {
                   }
                 }}
                 onTogglePanel={() => {
-                  setPanelCollapsed((c) => {
-                    if (c) setSidebarCollapsed(true);
-                    return !c;
-                  });
+                  setPanelCollapsed((c) => !c);
                 }}
                 onOpenSidebar={() => setMobileSidebarOpen(true)}
               />
@@ -983,12 +979,7 @@ export default function Home() {
               onViewChange={setActiveView}
               onOpenWorkspace={() => setWorkspaceOpen(true)}
               collapsed={panelCollapsed}
-              onToggleCollapse={() => {
-                setPanelCollapsed((c) => {
-                  if (c) setSidebarCollapsed(true); // expanding right panel → collapse left
-                  return !c;
-                });
-              }}
+              onToggleCollapse={() => setPanelCollapsed((c) => !c)}
               workspaceConnecting={workspaceConnecting}
               firstRunTask={firstRunTask}
               firstRunDone={firstRunDone}
