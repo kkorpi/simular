@@ -875,10 +875,8 @@ export default function Home() {
                 taskStatus={
                   workspaceConnecting || (isOnboarding && !workspaceSetupDone)
                     ? { label: "Setting up workspace", state: "setup" } as TaskStatus
-                    : firstRunTask && !firstRunDone
-                      ? { label: firstRunTask.title, state: "working" } as TaskStatus
-                      : isAutoPlay && autoStep < 10
-                        ? { label: "Working", state: "working" } as TaskStatus
+                    : (firstRunTask && !firstRunDone) || (isAutoPlay && autoStep < 10)
+                      ? { label: "Working", state: "working" } as TaskStatus
                         : activeView !== "zero-state"
                           ? { label: "Ready", state: "ready" } as TaskStatus
                           : undefined
