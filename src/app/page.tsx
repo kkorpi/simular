@@ -423,30 +423,37 @@ export default function Home() {
     if (mode === "fresh") {
       setTrialDaysLeft(6);
       setActiveView("zero-state");
+      setPanelCollapsed(true);
       setChatKey((k) => k + 1);
     } else if (mode === "active") {
       setTrialDaysLeft(6);
       setIsAutoPlay(true);
       setActiveView("task-hover");
+      setPanelCollapsed(false);
       setChatKey((k) => k + 1);
     } else if (mode === "gallery") {
       setTrialDaysLeft(6);
+      setPanelCollapsed(true);
       setCardGalleryOpen(true);
     } else if (mode === "teach") {
       setTrialDaysLeft(6);
       setActiveView("task-hover");
+      setPanelCollapsed(false);
       setTeachPhase("suggest");
       setTeachTaskName(TEACH_TASK_NAME);
     } else if (mode === "trial") {
       setTrialDaysLeft(1);
       setActiveView("task-hover");
+      setPanelCollapsed(false);
       setTimeout(() => setTrialDialogOpen(true), 400);
     } else if (mode === "system") {
       setTrialDaysLeft(6);
+      setPanelCollapsed(true);
       setDesignSystemOpen(true);
     } else if (mode === "expired") {
       setTrialDaysLeft(0);
       setTrialCancelled(true);
+      setPanelCollapsed(false);
       setActiveView("task-hover");
     } else if (mode === "onboarding") {
       setTrialDaysLeft(6);
@@ -455,11 +462,13 @@ export default function Home() {
       setIsOnboarding(true);
       setWorkspaceSetupStep(0);
       setWorkspaceSetupDone(false);
+      setPanelCollapsed(true);
       setActiveView("zero-state");
       setChatKey((k) => k + 1);
     } else if (mode === "messy") {
       setTrialDaysLeft(6);
       setMessyMode(true);
+      setPanelCollapsed(true);
       setActiveView("zero-state");
       setChatKey((k) => k + 1);
     }
