@@ -189,7 +189,7 @@ export function CommandPalette({
                 >
                   <span className="shrink-0 text-t3">{item.icon}</span>
                   <span className="flex-1 truncate">{item.label}</span>
-                  {item.id === "new-chat" && selectedIndex === item.flatIndex && (
+                  {selectedIndex === item.flatIndex && (
                     <span className="shrink-0 rounded border border-b1 bg-bg3h px-1.5 py-0.5 text-[10px] text-t4">⏎</span>
                   )}
                 </button>

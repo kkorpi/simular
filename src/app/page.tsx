@@ -171,6 +171,7 @@ export default function Home() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarView, setSidebarView] = useState<"chat" | "artifacts" | "uploads">("chat");
+  const [triggerRenameId, setTriggerRenameId] = useState<string | null>(null);
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(mockWorkspaces[0].id);
 
   // ── ChatArea remount key & auto-play ──
@@ -847,6 +848,8 @@ export default function Home() {
               onOpenUploads={() => setSidebarView("uploads")}
               activeView={sidebarView}
               isWorkspaceWorking={!!(firstRunTask && !firstRunDone) || (isAutoPlay && (autoStep ?? 0) < 10)}
+              triggerRenameId={triggerRenameId}
+              onTriggerRenameHandled={() => setTriggerRenameId(null)}
               trialDaysLeft={trialDaysLeft}
               mobileOpen={mobileSidebarOpen}
               onCloseMobile={() => setMobileSidebarOpen(false)}
@@ -876,11 +879,8 @@ export default function Home() {
                 }
                 onDelete={() => handleDeleteConversation(selectedConversationId)}
                 onRename={() => {
-                  const current = conversations.find((c) => c.id === selectedConversationId);
-                  const newName = window.prompt("Rename chat", current?.title ?? "");
-                  if (newName?.trim()) {
-                    setConversations((prev) => prev.map((c) => c.id === selectedConversationId ? { ...c, title: newName.trim() } : c));
-                  }
+                  setSidebarCollapsed(false);
+                  setTriggerRenameId(selectedConversationId);
                 }}
                 onTogglePanel={() => {
                   setPanelCollapsed((c) => !c);
