@@ -102,8 +102,6 @@ export function LeftSidebar({
   onOpenUploads,
   activeView = "chat",
   isWorkspaceWorking = false,
-  triggerRenameId,
-  onTriggerRenameHandled,
   trialDaysLeft = 6,
   mobileOpen = false,
   onCloseMobile,
@@ -128,8 +126,6 @@ export function LeftSidebar({
   onOpenUploads?: () => void;
   activeView?: "chat" | "artifacts" | "uploads";
   isWorkspaceWorking?: boolean;
-  triggerRenameId?: string | null;
-  onTriggerRenameHandled?: () => void;
   trialDaysLeft?: number;
   mobileOpen?: boolean;
   onCloseMobile?: () => void;
@@ -155,17 +151,6 @@ export function LeftSidebar({
 
   const selectedWorkspace = workspaces.find((w) => w.id === selectedWorkspaceId) ?? workspaces[0];
 
-  // External trigger for inline rename (e.g., from title bar)
-  useEffect(() => {
-    if (triggerRenameId) {
-      const conv = conversations.find((c) => c.id === triggerRenameId);
-      if (conv) {
-        setRenamingId(conv.id);
-        setRenameValue(conv.title);
-      }
-      onTriggerRenameHandled?.();
-    }
-  }, [triggerRenameId]);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
 
