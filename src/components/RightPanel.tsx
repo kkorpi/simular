@@ -537,7 +537,7 @@ export function RightPanel({
             : isFreshState ? "Ready"
             : isOnboarding ? (workspaceSetupDone ? "Workspace ready" : "Setting up workspace")
             : workspaceConnecting ? "Setting up workspace"
-            : hasActiveTask ? (firstRunTask ? `${firstRunTask.title}${elapsedStr ? ` · ${elapsedStr}` : ""}` : `Working${elapsedStr ? ` · ${elapsedStr}` : ""}`)
+            : hasActiveTask ? `Working${elapsedStr ? ` · ${elapsedStr}` : ""}`
             : "Ready"
           }</span>
         </div>

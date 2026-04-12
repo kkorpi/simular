@@ -847,6 +847,7 @@ export default function Home() {
               onOpenArtifacts={() => setSidebarView("artifacts")}
               onOpenUploads={() => setSidebarView("uploads")}
               activeView={sidebarView}
+              isWorkspaceWorking={!!(firstRunTask && !firstRunDone) || (isAutoPlay && (autoStep ?? 0) < 10)}
               trialDaysLeft={trialDaysLeft}
               mobileOpen={mobileSidebarOpen}
               onCloseMobile={() => setMobileSidebarOpen(false)}

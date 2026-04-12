@@ -101,6 +101,7 @@ export function LeftSidebar({
   onOpenArtifacts,
   onOpenUploads,
   activeView = "chat",
+  isWorkspaceWorking = false,
   trialDaysLeft = 6,
   mobileOpen = false,
   onCloseMobile,
@@ -124,6 +125,7 @@ export function LeftSidebar({
   onOpenArtifacts?: () => void;
   onOpenUploads?: () => void;
   activeView?: "chat" | "artifacts" | "uploads";
+  isWorkspaceWorking?: boolean;
   trialDaysLeft?: number;
   mobileOpen?: boolean;
   onCloseMobile?: () => void;
@@ -199,7 +201,11 @@ export function LeftSidebar({
               className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-t3 transition-colors hover:bg-bg3h hover:text-t1"
             >
               {selectedWorkspace.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0" /> : <Monitor className="h-3.5 w-3.5 shrink-0" />}
-              <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${selectedWorkspace.status === "active" ? "bg-g" : selectedWorkspace.status === "setup" ? "bg-am" : "bg-t4"}`} />
+              {isWorkspaceWorking ? (
+                <div className="h-[10px] w-[10px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+              ) : (
+                <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${selectedWorkspace.status === "active" ? "bg-g" : selectedWorkspace.status === "setup" ? "bg-am" : "bg-t4"}`} />
+              )}
               <span className="flex-1 truncate text-left text-[12px]">{selectedWorkspace.name}</span>
               <ChevronDown className="h-3 w-3 shrink-0 text-t4" />
             </button>
@@ -444,7 +450,11 @@ export function LeftSidebar({
               className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-t3 transition-colors hover:bg-bg3h hover:text-t1"
             >
               {selectedWorkspace.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0" /> : <Monitor className="h-3.5 w-3.5 shrink-0" />}
-              <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${selectedWorkspace.status === "active" ? "bg-g" : selectedWorkspace.status === "setup" ? "bg-am" : "bg-t4"}`} />
+              {isWorkspaceWorking ? (
+                <div className="h-[10px] w-[10px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+              ) : (
+                <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${selectedWorkspace.status === "active" ? "bg-g" : selectedWorkspace.status === "setup" ? "bg-am" : "bg-t4"}`} />
+              )}
               <span className="flex-1 truncate text-left text-[12px]">{selectedWorkspace.name}</span>
               <ChevronDown className="h-3 w-3 shrink-0 text-t4" />
             </button>
