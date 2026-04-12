@@ -305,7 +305,7 @@ export function LeftSidebar({
           return (
             <div key={conv.id} className="relative">
               {isRenaming ? (
-                <div className="relative z-10 flex items-center rounded-lg bg-bg3 ring-1 ring-as/50 px-2.5 py-1.5">
+                <div className="relative z-10 flex items-center rounded-lg bg-bg3 ring-1 ring-as/50 px-2.5 py-2">
                   <input
                     autoFocus
                     value={renameValue}
@@ -613,7 +613,7 @@ export function LeftSidebar({
           return (
             <div key={conv.id} className="relative">
               {isRenaming ? (
-                <div className="relative z-10 flex items-center rounded-lg bg-bg3 ring-1 ring-as/50 px-2.5 py-1.5">
+                <div className="relative z-10 flex items-center rounded-lg bg-bg3 ring-1 ring-as/50 px-2.5 py-2">
                   <input
                     autoFocus
                     value={renameValue}
