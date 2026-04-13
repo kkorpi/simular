@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Plus, PanelLeftClose, PanelLeft, Ellipsis, Trash2, Pencil, Settings, Layers, FileText, Upload, Monitor, ChevronDown, Laptop, Search } from "lucide-react";
+import { Plus, PanelLeftClose, PanelLeft, Ellipsis, Trash2, Pencil, Settings, Layers, FileText, Upload, Monitor, ChevronDown, Laptop, Search, MessageCircle } from "lucide-react";
 import { SimularLogo } from "./SimularLogo";
 import type { Conversation, Workspace } from "@/data/mockData";
 
@@ -138,6 +138,17 @@ export function LeftSidebar({
   const [renameValue, setRenameValue] = useState("");
   const [wsDropdownOpen, setWsDropdownOpen] = useState(false);
   const [wsMenuOpenId, setWsMenuOpenId] = useState<string | null>(null);
+  const [convFlyoutOpen, setConvFlyoutOpen] = useState(false);
+  const convFlyoutRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!convFlyoutOpen) return;
+    const handle = (e: PointerEvent) => {
+      if (convFlyoutRef.current && !convFlyoutRef.current.contains(e.target as Node)) setConvFlyoutOpen(false);
+    };
+    document.addEventListener("pointerdown", handle);
+    return () => document.removeEventListener("pointerdown", handle);
+  }, [convFlyoutOpen]);
   const wsDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -600,6 +611,41 @@ export function LeftSidebar({
           </>
         )}
       </div>
+
+      {/* Conversations flyout — collapsed only */}
+      {collapsed && (
+        <div className="shrink-0 px-2 pt-1 flex justify-center" ref={convFlyoutRef}>
+          <div className="relative">
+            <Tooltip text="Recents">
+              <button
+                onClick={() => setConvFlyoutOpen(!convFlyoutOpen)}
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-t3 transition-colors hover:bg-bg3h hover:text-t1"
+              >
+                <MessageCircle className="h-4 w-4" />
+              </button>
+            </Tooltip>
+            {convFlyoutOpen && (
+              <div className="absolute left-full top-0 z-50 ml-2 w-[220px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                <div className="px-3 pt-2.5 pb-1 text-[11px] font-medium uppercase tracking-wider text-t4">Recents</div>
+                <div className="p-1 max-h-[300px] overflow-y-auto">
+                  {conversations.map((conv) => {
+                    const isActive = conv.id === selectedId;
+                    return (
+                      <button
+                        key={conv.id}
+                        onClick={() => { onSelect(conv.id); setConvFlyoutOpen(false); }}
+                        className={`flex w-full items-center rounded-md px-2.5 py-2 text-left text-[12px] transition-colors hover:bg-bg3 ${isActive ? "text-t1 bg-bg3/50" : "text-t2"}`}
+                      >
+                        <span className="flex-1 truncate">{conv.title}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Conversation list — hidden when collapsed */}
       {!collapsed && (
