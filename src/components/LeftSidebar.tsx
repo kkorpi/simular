@@ -377,9 +377,10 @@ export function LeftSidebar({
           <Tooltip text="Expand sidebar">
             <button
               onClick={onToggleCollapse}
-              className="flex h-9 w-9 cursor-e-resize items-center justify-center rounded-lg transition-colors hover:bg-bg3h"
+              className="group flex h-9 w-9 cursor-e-resize items-center justify-center rounded-lg transition-colors hover:bg-bg3h"
             >
-              <SimularLogo size={24} />
+              <span className="group-hover:hidden"><SimularLogo size={24} /></span>
+              <PanelLeft className="hidden h-4 w-4 text-t2 group-hover:block" />
             </button>
           </Tooltip>
         ) : (
