@@ -325,7 +325,9 @@ export default function Home() {
     if (cfg?.teachTaskName) setTeachTaskName(cfg.teachTaskName);
 
     // Expand right panel for active conversations, collapse for empty
-    setPanelCollapsed(conv.status === "empty");
+    const shouldOpenPanel = conv.status !== "empty";
+    setPanelCollapsed(!shouldOpenPanel);
+    if (shouldOpenPanel) setSidebarCollapsed(true);
 
     // Remount ChatArea
     setChatKey((k) => k + 1);
@@ -886,7 +888,10 @@ export default function Home() {
                   setConversations((prev) => prev.map((c) => c.id === selectedConversationId ? { ...c, title: newTitle } : c));
                 }}
                 onTogglePanel={() => {
-                  setPanelCollapsed((c) => !c);
+                  setPanelCollapsed((c) => {
+                    if (c) setSidebarCollapsed(true);
+                    return !c;
+                  });
                 }}
                 onOpenSidebar={() => setMobileSidebarOpen(true)}
               />
@@ -982,7 +987,10 @@ export default function Home() {
               onViewChange={setActiveView}
               onOpenWorkspace={() => setWorkspaceOpen(true)}
               collapsed={panelCollapsed}
-              onToggleCollapse={() => setPanelCollapsed((c) => !c)}
+              onToggleCollapse={() => setPanelCollapsed((c) => {
+                if (c) setSidebarCollapsed(true);
+                return !c;
+              })}
               workspaceConnecting={workspaceConnecting}
               firstRunTask={firstRunTask}
               firstRunDone={firstRunDone}
