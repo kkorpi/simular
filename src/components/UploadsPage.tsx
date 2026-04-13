@@ -171,7 +171,7 @@ export function UploadsPage() {
             </button>
           </div>
 
-          <div className="mt-6 grid grid-cols-2 gap-4 max-md:grid-cols-1">
+          <div className="mt-6 grid grid-cols-3 gap-3 max-md:grid-cols-1">
             {mockUploads.map((upload) => (
               <button
                 key={upload.id}
