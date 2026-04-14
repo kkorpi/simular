@@ -293,7 +293,7 @@ export function AuthInput({
   // ── 2FA State ──
   if (state === "2fa") {
     return (
-      <div className="rounded-lg border border-b1 bg-bgcard transition-colors">
+      <div className="mx-auto max-w-[480px] rounded-lg border border-b1 bg-bgcard transition-colors">
         {/* Header */}
         <div className="flex items-center gap-3 px-4 py-3">
           <ServiceIcon serviceId={serviceId} service={service} />
@@ -354,7 +354,7 @@ export function AuthInput({
   // ── CAPTCHA State ──
   if (state === "captcha") {
     return (
-      <div className="rounded-lg border border-b1 bg-bgcard transition-colors">
+      <div className="mx-auto max-w-[480px] rounded-lg border border-b1 bg-bgcard transition-colors">
         {/* Header */}
         <div className="flex items-center gap-3 px-4 py-3">
           <ServiceIcon serviceId={serviceId} service={service} />
@@ -403,7 +403,7 @@ export function AuthInput({
 
   // ── Pending / Failed State ──
   return (
-    <div className="rounded-lg border border-b1 bg-bgcard transition-colors">
+    <div className="mx-auto max-w-[480px] rounded-lg border border-b1 bg-bgcard transition-colors">
       {/* Header with service logo + overflow menu */}
       <div className="flex items-center gap-3 px-4 py-3">
         <ServiceIcon serviceId={serviceId} service={service} />
