@@ -403,7 +403,7 @@ export function AuthInput({
 
   // ── Pending / Failed State ──
   return (
-    <div className="mx-auto max-w-[420px] rounded-lg border border-b1 bg-bgcard transition-colors">
+    <div className="rounded-lg border border-b1 bg-bgcard transition-colors">
       {/* Header with service logo + overflow menu */}
       <div className="flex items-center gap-3 px-4 py-3">
         <ServiceIcon serviceId={serviceId} service={service} />
