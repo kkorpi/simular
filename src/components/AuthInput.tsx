@@ -403,7 +403,7 @@ export function AuthInput({
 
   // ── Pending / Failed State ──
   return (
-    <div className="mx-auto max-w-[480px] rounded-lg border border-b1 bg-bgcard transition-colors">
+    <div className="mx-auto max-w-[420px] rounded-lg border border-b1 bg-bgcard transition-colors">
       {/* Header with service logo + overflow menu */}
       <div className="flex items-center gap-3 px-4 py-3">
         <ServiceIcon serviceId={serviceId} service={service} />
@@ -420,15 +420,7 @@ export function AuthInput({
         {/* Error message */}
         {state === "failed" && errorMessage && (
           <div className="mb-3 flex items-center gap-1.5 rounded-md bg-rd/[0.08] px-2.5 py-2 text-[12px] text-rd">
-            <svg
-              className="h-3.5 w-3.5 shrink-0"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
+            <svg className="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="10" />
               <line x1="12" y1="8" x2="12" y2="12" />
               <line x1="12" y1="16" x2="12.01" y2="16" />
@@ -442,22 +434,12 @@ export function AuthInput({
           <>
             <div className="flex flex-wrap gap-2 mb-3">
               {service.oauthProviders.map((provider) => (
-                <OAuthButton
-                  key={provider}
-                  provider={provider}
-                  onClick={() => onOAuthSelect?.(provider)}
-                />
+                <OAuthButton key={provider} provider={provider} onClick={() => onOAuthSelect?.(provider)} />
               ))}
             </div>
-
-            {/* "or" divider */}
             <div className="relative mb-3">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-b1" />
-              </div>
-              <div className="relative flex justify-center">
-                <span className="bg-bgcard px-2 text-[11px] text-t4">or</span>
-              </div>
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-b1" /></div>
+              <div className="relative flex justify-center"><span className="bg-bgcard px-2 text-[11px] text-t4">or</span></div>
             </div>
           </>
         )}
@@ -466,19 +448,11 @@ export function AuthInput({
         <div className="flex flex-col gap-3">
           {service.fields.map((field, i) => (
             <div key={field.key}>
-              <label className="mb-1 flex items-center justify-between text-[12px] font-medium text-t2">
-                {field.label}
-              </label>
+              <label className="mb-1 flex items-center justify-between text-[12px] font-medium text-t2">{field.label}</label>
               <div className="relative">
                 <input
                   ref={i === 0 ? firstInputRef : undefined}
-                  type={
-                    field.type === "password" && !showPasswords[field.key]
-                      ? "password"
-                      : field.type === "email"
-                        ? "email"
-                        : "text"
-                  }
+                  type={field.type === "password" && !showPasswords[field.key] ? "password" : field.type === "email" ? "email" : "text"}
                   autoComplete={field.autoComplete}
                   value={values[field.key] ?? ""}
                   onChange={(e) => updateValue(field.key, e.target.value)}
@@ -512,15 +486,7 @@ export function AuthInput({
 
         {/* Trust signal */}
         <div className="flex items-center gap-1.5 mt-3 text-[11px] text-t3">
-          <svg
-            className="h-3 w-3 shrink-0 text-g"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
+          <svg className="h-3 w-3 shrink-0 text-g" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="11" width="18" height="11" rx="2" />
             <path d="M7 11V7a5 5 0 0110 0v4" />
           </svg>
