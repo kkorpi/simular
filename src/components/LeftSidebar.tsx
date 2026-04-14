@@ -35,6 +35,127 @@ function Tooltip({ text, children }: { text: string; children: React.ReactNode }
   );
 }
 
+/** Mini wireframe previews for workspace cards */
+function LinkedInWireframe() {
+  return (
+    <div className="flex h-full w-full bg-bg3">
+      <div className="w-[16px] shrink-0 border-r border-b1/40 bg-bg2/40 flex flex-col items-center pt-2 gap-1.5">
+        <div className="h-[4px] w-[4px] rounded-sm bg-t4/30" />
+        <div className="h-[4px] w-[4px] rounded-sm bg-blt/40" />
+        <div className="h-[4px] w-[4px] rounded-sm bg-t4/30" />
+      </div>
+      <div className="flex-1 p-2 flex flex-col gap-1.5">
+        <div className="h-[4px] w-[60%] rounded-full bg-t4/20" />
+        <div className="h-[4px] w-[80%] rounded-full bg-t4/15" />
+        <div className="h-[4px] w-[45%] rounded-full bg-blt/20" />
+        <div className="h-[4px] w-[70%] rounded-full bg-t4/15" />
+        <div className="h-[4px] w-[55%] rounded-full bg-t4/10" />
+      </div>
+    </div>
+  );
+}
+
+function CodeEditorWireframe() {
+  return (
+    <div className="flex h-full w-full bg-bg3">
+      <div className="w-[20px] shrink-0 border-r border-b1/40 bg-bg2/60 flex flex-col items-end pr-1 pt-2 gap-1">
+        {[1,2,3,4,5,6].map(i => (
+          <div key={i} className="h-[3px] w-[6px] rounded-full bg-t4/20" />
+        ))}
+      </div>
+      <div className="flex-1 p-2 flex flex-col gap-1">
+        <div className="h-[3px] w-[40%] rounded-full bg-purple-400/25" />
+        <div className="h-[3px] w-[65%] rounded-full bg-t4/15 ml-2" />
+        <div className="h-[3px] w-[50%] rounded-full bg-g/20 ml-2" />
+        <div className="h-[3px] w-[70%] rounded-full bg-t4/15 ml-4" />
+        <div className="h-[3px] w-[35%] rounded-full bg-am/20 ml-4" />
+        <div className="h-[3px] w-[55%] rounded-full bg-t4/15 ml-2" />
+      </div>
+    </div>
+  );
+}
+
+function DesktopWireframe() {
+  return (
+    <div className="flex h-full w-full flex-col bg-bg3">
+      <div className="flex-1 p-2 flex flex-col gap-1.5">
+        <div className="flex gap-1.5">
+          <div className="h-[16px] w-[20px] rounded-sm bg-t4/15 border border-b1/30" />
+          <div className="h-[16px] w-[24px] rounded-sm bg-t4/10 border border-b1/30" />
+        </div>
+        <div className="h-[4px] w-[50%] rounded-full bg-t4/20" />
+        <div className="h-[4px] w-[70%] rounded-full bg-t4/15" />
+      </div>
+      <div className="flex items-center justify-center gap-1 py-1 border-t border-b1/30">
+        <div className="h-[4px] w-[4px] rounded-full bg-t4/25" />
+        <div className="h-[4px] w-[4px] rounded-full bg-t4/25" />
+        <div className="h-[4px] w-[4px] rounded-full bg-blt/30" />
+        <div className="h-[4px] w-[4px] rounded-full bg-t4/25" />
+      </div>
+    </div>
+  );
+}
+
+function WorkspacePreviewCard({
+  ws,
+  isSelected,
+  isWorking,
+  onClick,
+}: {
+  ws: Workspace;
+  isSelected: boolean;
+  isWorking: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex flex-col overflow-hidden rounded-lg border text-left transition-all hover:border-b2 hover:shadow-md ${
+        isSelected ? "border-as/40 ring-1 ring-as/20" : "border-b1"
+      }`}
+    >
+      {/* Mini browser chrome */}
+      <div className="flex items-center gap-1 bg-bg2 px-1.5 py-1 border-b border-b1/50">
+        <div className="flex gap-0.5">
+          <div className="h-[4px] w-[4px] rounded-full bg-t4/30" />
+          <div className="h-[4px] w-[4px] rounded-full bg-t4/30" />
+          <div className="h-[4px] w-[4px] rounded-full bg-t4/30" />
+        </div>
+        <div className="flex-1 mx-1 h-[10px] rounded-sm bg-bg3 flex items-center px-1">
+          <span className="text-[6px] text-t4 truncate">
+            {ws.isDevice ? "desktop" : ws.name === "Dev Environment" ? "github.com" : "linkedin.com"}
+          </span>
+        </div>
+        <div className={`flex items-center gap-0.5 rounded-full px-1 py-px text-[5px] font-semibold ${ws.status === "active" ? "text-g" : "text-t4"}`}>
+          {isWorking && isSelected ? (
+            <div className="h-[5px] w-[5px] rounded-full border border-g/30 border-t-g animate-spin" />
+          ) : (
+            <div className={`h-[3px] w-[3px] rounded-full ${ws.status === "active" ? "bg-g" : "bg-t4"}`} />
+          )}
+          {ws.status === "active" ? "LIVE" : "OFF"}
+        </div>
+      </div>
+      {/* Wireframe content */}
+      <div className="aspect-[16/10]">
+        {ws.isDevice ? <DesktopWireframe /> : ws.name === "Dev Environment" ? <CodeEditorWireframe /> : <LinkedInWireframe />}
+      </div>
+      {/* Footer */}
+      <div className="flex items-center gap-1.5 border-t border-b1/50 bg-bg2 px-2 py-1.5">
+        {ws.isDevice ? <Laptop className="h-3 w-3 shrink-0 text-t3" /> : <Monitor className="h-3 w-3 shrink-0 text-t3" />}
+        {isWorking ? (
+          <div className="h-[8px] w-[8px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+        ) : (
+          <div className={`h-[5px] w-[5px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+        )}
+        <span className={`flex-1 truncate text-[10px] ${isSelected ? "text-t1 font-medium" : "text-t2"}`}>{ws.name}</span>
+        {isSelected && (
+          <svg className="h-3 w-3 shrink-0 text-as" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+        )}
+      </div>
+    </button>
+  );
+}
+
 function ConversationMenu({
   open,
   onClose,
@@ -222,50 +343,16 @@ export function LeftSidebar({
               <ChevronDown className="h-3 w-3 shrink-0 text-t4" />
             </button>
             {wsDropdownOpen && (
-              <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
-                <div className="p-1">
+              <div className="absolute left-0 top-full z-50 mt-1 w-[380px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                <div className="grid grid-cols-2 gap-2 p-2">
                   {workspaces.map((ws) => (
-                    <div
+                    <WorkspacePreviewCard
                       key={ws.id}
-                      className={`group flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[12px] transition-colors hover:bg-bg3 cursor-pointer ${ws.id === selectedWorkspaceId ? "text-t1 bg-bg3/50" : "text-t2"}`}
+                      ws={ws}
+                      isSelected={ws.id === selectedWorkspaceId}
+                      isWorking={isWorkspaceWorking && ws.id === selectedWorkspaceId}
                       onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
-                    >
-                      {ws.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0 text-t3" /> : <Monitor className="h-3.5 w-3.5 shrink-0 text-t3" />}
-                      {isWorkspaceWorking && ws.id === selectedWorkspaceId ? (
-                        <div className="h-[10px] w-[10px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
-                      ) : (
-                        <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
-                      )}
-                      <span className="flex-1 truncate text-left">{ws.name}</span>
-                      <div className="relative shrink-0">
-                        <span
-                          onClick={(e) => { e.stopPropagation(); setWsMenuOpenId(wsMenuOpenId === ws.id ? null : ws.id); }}
-                          className={`flex h-5 w-5 items-center justify-center rounded text-t4 transition-all hover:bg-bg3h hover:text-t2 ${wsMenuOpenId === ws.id ? "opacity-100 bg-bg3h" : "opacity-0 group-hover:opacity-100"}`}
-                        >
-                          <Ellipsis className="h-3.5 w-3.5" />
-                        </span>
-                        {wsMenuOpenId === ws.id && (
-                          <div className="absolute right-0 top-full z-50 mt-1 w-[140px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
-                            <div className="p-1">
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setWsMenuOpenId(null); }}
-                                className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-[12px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
-                              >
-                                <Pencil className="h-3 w-3 text-t3" />
-                                Rename
-                              </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setWsMenuOpenId(null); }}
-                                className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-[12px] text-red-400 transition-colors hover:bg-bg3"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    />
                   ))}
                 </div>
                 <div className="border-t border-b1 p-1">
@@ -435,25 +522,16 @@ export function LeftSidebar({
               </button>
             </Tooltip>
             {wsDropdownOpen && (
-              <div className="absolute left-full top-0 z-50 ml-2 w-[200px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
-                <div className="p-1">
+              <div className="absolute left-full top-0 z-50 ml-2 w-[380px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                <div className="grid grid-cols-2 gap-2 p-2">
                   {workspaces.map((ws) => (
-                    <button
+                    <WorkspacePreviewCard
                       key={ws.id}
+                      ws={ws}
+                      isSelected={ws.id === selectedWorkspaceId}
+                      isWorking={isWorkspaceWorking && ws.id === selectedWorkspaceId}
                       onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
-                      className={`flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[12px] transition-colors hover:bg-bg3 ${ws.id === selectedWorkspaceId ? "text-t1 bg-bg3/50" : "text-t2"}`}
-                    >
-                      {ws.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0 text-t3" /> : <Monitor className="h-3.5 w-3.5 shrink-0 text-t3" />}
-                      {isWorkspaceWorking && ws.id === selectedWorkspaceId ? (
-                        <div className="h-[10px] w-[10px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
-                      ) : (
-                        <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
-                      )}
-                      <span className="flex-1 truncate text-left">{ws.name}</span>
-                      {ws.id === selectedWorkspaceId && (
-                        <svg className="h-3.5 w-3.5 shrink-0 text-as" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
-                      )}
-                    </button>
+                    />
                   ))}
                 </div>
                 <div className="border-t border-b1 p-1">
@@ -487,50 +565,16 @@ export function LeftSidebar({
               <ChevronDown className="h-3 w-3 shrink-0 text-t4" />
             </button>
             {wsDropdownOpen && (
-              <div className="absolute left-0 right-0 top-full z-50 mt-1 overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
-                <div className="p-1">
+              <div className="absolute left-0 top-full z-50 mt-1 w-[380px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                <div className="grid grid-cols-2 gap-2 p-2">
                   {workspaces.map((ws) => (
-                    <div
+                    <WorkspacePreviewCard
                       key={ws.id}
-                      className={`group flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[12px] transition-colors hover:bg-bg3 cursor-pointer ${ws.id === selectedWorkspaceId ? "text-t1 bg-bg3/50" : "text-t2"}`}
+                      ws={ws}
+                      isSelected={ws.id === selectedWorkspaceId}
+                      isWorking={isWorkspaceWorking && ws.id === selectedWorkspaceId}
                       onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
-                    >
-                      {ws.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0 text-t3" /> : <Monitor className="h-3.5 w-3.5 shrink-0 text-t3" />}
-                      {isWorkspaceWorking && ws.id === selectedWorkspaceId ? (
-                        <div className="h-[10px] w-[10px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
-                      ) : (
-                        <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
-                      )}
-                      <span className="flex-1 truncate text-left">{ws.name}</span>
-                      <div className="relative shrink-0">
-                        <span
-                          onClick={(e) => { e.stopPropagation(); setWsMenuOpenId(wsMenuOpenId === ws.id ? null : ws.id); }}
-                          className={`flex h-5 w-5 items-center justify-center rounded text-t4 transition-all hover:bg-bg3h hover:text-t2 ${wsMenuOpenId === ws.id ? "opacity-100 bg-bg3h" : "opacity-0 group-hover:opacity-100"}`}
-                        >
-                          <Ellipsis className="h-3.5 w-3.5" />
-                        </span>
-                        {wsMenuOpenId === ws.id && (
-                          <div className="absolute right-0 top-full z-50 mt-1 w-[140px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
-                            <div className="p-1">
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setWsMenuOpenId(null); }}
-                                className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-[12px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
-                              >
-                                <Pencil className="h-3 w-3 text-t3" />
-                                Rename
-                              </button>
-                              <button
-                                onClick={(e) => { e.stopPropagation(); setWsMenuOpenId(null); }}
-                                className="flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-[12px] text-red-400 transition-colors hover:bg-bg3"
-                              >
-                                <Trash2 className="h-3 w-3" />
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    />
                   ))}
                 </div>
                 <div className="border-t border-b1 p-1">
