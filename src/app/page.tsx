@@ -17,6 +17,8 @@ import { WaitlistSignup } from "@/components/WaitlistSignup";
 import { WaitlistConfirmation } from "@/components/WaitlistConfirmation";
 import { OnboardingScreen, type OnboardingProfile } from "@/components/OnboardingScreen";
 import { SaiInterstitial } from "@/components/SaiInterstitial";
+import { SimularLogo } from "@/components/SimularLogo";
+import { Monitor, Laptop } from "lucide-react";
 import type { AuthInputState } from "@/components/AuthInput";
 import { LeftSidebar } from "@/components/LeftSidebar";
 import { ConversationTitleBar, type TaskStatus } from "@/components/ConversationTitleBar";
@@ -172,6 +174,8 @@ export default function Home() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarView, setSidebarView] = useState<"chat" | "artifacts" | "uploads">("chat");
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(mockWorkspaces[0].id);
+  const [openWorkspaceTabs, setOpenWorkspaceTabs] = useState<string[]>([mockWorkspaces[0].id]);
+  const [wsTabMenuOpen, setWsTabMenuOpen] = useState(false);
 
   // ── ChatArea remount key & auto-play ──
   const [chatKey, setChatKey] = useState(0);
@@ -282,6 +286,17 @@ export default function Home() {
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, []);
+
+  // Close workspace tab menu on click outside
+  const wsTabMenuRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!wsTabMenuOpen) return;
+    const handle = (e: PointerEvent) => {
+      if (wsTabMenuRef.current && !wsTabMenuRef.current.contains(e.target as Node)) setWsTabMenuOpen(false);
+    };
+    document.addEventListener("pointerdown", handle);
+    return () => document.removeEventListener("pointerdown", handle);
+  }, [wsTabMenuOpen]);
 
   // ── Conversation switching ──
   const resetDemoState = useCallback(() => {
@@ -836,6 +851,106 @@ export default function Home() {
               </div>
             </div>
           )}
+          {/* Workspace tab bar — spans full width above everything */}
+          <div className="flex shrink-0 items-center border-b border-b1 bg-bg2 h-[42px]">
+            {/* Logo + sidebar toggle */}
+            <div className="flex shrink-0 items-center gap-1 pl-3 pr-2">
+              <SimularLogo size={22} />
+              <button
+                onClick={() => setSidebarCollapsed((c) => !c)}
+                className="flex h-7 w-7 items-center justify-center rounded-md text-t4 transition-colors hover:bg-bg3h hover:text-t2"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" /><path d="M9 3v18" /></svg>
+              </button>
+            </div>
+            <div className="h-4 w-px bg-b1 mr-2" />
+            <div className="flex flex-1 items-center gap-1 pr-3">
+            {openWorkspaceTabs.map((wsId) => {
+              const ws = mockWorkspaces.find((w) => w.id === wsId);
+              if (!ws) return null;
+              const isActive = ws.id === selectedWorkspaceId;
+              const isWorking = !!(firstRunTask && !firstRunDone) || (isAutoPlay && (autoStep ?? 0) < 10);
+              return (
+                <button
+                  key={ws.id}
+                  onClick={() => setSelectedWorkspaceId(ws.id)}
+                  className={`group flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[12px] transition-colors ${
+                    isActive ? "bg-bg3 text-t1 font-medium" : "text-t3 hover:bg-bg3h hover:text-t2"
+                  }`}
+                >
+                  {isWorking && isActive ? (
+                    <span className="h-[8px] w-[8px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+                  ) : (
+                    <span className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+                  )}
+                  {ws.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0" /> : <Monitor className="h-3.5 w-3.5 shrink-0" />}
+                  {ws.name}
+                  {openWorkspaceTabs.length > 1 && (
+                    <span
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpenWorkspaceTabs((prev) => prev.filter((id) => id !== ws.id));
+                        if (isActive) {
+                          const remaining = openWorkspaceTabs.filter((id) => id !== ws.id);
+                          setSelectedWorkspaceId(remaining[0]);
+                        }
+                      }}
+                      className={`ml-0.5 flex h-4 w-4 items-center justify-center rounded text-t4 transition-all hover:bg-bg3h hover:text-t2 ${
+                        isActive ? "opacity-60 group-hover:opacity-100" : "opacity-0 group-hover:opacity-60"
+                      }`}
+                    >
+                      <svg className="h-2.5 w-2.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+            <div className="relative" ref={wsTabMenuRef}>
+              <button
+                onClick={(e) => { e.stopPropagation(); setWsTabMenuOpen(!wsTabMenuOpen); }}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="flex shrink-0 items-center gap-0.5 rounded-md px-1.5 py-1 text-t4 transition-colors hover:bg-bg3h hover:text-t2"
+              >
+                <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+                <Monitor className="h-3.5 w-3.5" />
+              </button>
+              {wsTabMenuOpen && (
+                <div className="absolute left-0 top-full z-50 mt-1 w-[200px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                  <div className="p-1">
+                    {mockWorkspaces.filter((ws) => !openWorkspaceTabs.includes(ws.id)).map((ws) => (
+                      <button
+                        key={ws.id}
+                        onClick={() => {
+                          setOpenWorkspaceTabs((prev) => [...prev, ws.id]);
+                          setSelectedWorkspaceId(ws.id);
+                          setWsTabMenuOpen(false);
+                        }}
+                        className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-left text-[12px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
+                      >
+                        <span className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+                        {ws.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0" /> : <Monitor className="h-3.5 w-3.5 shrink-0" />}
+                  {ws.name}
+                      </button>
+                    ))}
+                    {mockWorkspaces.filter((ws) => !openWorkspaceTabs.includes(ws.id)).length === 0 && (
+                      <div className="px-2.5 py-2 text-[12px] text-t4">All workspaces open</div>
+                    )}
+                  </div>
+                  <div className="border-t border-b1 p-1">
+                    <button
+                      onClick={() => { setWsTabMenuOpen(false); setSettingsSection("workspaces"); setSettingsOpen(true); }}
+                      className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[12px] text-t3 transition-colors hover:bg-bg3 hover:text-t1"
+                    >
+                      <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" /></svg>
+                      Manage workspaces
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            </div>
+          </div>
+
           <div className="flex flex-1 overflow-hidden">
             <LeftSidebar
               conversations={conversations}
@@ -857,7 +972,7 @@ export default function Home() {
               onOpenArtifacts={() => setSidebarView("artifacts")}
               onOpenUploads={() => setSidebarView("uploads")}
               activeView={sidebarView}
-              isWorkspaceWorking={!!(firstRunTask && !firstRunDone) || (isAutoPlay && (autoStep ?? 0) < 10)}
+
               trialDaysLeft={trialDaysLeft}
               mobileOpen={mobileSidebarOpen}
               onCloseMobile={() => setMobileSidebarOpen(false)}
@@ -868,35 +983,6 @@ export default function Home() {
               <UploadsPage />
             ) : (
             <div className="flex min-w-0 flex-1 flex-col">
-              {/* Workspace tabs */}
-              <div className="flex shrink-0 items-center gap-1 border-b border-b1 px-3 h-[36px] overflow-x-auto max-md:px-2">
-                {mockWorkspaces.map((ws) => {
-                  const isActive = ws.id === selectedWorkspaceId;
-                  const isWorking = !!(firstRunTask && !firstRunDone) || (isAutoPlay && (autoStep ?? 0) < 10);
-                  return (
-                    <button
-                      key={ws.id}
-                      onClick={() => setSelectedWorkspaceId(ws.id)}
-                      className={`flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] transition-colors ${
-                        isActive ? "bg-bg3 text-t1 font-medium" : "text-t3 hover:bg-bg3h hover:text-t2"
-                      }`}
-                    >
-                      {isWorking && isActive ? (
-                        <span className="h-[8px] w-[8px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
-                      ) : (
-                        <span className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
-                      )}
-                      {ws.name}
-                    </button>
-                  );
-                })}
-                <button
-                  onClick={() => { setSettingsSection("workspaces"); setSettingsOpen(true); }}
-                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-t4 transition-colors hover:bg-bg3h hover:text-t2"
-                >
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                </button>
-              </div>
               <ConversationTitleBar
                 title={conversations.find((c) => c.id === selectedConversationId)?.title ?? "New chat"}
                 panelOpen={!panelCollapsed}
