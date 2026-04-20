@@ -165,11 +165,15 @@ export function LeftSidebar({
   // Shared sidebar content for mobile drawer (always expanded)
   const sidebarContent = (isMobile: boolean) => (
     <>
-      {/* Header — close button only for mobile */}
-      <div className="flex items-center shrink-0 h-[36px] justify-end px-2">
+      {/* Header */}
+      <div className="flex items-center shrink-0 h-[50px] px-3">
+        <button onClick={onGoHome} className="flex items-center gap-2.5 transition-opacity hover:opacity-80">
+          <SimularLogo size={24} />
+          <span className="text-sm font-semibold text-t1">Sai</span>
+        </button>
         {isMobile && (
-          <div>
-            <button onClick={onCloseMobile} className="flex h-7 w-7 items-center justify-center rounded-md text-t4 transition-colors hover:bg-bg3h hover:text-t2">
+          <div className="ml-auto">
+            <button onClick={onCloseMobile} className="flex h-8 w-8 items-center justify-center rounded-md text-t4 transition-colors hover:bg-bg3h hover:text-t2">
               <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
@@ -278,6 +282,39 @@ export function LeftSidebar({
         collapsed ? "w-[56px]" : "w-[260px]"
       }`}
     >
+      {/* Header: Logo + Sai + collapse toggle */}
+      <div className={`flex items-center shrink-0 h-[50px] ${collapsed ? "justify-center px-2" : "px-3"}`}>
+        {collapsed ? (
+          <Tooltip text="Expand sidebar">
+            <button
+              onClick={onToggleCollapse}
+              className="group flex h-9 w-9 cursor-e-resize items-center justify-center rounded-lg transition-colors hover:bg-bg3h"
+            >
+              <span className="group-hover:hidden"><SimularLogo size={24} /></span>
+              <PanelLeft className="hidden h-4 w-4 text-t2 group-hover:block" />
+            </button>
+          </Tooltip>
+        ) : (
+          <>
+            <button
+              onClick={onGoHome}
+              className="flex items-center gap-2.5 transition-opacity hover:opacity-80"
+            >
+              <SimularLogo size={24} />
+              <span className="text-sm font-semibold text-t1">Sai</span>
+            </button>
+            <div className="ml-auto">
+              <button
+                onClick={onToggleCollapse}
+                className="flex h-8 w-8 cursor-w-resize items-center justify-center rounded-md text-t4 transition-colors hover:bg-bg3h hover:text-t2"
+              >
+                <PanelLeftClose className="h-4 w-4" />
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
 
       {/* New chat + Search */}
       <div className={`shrink-0 px-2 pb-1 ${collapsed ? "flex flex-col items-center" : "px-3"}`}>
