@@ -861,6 +861,9 @@ export default function Home() {
               trialDaysLeft={trialDaysLeft}
               mobileOpen={mobileSidebarOpen}
               onCloseMobile={() => setMobileSidebarOpen(false)}
+              workspaces={mockWorkspaces}
+              selectedWorkspaceId={selectedWorkspaceId}
+              onSelectWorkspace={setSelectedWorkspaceId}
             />
             {sidebarView === "artifacts" ? (
               <ArtifactsPage />
@@ -868,35 +871,6 @@ export default function Home() {
               <UploadsPage />
             ) : (
             <div className="flex min-w-0 flex-1 flex-col">
-              {/* Workspace tabs */}
-              <div className="flex shrink-0 items-center gap-1 border-b border-b1 px-3 h-[36px] overflow-x-auto max-md:px-2">
-                {mockWorkspaces.map((ws) => {
-                  const isActive = ws.id === selectedWorkspaceId;
-                  const isWorking = !!(firstRunTask && !firstRunDone) || (isAutoPlay && (autoStep ?? 0) < 10);
-                  return (
-                    <button
-                      key={ws.id}
-                      onClick={() => setSelectedWorkspaceId(ws.id)}
-                      className={`flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-[12px] transition-colors ${
-                        isActive ? "bg-bg3 text-t1 font-medium" : "text-t3 hover:bg-bg3h hover:text-t2"
-                      }`}
-                    >
-                      {isWorking && isActive ? (
-                        <span className="h-[8px] w-[8px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
-                      ) : (
-                        <span className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
-                      )}
-                      {ws.name}
-                    </button>
-                  );
-                })}
-                <button
-                  onClick={() => { setSettingsSection("workspaces"); setSettingsOpen(true); }}
-                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-t4 transition-colors hover:bg-bg3h hover:text-t2"
-                >
-                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-                </button>
-              </div>
               <ConversationTitleBar
                 title={conversations.find((c) => c.id === selectedConversationId)?.title ?? "New chat"}
                 panelOpen={!panelCollapsed}

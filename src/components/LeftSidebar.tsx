@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Plus, PanelLeftClose, PanelLeft, Ellipsis, Trash2, Pencil, Settings, Layers, FileText, Upload, Search, MessageCircle } from "lucide-react";
+import { Plus, PanelLeftClose, PanelLeft, Ellipsis, Trash2, Pencil, Settings, Layers, FileText, Upload, Monitor, ChevronDown, Laptop, Search, MessageCircle } from "lucide-react";
 import { SimularLogo } from "./SimularLogo";
-import type { Conversation } from "@/data/mockData";
+import type { Conversation, Workspace } from "@/data/mockData";
 
 function Tooltip({ text, children }: { text: string; children: React.ReactNode }) {
   const [show, setShow] = useState(false);
@@ -32,6 +32,127 @@ function Tooltip({ text, children }: { text: string; children: React.ReactNode }
         {text}
       </div>
     </div>
+  );
+}
+
+/** Mini wireframe previews for workspace cards */
+function LinkedInWireframe() {
+  return (
+    <div className="flex h-full w-full bg-bg3">
+      <div className="w-[16px] shrink-0 border-r border-b1/40 bg-bg2/40 flex flex-col items-center pt-2 gap-1.5">
+        <div className="h-[4px] w-[4px] rounded-sm bg-t4/30" />
+        <div className="h-[4px] w-[4px] rounded-sm bg-blt/40" />
+        <div className="h-[4px] w-[4px] rounded-sm bg-t4/30" />
+      </div>
+      <div className="flex-1 p-2 flex flex-col gap-1.5">
+        <div className="h-[4px] w-[60%] rounded-full bg-t4/20" />
+        <div className="h-[4px] w-[80%] rounded-full bg-t4/15" />
+        <div className="h-[4px] w-[45%] rounded-full bg-blt/20" />
+        <div className="h-[4px] w-[70%] rounded-full bg-t4/15" />
+        <div className="h-[4px] w-[55%] rounded-full bg-t4/10" />
+      </div>
+    </div>
+  );
+}
+
+function CodeEditorWireframe() {
+  return (
+    <div className="flex h-full w-full bg-bg3">
+      <div className="w-[20px] shrink-0 border-r border-b1/40 bg-bg2/60 flex flex-col items-end pr-1 pt-2 gap-1">
+        {[1,2,3,4,5,6].map(i => (
+          <div key={i} className="h-[3px] w-[6px] rounded-full bg-t4/20" />
+        ))}
+      </div>
+      <div className="flex-1 p-2 flex flex-col gap-1">
+        <div className="h-[3px] w-[40%] rounded-full bg-purple-400/25" />
+        <div className="h-[3px] w-[65%] rounded-full bg-t4/15 ml-2" />
+        <div className="h-[3px] w-[50%] rounded-full bg-g/20 ml-2" />
+        <div className="h-[3px] w-[70%] rounded-full bg-t4/15 ml-4" />
+        <div className="h-[3px] w-[35%] rounded-full bg-am/20 ml-4" />
+        <div className="h-[3px] w-[55%] rounded-full bg-t4/15 ml-2" />
+      </div>
+    </div>
+  );
+}
+
+function DesktopWireframe() {
+  return (
+    <div className="flex h-full w-full flex-col bg-bg3">
+      <div className="flex-1 p-2 flex flex-col gap-1.5">
+        <div className="flex gap-1.5">
+          <div className="h-[16px] w-[20px] rounded-sm bg-t4/15 border border-b1/30" />
+          <div className="h-[16px] w-[24px] rounded-sm bg-t4/10 border border-b1/30" />
+        </div>
+        <div className="h-[4px] w-[50%] rounded-full bg-t4/20" />
+        <div className="h-[4px] w-[70%] rounded-full bg-t4/15" />
+      </div>
+      <div className="flex items-center justify-center gap-1 py-1 border-t border-b1/30">
+        <div className="h-[4px] w-[4px] rounded-full bg-t4/25" />
+        <div className="h-[4px] w-[4px] rounded-full bg-t4/25" />
+        <div className="h-[4px] w-[4px] rounded-full bg-blt/30" />
+        <div className="h-[4px] w-[4px] rounded-full bg-t4/25" />
+      </div>
+    </div>
+  );
+}
+
+function WorkspacePreviewCard({
+  ws,
+  isSelected,
+  isWorking,
+  onClick,
+}: {
+  ws: Workspace;
+  isSelected: boolean;
+  isWorking: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex flex-col overflow-hidden rounded-lg border text-left transition-all hover:border-b2 hover:shadow-md ${
+        isSelected ? "border-as/40 ring-1 ring-as/20" : "border-b1"
+      }`}
+    >
+      {/* Mini browser chrome */}
+      <div className="flex items-center gap-1 bg-bg2 px-1.5 py-1 border-b border-b1/50">
+        <div className="flex gap-0.5">
+          <div className="h-[4px] w-[4px] rounded-full bg-t4/30" />
+          <div className="h-[4px] w-[4px] rounded-full bg-t4/30" />
+          <div className="h-[4px] w-[4px] rounded-full bg-t4/30" />
+        </div>
+        <div className="flex-1 mx-1 h-[10px] rounded-sm bg-bg3 flex items-center px-1">
+          <span className="text-[6px] text-t4 truncate">
+            {ws.isDevice ? "desktop" : ws.name === "Dev Environment" ? "github.com" : "linkedin.com"}
+          </span>
+        </div>
+        <div className={`flex items-center gap-0.5 rounded-full px-1 py-px text-[5px] font-semibold ${ws.status === "active" ? "text-g" : "text-t4"}`}>
+          {isWorking && isSelected ? (
+            <div className="h-[5px] w-[5px] rounded-full border border-g/30 border-t-g animate-spin" />
+          ) : (
+            <div className={`h-[3px] w-[3px] rounded-full ${ws.status === "active" ? "bg-g" : "bg-t4"}`} />
+          )}
+          {ws.status === "active" ? "LIVE" : "OFF"}
+        </div>
+      </div>
+      {/* Wireframe content */}
+      <div className="aspect-[16/10]">
+        {ws.isDevice ? <DesktopWireframe /> : ws.name === "Dev Environment" ? <CodeEditorWireframe /> : <LinkedInWireframe />}
+      </div>
+      {/* Footer */}
+      <div className="flex items-center gap-1.5 border-t border-b1/50 bg-bg2 px-2 py-1.5">
+        {ws.isDevice ? <Laptop className="h-3 w-3 shrink-0 text-t3" /> : <Monitor className="h-3 w-3 shrink-0 text-t3" />}
+        {isWorking ? (
+          <div className="h-[8px] w-[8px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+        ) : (
+          <div className={`h-[5px] w-[5px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+        )}
+        <span className={`flex-1 truncate text-[10px] ${isSelected ? "text-t1 font-medium" : "text-t2"}`}>{ws.name}</span>
+        {isSelected && (
+          <svg className="h-3 w-3 shrink-0 text-as" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+        )}
+      </div>
+    </button>
   );
 }
 
@@ -101,9 +222,13 @@ export function LeftSidebar({
   onOpenArtifacts,
   onOpenUploads,
   activeView = "chat",
+  isWorkspaceWorking = false,
   trialDaysLeft = 6,
   mobileOpen = false,
   onCloseMobile,
+  workspaces = [],
+  selectedWorkspaceId,
+  onSelectWorkspace,
 }: {
   conversations: Conversation[];
   selectedId: string;
@@ -121,13 +246,19 @@ export function LeftSidebar({
   onOpenArtifacts?: () => void;
   onOpenUploads?: () => void;
   activeView?: "chat" | "artifacts" | "uploads";
+  isWorkspaceWorking?: boolean;
   trialDaysLeft?: number;
   mobileOpen?: boolean;
   onCloseMobile?: () => void;
+  workspaces?: Workspace[];
+  selectedWorkspaceId?: string;
+  onSelectWorkspace?: (id: string) => void;
 }) {
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
+  const [wsDropdownOpen, setWsDropdownOpen] = useState(false);
+  const [wsMenuOpenId, setWsMenuOpenId] = useState<string | null>(null);
   const [convFlyoutOpen, setConvFlyoutOpen] = useState(false);
   const convFlyoutRef = useRef<HTMLDivElement>(null);
 
@@ -139,6 +270,18 @@ export function LeftSidebar({
     document.addEventListener("pointerdown", handle);
     return () => document.removeEventListener("pointerdown", handle);
   }, [convFlyoutOpen]);
+  const wsDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!wsDropdownOpen) return;
+    const handle = (e: PointerEvent) => {
+      if (wsDropdownRef.current && !wsDropdownRef.current.contains(e.target as Node)) setWsDropdownOpen(false);
+    };
+    document.addEventListener("pointerdown", handle);
+    return () => document.removeEventListener("pointerdown", handle);
+  }, [wsDropdownOpen]);
+
+  const selectedWorkspace = workspaces.find((w) => w.id === selectedWorkspaceId) ?? workspaces[0];
 
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const avatarMenuRef = useRef<HTMLDivElement>(null);
@@ -182,6 +325,50 @@ export function LeftSidebar({
           </div>
         )}
       </div>
+      {/* Workspace selector */}
+      {selectedWorkspace && (
+        <div className="shrink-0 px-3 pb-2 border-b border-b1 mb-1" ref={wsDropdownRef}>
+          <div className="relative">
+            <button
+              onClick={() => { setWsDropdownOpen(!wsDropdownOpen); setWsMenuOpenId(null); }}
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-t3 transition-colors hover:bg-bg3h hover:text-t1"
+            >
+              {selectedWorkspace.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0" /> : <Monitor className="h-3.5 w-3.5 shrink-0" />}
+              {isWorkspaceWorking ? (
+                <div className="h-[10px] w-[10px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+              ) : (
+                <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${selectedWorkspace.status === "active" ? "bg-g" : selectedWorkspace.status === "setup" ? "bg-am" : "bg-t4"}`} />
+              )}
+              <span className="flex-1 truncate text-left text-[12px]">{selectedWorkspace.name}</span>
+              <ChevronDown className="h-3 w-3 shrink-0 text-t4" />
+            </button>
+            {wsDropdownOpen && (
+              <div className="absolute left-0 top-full z-50 mt-1 w-[380px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                <div className="grid grid-cols-2 gap-2 p-2">
+                  {workspaces.map((ws) => (
+                    <WorkspacePreviewCard
+                      key={ws.id}
+                      ws={ws}
+                      isSelected={ws.id === selectedWorkspaceId}
+                      isWorking={isWorkspaceWorking && ws.id === selectedWorkspaceId}
+                      onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
+                    />
+                  ))}
+                </div>
+                <div className="border-t border-b1 p-1">
+                  <button
+                    onClick={() => { setWsDropdownOpen(false); onOpenSettings?.(); }}
+                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[12px] text-t3 transition-colors hover:bg-bg3 hover:text-t1"
+                  >
+                    <Settings className="h-3.5 w-3.5" />
+                    Manage workspaces
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {/* New chat + Search */}
       <div className="shrink-0 px-3 pb-1">
         <button
@@ -315,6 +502,95 @@ export function LeftSidebar({
         )}
       </div>
 
+      {/* Workspace selector (collapsed = icon, expanded = full) */}
+      {selectedWorkspace && collapsed && (
+        <div className="shrink-0 px-2 pb-2 flex justify-center border-b border-b1 mb-1" ref={wsDropdownRef}>
+          <div className="relative">
+            <Tooltip text={selectedWorkspace.name}>
+              <button
+                onClick={() => { setWsDropdownOpen(!wsDropdownOpen); setWsMenuOpenId(null); }}
+                className="relative flex h-9 w-9 items-center justify-center rounded-lg text-t3 transition-colors hover:bg-bg3h hover:text-t1"
+              >
+                {selectedWorkspace.isDevice ? <Laptop className="h-4 w-4" /> : <Monitor className="h-4 w-4" />}
+                <span className="absolute bottom-1 right-1">
+                  {isWorkspaceWorking ? (
+                    <span className="block h-[8px] w-[8px] rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+                  ) : (
+                    <span className={`block h-[6px] w-[6px] rounded-full ${selectedWorkspace.status === "active" ? "bg-g" : selectedWorkspace.status === "setup" ? "bg-am" : "bg-t4"}`} />
+                  )}
+                </span>
+              </button>
+            </Tooltip>
+            {wsDropdownOpen && (
+              <div className="absolute left-full top-0 z-50 ml-2 w-[380px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                <div className="grid grid-cols-2 gap-2 p-2">
+                  {workspaces.map((ws) => (
+                    <WorkspacePreviewCard
+                      key={ws.id}
+                      ws={ws}
+                      isSelected={ws.id === selectedWorkspaceId}
+                      isWorking={isWorkspaceWorking && ws.id === selectedWorkspaceId}
+                      onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
+                    />
+                  ))}
+                </div>
+                <div className="border-t border-b1 p-1">
+                  <button
+                    onClick={() => { setWsDropdownOpen(false); onOpenSettings?.(); }}
+                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[12px] text-t3 transition-colors hover:bg-bg3 hover:text-t1"
+                  >
+                    <Settings className="h-3.5 w-3.5" />
+                    Manage workspaces
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {selectedWorkspace && !collapsed && (
+        <div className="shrink-0 px-3 pb-2 border-b border-b1 mb-1" ref={wsDropdownRef}>
+          <div className="relative">
+            <button
+              onClick={() => { setWsDropdownOpen(!wsDropdownOpen); setWsMenuOpenId(null); }}
+              className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-t3 transition-colors hover:bg-bg3h hover:text-t1"
+            >
+              {selectedWorkspace.isDevice ? <Laptop className="h-3.5 w-3.5 shrink-0" /> : <Monitor className="h-3.5 w-3.5 shrink-0" />}
+              {isWorkspaceWorking ? (
+                <div className="h-[10px] w-[10px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+              ) : (
+                <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${selectedWorkspace.status === "active" ? "bg-g" : selectedWorkspace.status === "setup" ? "bg-am" : "bg-t4"}`} />
+              )}
+              <span className="flex-1 truncate text-left text-[12px]">{selectedWorkspace.name}</span>
+              <ChevronDown className="h-3 w-3 shrink-0 text-t4" />
+            </button>
+            {wsDropdownOpen && (
+              <div className="absolute left-0 top-full z-50 mt-1 w-[380px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                <div className="grid grid-cols-2 gap-2 p-2">
+                  {workspaces.map((ws) => (
+                    <WorkspacePreviewCard
+                      key={ws.id}
+                      ws={ws}
+                      isSelected={ws.id === selectedWorkspaceId}
+                      isWorking={isWorkspaceWorking && ws.id === selectedWorkspaceId}
+                      onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
+                    />
+                  ))}
+                </div>
+                <div className="border-t border-b1 p-1">
+                  <button
+                    onClick={() => { setWsDropdownOpen(false); onOpenSettings?.(); }}
+                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[12px] text-t3 transition-colors hover:bg-bg3 hover:text-t1"
+                  >
+                    <Settings className="h-3.5 w-3.5" />
+                    Manage workspaces
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* New chat + Search */}
       <div className={`shrink-0 px-2 pb-1 ${collapsed ? "flex flex-col items-center" : "px-3"}`}>
