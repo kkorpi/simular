@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { Monitor, Laptop } from "lucide-react";
 import { useTheme } from "./ThemeProvider";
+import { RenameModal } from "./RenameModal";
+import type { Workspace } from "@/data/mockData";
 
 export interface ConnectedServiceInfo {
   id: string;
@@ -22,6 +25,9 @@ interface SettingsOverlayProps {
   connectedServices?: ConnectedServiceInfo[];
   onSignOut?: (serviceId: string) => void;
   onSignOutAll?: () => void;
+  workspaces?: Workspace[];
+  onRenameWorkspace?: (id: string, newName: string) => void;
+  onCreateWorkspace?: (ws: { name: string; isDevice: boolean }) => void;
 }
 
 type SettingsSection =
@@ -47,20 +53,31 @@ const sections: { id: SettingsSection; label: string }[] = [
 
 export { type SettingsSection };
 
-export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGallery, onOpenDesignSystem, trialDaysLeft = 6, trialCancelled, onCancelTrial, onReactivateTrial, connectedServices = [], onSignOut, onSignOutAll }: SettingsOverlayProps) {
+export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGallery, onOpenDesignSystem, trialDaysLeft = 6, trialCancelled, onCancelTrial, onReactivateTrial, connectedServices = [], onSignOut, onSignOutAll, workspaces, onRenameWorkspace, onCreateWorkspace }: SettingsOverlayProps) {
   const [active, setActive] = useState<SettingsSection>(initialSection || "appearance");
   const [selectedWsId, setSelectedWsId] = useState<string | null>(null);
   const [wsSubSection, setWsSubSection] = useState<WorkspaceSubSection>("integrations");
+  const [wsCreating, setWsCreating] = useState(false);
 
   // Sync when initialSection changes (e.g., from slash command)
   useEffect(() => {
     if (initialSection && open) {
       setActive(initialSection);
       setSelectedWsId(null);
+      setWsCreating(false);
     }
   }, [initialSection, open]);
 
+  // Leaving the workspaces section clears nested views.
+  useEffect(() => {
+    if (active !== "workspaces") {
+      setSelectedWsId(null);
+      setWsCreating(false);
+    }
+  }, [active]);
+
   const isWorkspaceDetail = active === "workspaces" && selectedWsId !== null;
+  const isWorkspaceCreate = active === "workspaces" && wsCreating;
 
   if (!open) return null;
 
@@ -132,7 +149,13 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
                 <>
                   <button onClick={() => setSelectedWsId(null)} className="transition-colors hover:text-t1">Workspaces</button>
                   <span className="text-t4">/</span>
-                  <span className="font-medium text-t1">{selectedWsId}</span>
+                  <span className="font-medium text-t1">{workspaces?.find((w) => w.id === selectedWsId)?.name ?? selectedWsId}</span>
+                </>
+              ) : isWorkspaceCreate ? (
+                <>
+                  <button onClick={() => setWsCreating(false)} className="transition-colors hover:text-t1">Workspaces</button>
+                  <span className="text-t4">/</span>
+                  <span className="font-medium text-t1">New</span>
                 </>
               ) : (
                 <span className="font-medium text-t1">
@@ -155,8 +178,19 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
           <div role="tabpanel" className="flex-1 px-6 py-5">
             {active === "appearance" && <AppearanceSettings />}
 
-            {active === "workspaces" && !isWorkspaceDetail && (
-              <WorkspacesListView onSelectWorkspace={(id) => { setSelectedWsId(id); setWsSubSection("integrations"); }} />
+            {active === "workspaces" && !isWorkspaceDetail && !isWorkspaceCreate && (
+              <WorkspacesListView
+                workspaces={workspaces}
+                onSelectWorkspace={(id) => { setSelectedWsId(id); setWsSubSection("integrations"); }}
+                onStartCreate={() => setWsCreating(true)}
+              />
+            )}
+            {isWorkspaceCreate && (
+              <WorkspaceCreateView
+                existingNames={(workspaces ?? []).map((w) => w.name)}
+                onCancel={() => setWsCreating(false)}
+                onCreate={(ws) => { onCreateWorkspace?.(ws); setWsCreating(false); }}
+              />
             )}
             {isWorkspaceDetail && (
               <WorkspaceDetailView
@@ -167,6 +201,8 @@ export function SettingsOverlay({ open, onClose, initialSection, onOpenCardGalle
                 connectedServices={connectedServices}
                 onSignOut={onSignOut}
                 onSignOutAll={onSignOutAll}
+                workspaces={workspaces}
+                onRenameWorkspace={onRenameWorkspace}
               />
             )}
 
@@ -209,12 +245,13 @@ function AppearanceSettings() {
 }
 
 /* ── Workspaces List ── */
-function WorkspacesListView({ onSelectWorkspace }: { onSelectWorkspace: (id: string) => void }) {
-  const workspaces = [
-    { id: "Cloud Workspace", status: "active", platform: "Windows", isDevice: false },
-    { id: "Dev Environment", status: "active", platform: "Windows", isDevice: false },
-    { id: "Kevin's MacBook", status: "active", platform: "macOS", isDevice: true },
+function WorkspacesListView({ workspaces, onSelectWorkspace, onStartCreate }: { workspaces?: Workspace[]; onSelectWorkspace: (id: string) => void; onStartCreate: () => void }) {
+  const fallback: Workspace[] = [
+    { id: "Cloud Workspace", name: "Cloud Workspace", status: "active", isDevice: false },
+    { id: "Dev Environment", name: "Dev Environment", status: "active", isDevice: false },
+    { id: "Kevin's MacBook", name: "Kevin's MacBook", status: "active", isDevice: true },
   ];
+  const list = workspaces && workspaces.length > 0 ? workspaces : fallback;
 
   return (
     <div className="flex flex-col gap-6">
@@ -223,13 +260,16 @@ function WorkspacesListView({ onSelectWorkspace }: { onSelectWorkspace: (id: str
           <div className="text-[14px] font-semibold text-t1">Workspaces</div>
           <div className="mt-1 text-[12.5px] text-t3">Your cloud workspaces and connected devices.</div>
         </div>
-        <button className="flex items-center gap-2 rounded-md border border-b1 px-3 py-2 text-[12px] font-medium text-t2 transition-colors hover:border-b2 hover:bg-bg3 hover:text-t1">
+        <button
+          onClick={onStartCreate}
+          className="flex items-center gap-2 rounded-md border border-b1 px-3 py-2 text-[12px] font-medium text-t2 transition-colors hover:border-b2 hover:bg-bg3 hover:text-t1"
+        >
           <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-          Add Workspace
+          Create workspace
         </button>
       </div>
       <div className="flex flex-col gap-2">
-        {workspaces.map((ws) => (
+        {list.map((ws) => (
           <button
             key={ws.id}
             onClick={() => onSelectWorkspace(ws.id)}
@@ -243,18 +283,184 @@ function WorkspacesListView({ onSelectWorkspace }: { onSelectWorkspace: (id: str
               )}
             </svg>
             <div className="min-w-0 flex-1">
-              <div className="text-[13px] font-medium text-t1">{ws.id}</div>
+              <div className="text-[13px] font-medium text-t1">{ws.name}</div>
               <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-t3">
                 <div className={`h-1.5 w-1.5 rounded-full ${ws.status === "active" ? "bg-g" : "bg-t4"}`} />
                 {ws.status === "active" ? "Active" : "Offline"}
                 <span className="text-t4">·</span>
-                {ws.platform}
+                {ws.isDevice ? "macOS" : "Windows"}
               </div>
             </div>
             <svg className="h-4 w-4 shrink-0 text-t4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+/* ── Workspace Create (inline — lives inside the Settings panel, not a nested modal) ── */
+function WorkspaceCreateView({ existingNames, onCancel, onCreate }: { existingNames: string[]; onCancel: () => void; onCreate: (ws: { name: string; isDevice: boolean }) => void }) {
+  const [mode, setMode] = useState<"cloud" | "device">("cloud");
+
+  // Pick a friendly default that doesn't clash with existing workspaces.
+  const defaultNameFor = (m: "cloud" | "device") => {
+    const base = m === "cloud" ? "Sai's computer" : "My device";
+    if (!existingNames.includes(base)) return base;
+    let n = 2;
+    while (existingNames.includes(`${base} ${n}`)) n++;
+    return `${base} ${n}`;
+  };
+
+  const [name, setName] = useState(() => defaultNameFor("cloud"));
+  const [touched, setTouched] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const nameValid = name.trim().length >= 1 && name.trim().length <= 40;
+  const usernameValid = username.length >= 1 && username.length <= 20 && /^[A-Za-z0-9._-]+$/.test(username);
+  const passwordValid = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?`~]).{8,123}$/.test(password);
+  const canSubmit = mode === "cloud" ? nameValid && usernameValid && passwordValid : nameValid;
+
+  const handleModeChange = (m: "cloud" | "device") => {
+    setMode(m);
+    if (!touched) setName(defaultNameFor(m));
+  };
+
+  const handleCreate = () => {
+    if (!canSubmit) return;
+    onCreate({ name: name.trim(), isDevice: mode === "device" });
+  };
+
+  return (
+    <div className="flex h-full flex-col">
+      {/* Intro */}
+      <div>
+        <div className="text-[15px] font-semibold text-t1">Create workspace</div>
+        <div className="mt-1 text-[12.5px] text-t3">A workspace is the computer Sai runs on.</div>
+      </div>
+
+      {/* Mode cards — two large radio-cards, richer than a toggle */}
+      <div className="mt-5 grid grid-cols-2 gap-2.5">
+        <ModeCard
+          Icon={Monitor}
+          title="Sai's own computer"
+          description="A fresh machine, ready in seconds."
+          selected={mode === "cloud"}
+          onClick={() => handleModeChange("cloud")}
+        />
+        <ModeCard
+          Icon={Laptop}
+          title="Share my device"
+          description="Let Sai work on this computer with you."
+          selected={mode === "device"}
+          onClick={() => handleModeChange("device")}
+        />
+      </div>
+
+      {/* Form — single compact block, no redundant helper text */}
+      <div className="mt-5 flex flex-col gap-3.5">
+        <Field label="Workspace name">
+          <input
+            value={name}
+            onChange={(e) => { setName(e.target.value); setTouched(true); }}
+            onFocus={(e) => e.currentTarget.select()}
+            onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); }}
+            className="w-full rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none ring-1 ring-transparent focus:ring-as/50 caret-as"
+            autoFocus
+          />
+        </Field>
+
+        {mode === "cloud" && (
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Username" hint="1–20 characters">
+              <input
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); }}
+                placeholder="kevin"
+                className="w-full rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none ring-1 ring-transparent focus:ring-as/50 caret-as"
+              />
+            </Field>
+            <Field label="Password" hint="8+ chars, mixed case, digit, symbol">
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); }}
+                placeholder="••••••••"
+                className="w-full rounded-md border border-b1 bg-bg3 px-3 py-2 text-[13px] text-t1 outline-none ring-1 ring-transparent focus:ring-as/50 caret-as"
+              />
+            </Field>
+          </div>
+        )}
+      </div>
+
+      {/* Actions pinned to the bottom of the scroll area so the form sits compactly up top */}
+      <div className="mt-auto flex items-center justify-end gap-2 pt-6">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-md px-3 py-2 text-[13px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          onClick={handleCreate}
+          disabled={!canSubmit}
+          className="rounded-md bg-as px-4 py-2 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Create workspace
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** Large radio-card for mode selection. */
+function ModeCard({
+  Icon,
+  title,
+  description,
+  selected,
+  onClick,
+}: {
+  Icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={`group flex flex-col items-start gap-1.5 rounded-lg border p-3 text-left transition-colors ${
+        selected
+          ? "border-as/50 bg-as/5 ring-1 ring-as/30"
+          : "border-b1 bg-bg2 hover:border-b2 hover:bg-bg3"
+      }`}
+    >
+      <div className={`flex h-7 w-7 items-center justify-center rounded-md ${selected ? "bg-as/15 text-as" : "bg-bg3 text-t3"}`}>
+        <Icon className="h-3.5 w-3.5" />
+      </div>
+      <div className={`text-[13px] font-medium ${selected ? "text-t1" : "text-t2"}`}>{title}</div>
+      <div className="text-[11.5px] leading-snug text-t4">{description}</div>
+    </button>
+  );
+}
+
+/** Label + optional right-aligned hint + control. */
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <div className="mb-1.5 flex items-baseline justify-between">
+        <label className="text-[12.5px] font-medium text-t2">{label}</label>
+        {hint && <span className="text-[11px] text-t4">{hint}</span>}
+      </div>
+      {children}
     </div>
   );
 }
@@ -268,6 +474,8 @@ function WorkspaceDetailView({
   connectedServices,
   onSignOut,
   onSignOutAll,
+  workspaces,
+  onRenameWorkspace,
 }: {
   workspaceId: string;
   subSection: WorkspaceSubSection;
@@ -276,6 +484,8 @@ function WorkspaceDetailView({
   connectedServices: ConnectedServiceInfo[];
   onSignOut?: (id: string) => void;
   onSignOutAll?: () => void;
+  workspaces?: Workspace[];
+  onRenameWorkspace?: (id: string, newName: string) => void;
 }) {
   const subSections: { id: WorkspaceSubSection; label: string }[] = [
     { id: "integrations", label: "Integrations" },
@@ -312,25 +522,51 @@ function WorkspaceDetailView({
       {subSection === "integrations" && <IntegrationsSettings />}
       {subSection === "accounts" && <SignedInAccountsSettings services={connectedServices} onSignOut={onSignOut} onSignOutAll={onSignOutAll} />}
       {subSection === "agent" && <AgentSettings />}
-      {subSection === "info" && <WorkspaceInfoSettings workspaceId={workspaceId} />}
+      {subSection === "info" && <WorkspaceInfoSettings workspaceId={workspaceId} workspaces={workspaces} onRenameWorkspace={onRenameWorkspace} />}
     </div>
   );
 }
 
 /* ── Workspace Info ── */
-function WorkspaceInfoSettings({ workspaceId }: { workspaceId: string }) {
-  const isDevice = workspaceId === "Kevin's MacBook";
+function WorkspaceInfoSettings({ workspaceId, workspaces, onRenameWorkspace }: { workspaceId: string; workspaces?: Workspace[]; onRenameWorkspace?: (id: string, newName: string) => void }) {
+  const ws = workspaces?.find((w) => w.id === workspaceId);
+  const displayName = ws?.name ?? workspaceId;
+  const isDevice = ws?.isDevice ?? workspaceId === "Kevin's MacBook";
+  const [renameOpen, setRenameOpen] = useState(false);
+
   return (
     <div className="flex flex-col gap-6">
       <div>
         <div className="text-[14px] font-semibold text-t1">Workspace Details</div>
         <div className="mt-4 flex flex-col gap-3">
-          <div className="flex justify-between text-[13px]"><span className="text-t3">Name</span><span className="text-t1">{workspaceId}</span></div>
+          <div className="flex items-center justify-between text-[13px]">
+            <span className="text-t3">Name</span>
+            <div className="flex items-center gap-2">
+              <span className="text-t1">{displayName}</span>
+              {ws && onRenameWorkspace && (
+                <button
+                  onClick={() => setRenameOpen(true)}
+                  className="rounded-md border border-b1 px-2 py-0.5 text-[11px] font-medium text-t3 transition-colors hover:border-b2 hover:bg-bg3 hover:text-t1"
+                >
+                  Rename
+                </button>
+              )}
+            </div>
+          </div>
           <div className="flex justify-between text-[13px]"><span className="text-t3">Platform</span><span className="text-t1">{isDevice ? "macOS" : "Windows"}</span></div>
           <div className="flex justify-between text-[13px]"><span className="text-t3">Type</span><span className="text-t1">{isDevice ? "Your Device" : "Cloud VM"}</span></div>
           <div className="flex justify-between text-[13px]"><span className="text-t3">Status</span><span className="flex items-center gap-1.5 text-t1"><div className="h-1.5 w-1.5 rounded-full bg-g" />Active</span></div>
         </div>
       </div>
+      {renameOpen && ws && onRenameWorkspace && (
+        <RenameModal
+          title="Rename workspace"
+          description="Choose a new name for this workspace."
+          initialValue={ws.name}
+          onCommit={(newName) => { onRenameWorkspace(ws.id, newName); setRenameOpen(false); }}
+          onCancel={() => setRenameOpen(false)}
+        />
+      )}
       <div className="h-px bg-b1" />
       <div>
         <div className="text-[14px] font-semibold text-t1">Danger Zone</div>

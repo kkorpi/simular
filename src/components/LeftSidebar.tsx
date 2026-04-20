@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Plus, PanelLeftClose, PanelLeft, Ellipsis, Trash2, Pencil, Settings, Layers, FileText, Upload, Monitor, ChevronDown, Laptop, Search, MessageCircle } from "lucide-react";
 import { SimularLogo } from "./SimularLogo";
+import { RenameModal } from "./RenameModal";
 import type { Conversation, Workspace } from "@/data/mockData";
 
 function Tooltip({ text, children }: { text: string; children: React.ReactNode }) {
@@ -96,25 +98,10 @@ function DesktopWireframe() {
   );
 }
 
-function WorkspacePreviewCard({
-  ws,
-  isSelected,
-  isWorking,
-  onClick,
-}: {
-  ws: Workspace;
-  isSelected: boolean;
-  isWorking: boolean;
-  onClick: () => void;
-}) {
+/** Reusable card art: mini browser chrome + wireframe. Used by hover preview flyout. */
+function WorkspacePreviewArt({ ws }: { ws: Workspace }) {
   return (
-    <button
-      onClick={onClick}
-      className={`flex flex-col overflow-hidden rounded-lg border text-left transition-all hover:border-b2 hover:shadow-md ${
-        isSelected ? "border-as/40 ring-1 ring-as/20" : "border-b1"
-      }`}
-    >
-      {/* Mini browser chrome */}
+    <div className="flex flex-col overflow-hidden rounded-lg border border-b1 bg-bg3">
       <div className="flex items-center gap-1 bg-bg2 px-1.5 py-1 border-b border-b1/50">
         <div className="flex gap-0.5">
           <div className="h-[4px] w-[4px] rounded-full bg-t4/30" />
@@ -127,32 +114,155 @@ function WorkspacePreviewCard({
           </span>
         </div>
         <div className={`flex items-center gap-0.5 rounded-full px-1 py-px text-[5px] font-semibold ${ws.status === "active" ? "text-g" : "text-t4"}`}>
-          {isWorking && isSelected ? (
-            <div className="h-[5px] w-[5px] rounded-full border border-g/30 border-t-g animate-spin" />
-          ) : (
-            <div className={`h-[3px] w-[3px] rounded-full ${ws.status === "active" ? "bg-g" : "bg-t4"}`} />
-          )}
+          <div className={`h-[3px] w-[3px] rounded-full ${ws.status === "active" ? "bg-g" : "bg-t4"}`} />
           {ws.status === "active" ? "LIVE" : "OFF"}
         </div>
       </div>
-      {/* Wireframe content */}
       <div className="aspect-[16/10]">
         {ws.isDevice ? <DesktopWireframe /> : ws.name === "Dev Environment" ? <CodeEditorWireframe /> : <LinkedInWireframe />}
       </div>
-      {/* Footer */}
-      <div className="flex items-center gap-1.5 border-t border-b1/50 bg-bg2 px-2 py-1.5">
-        {ws.isDevice ? <Laptop className="h-3 w-3 shrink-0 text-t3" /> : <Monitor className="h-3 w-3 shrink-0 text-t3" />}
-        {isWorking ? (
-          <div className="h-[8px] w-[8px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
-        ) : (
-          <div className={`h-[5px] w-[5px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
-        )}
-        <span className={`flex-1 truncate text-[10px] ${isSelected ? "text-t1 font-medium" : "text-t2"}`}>{ws.name}</span>
-        {isSelected && (
-          <svg className="h-3 w-3 shrink-0 text-as" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+    </div>
+  );
+}
+
+/** Walks up the DOM to detect if the element is visually hidden (display:none / visibility:hidden / opacity:0 on any ancestor).
+ * `offsetParent` alone misses opacity:0 — which is how the closed mobile drawer hides itself. */
+function isEffectivelyVisible(el: HTMLElement | null): boolean {
+  if (!el) return false;
+  let cur: HTMLElement | null = el;
+  while (cur) {
+    const cs = getComputedStyle(cur);
+    if (cs.display === "none" || cs.visibility === "hidden" || parseFloat(cs.opacity) === 0) return false;
+    cur = cur.parentElement;
+  }
+  return true;
+}
+
+/** Hover flyout positioned to the right of the anchor row. Mirrors TaskItem's HoverThumbnail.
+ * Bail out if the anchor is inside a hidden sidebar copy — otherwise mobile + desktop both
+ * spawn portals for the same row and the previews stack. */
+function WorkspaceHoverThumbnail({ ws, anchorRef }: { ws: Workspace; anchorRef: React.RefObject<HTMLDivElement | null> }) {
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
+
+  useEffect(() => {
+    const el = anchorRef.current;
+    if (!el || !isEffectivelyVisible(el)) return;
+    const rect = el.getBoundingClientRect();
+    const previewHeight = 160;
+    const margin = 12;
+    let top = rect.top + 4;
+    if (top + previewHeight > window.innerHeight - margin) {
+      top = Math.max(margin, window.innerHeight - margin - previewHeight);
+    }
+    if (top < margin) top = margin;
+    setPos({ top, left: rect.right + 12 });
+  }, [anchorRef]);
+
+  if (!pos) return null;
+
+  return createPortal(
+    <div
+      className="pointer-events-none fixed z-[100] w-[220px] animate-hover-thumb-enter"
+      style={{ top: pos.top, left: pos.left }}
+    >
+      <div className="overflow-hidden rounded-[10px] border border-b2 bg-bg3 shadow-[var(--thumb-shadow)]">
+        <WorkspacePreviewArt ws={ws} />
+      </div>
+    </div>,
+    document.body
+  );
+}
+
+
+/** Single row in the workspace list. Uses TaskItem pattern: outer onClick for select, nested button for kebab.
+ * Rename is handled by a parent-level modal, not inline, so this component never has to swap its subtree. */
+function WorkspaceRow({
+  ws,
+  isSelected,
+  isWorking,
+  menuOpen,
+  isHovered,
+  onSelect,
+  onToggleMenu,
+  onStartRename,
+  onHoverChange,
+}: {
+  ws: Workspace;
+  isSelected: boolean;
+  isWorking: boolean;
+  menuOpen: boolean;
+  isHovered: boolean;
+  onSelect: () => void;
+  onToggleMenu: () => void;
+  onStartRename: () => void;
+  onHoverChange: (hovered: boolean) => void;
+}) {
+  const rowRef = useRef<HTMLDivElement>(null);
+
+  // Outside-click close via data-attribute — checking any visible "ws row menu" ancestor.
+  // Using a ref + `contains` would false-positive across mobile/desktop duplicates.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handle = (e: PointerEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (!t) return;
+      const host = t.closest("[data-ws-row-menu]");
+      if (!host || host.getAttribute("data-ws-row-menu") !== ws.id) onToggleMenu();
+    };
+    document.addEventListener("pointerdown", handle);
+    return () => document.removeEventListener("pointerdown", handle);
+  }, [menuOpen, onToggleMenu, ws.id]);
+
+  const Icon = ws.isDevice ? Laptop : Monitor;
+
+  return (
+    <div
+      ref={rowRef}
+      onClick={onSelect}
+      onMouseEnter={() => onHoverChange(true)}
+      onMouseLeave={() => onHoverChange(false)}
+      className={`group relative flex h-9 cursor-pointer items-center rounded-lg px-2.5 gap-2 transition-colors ${
+        isSelected ? "bg-bg3" : "hover:bg-bg3h"
+      }`}
+    >
+      <Icon className="h-4 w-4 shrink-0 text-t3" />
+      {isWorking ? (
+        <div className="h-[8px] w-[8px] shrink-0 rounded-full border-[1.5px] border-g/30 border-t-g animate-spin" />
+      ) : (
+        <div className={`h-[6px] w-[6px] shrink-0 rounded-full ${ws.status === "active" ? "bg-g" : ws.status === "setup" ? "bg-am" : "bg-t4"}`} />
+      )}
+      <span className={`flex-1 truncate text-[13px] ${isSelected ? "text-t1 font-medium" : "text-t2"}`}>{ws.name}</span>
+      {isSelected && (
+        <svg className="h-3.5 w-3.5 shrink-0 text-as" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>
+      )}
+      <div className="relative shrink-0" data-ws-row-menu={ws.id}>
+        <button
+          type="button"
+          onClick={(e) => { e.stopPropagation(); onToggleMenu(); }}
+          className={`flex h-6 w-6 items-center justify-center rounded-md text-t4 transition-colors hover:bg-bg3h hover:text-t1 ${
+            menuOpen ? "bg-bg3 text-t1" : ""
+          }`}
+          aria-label={`${ws.name} options`}
+        >
+          <Ellipsis className="h-4 w-4" />
+        </button>
+        {menuOpen && (
+          <div className="absolute right-0 top-full z-[60] mt-1 w-[160px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+            <div className="p-1">
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); onStartRename(); }}
+                className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-1.5 text-[13px] text-t2 transition-colors hover:bg-bg3 hover:text-t1"
+              >
+                <Pencil className="h-3.5 w-3.5 text-t3" />
+                Rename
+              </button>
+            </div>
+          </div>
         )}
       </div>
-    </button>
+      {isHovered && !menuOpen && <WorkspaceHoverThumbnail ws={ws} anchorRef={rowRef} />}
+    </div>
   );
 }
 
@@ -229,6 +339,8 @@ export function LeftSidebar({
   workspaces = [],
   selectedWorkspaceId,
   onSelectWorkspace,
+  onRenameWorkspace,
+  onManageWorkspaces,
 }: {
   conversations: Conversation[];
   selectedId: string;
@@ -253,12 +365,48 @@ export function LeftSidebar({
   workspaces?: Workspace[];
   selectedWorkspaceId?: string;
   onSelectWorkspace?: (id: string) => void;
+  onRenameWorkspace?: (id: string, name: string) => void;
+  onManageWorkspaces?: () => void;
 }) {
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
-  const [renamingId, setRenamingId] = useState<string | null>(null);
-  const [renameValue, setRenameValue] = useState("");
   const [wsDropdownOpen, setWsDropdownOpen] = useState(false);
   const [wsMenuOpenId, setWsMenuOpenId] = useState<string | null>(null);
+  // Workspace being renamed. Null = no rename dialog open. One global instance via portal.
+  const [wsRenamingWs, setWsRenamingWs] = useState<Workspace | null>(null);
+  // Conversation being renamed via modal.
+  const [convRenaming, setConvRenaming] = useState<Conversation | null>(null);
+  // Single lifted hover state so only one row's preview flyout is visible at a time.
+  const [wsHoverId, setWsHoverId] = useState<string | null>(null);
+
+  const renderWorkspaceList = () => (
+    <>
+      <div className="p-1">
+        {workspaces.map((ws) => (
+          <WorkspaceRow
+            key={ws.id}
+            ws={ws}
+            isSelected={ws.id === selectedWorkspaceId}
+            isWorking={isWorkspaceWorking && ws.id === selectedWorkspaceId}
+            menuOpen={wsMenuOpenId === ws.id}
+            isHovered={wsHoverId === ws.id && wsMenuOpenId === null}
+            onSelect={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); setWsHoverId(null); }}
+            onToggleMenu={() => { setWsMenuOpenId(wsMenuOpenId === ws.id ? null : ws.id); setWsHoverId(null); }}
+            onStartRename={() => { setWsMenuOpenId(null); setWsHoverId(null); setWsRenamingWs(ws); }}
+            onHoverChange={(hovered) => { if (hovered) setWsHoverId(ws.id); else if (wsHoverId === ws.id) setWsHoverId(null); }}
+          />
+        ))}
+      </div>
+      <div className="border-t border-b1 p-1">
+        <button
+          onClick={() => { setWsDropdownOpen(false); (onManageWorkspaces ?? onOpenSettings)?.(); }}
+          className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] text-t3 transition-colors hover:bg-bg3 hover:text-t1"
+        >
+          <Settings className="h-3.5 w-3.5" />
+          Manage workspaces
+        </button>
+      </div>
+    </>
+  );
   const [convFlyoutOpen, setConvFlyoutOpen] = useState(false);
   const convFlyoutRef = useRef<HTMLDivElement>(null);
 
@@ -270,12 +418,14 @@ export function LeftSidebar({
     document.addEventListener("pointerdown", handle);
     return () => document.removeEventListener("pointerdown", handle);
   }, [convFlyoutOpen]);
-  const wsDropdownRef = useRef<HTMLDivElement>(null);
-
+  // Outside-click uses a data-attribute check instead of a ref, because multiple
+  // sidebar copies (mobile + desktop) all mount dropdown containers — a single shared
+  // ref ends up pointing at only one of them and false-positives "outside".
   useEffect(() => {
     if (!wsDropdownOpen) return;
     const handle = (e: PointerEvent) => {
-      if (wsDropdownRef.current && !wsDropdownRef.current.contains(e.target as Node)) setWsDropdownOpen(false);
+      const t = e.target as HTMLElement | null;
+      if (!t || !t.closest("[data-ws-dropdown]")) setWsDropdownOpen(false);
     };
     document.addEventListener("pointerdown", handle);
     return () => document.removeEventListener("pointerdown", handle);
@@ -327,7 +477,7 @@ export function LeftSidebar({
       </div>
       {/* Workspace selector */}
       {selectedWorkspace && (
-        <div className="shrink-0 px-3 pb-2 border-b border-b1 mb-1" ref={wsDropdownRef}>
+        <div className="shrink-0 px-3 pb-2 border-b border-b1 mb-1" data-ws-dropdown>
           <div className="relative">
             <button
               onClick={() => { setWsDropdownOpen(!wsDropdownOpen); setWsMenuOpenId(null); }}
@@ -343,27 +493,8 @@ export function LeftSidebar({
               <ChevronDown className="h-3 w-3 shrink-0 text-t4" />
             </button>
             {wsDropdownOpen && (
-              <div className="absolute left-0 top-full z-50 mt-1 w-[380px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
-                <div className="grid grid-cols-2 gap-2 p-2">
-                  {workspaces.map((ws) => (
-                    <WorkspacePreviewCard
-                      key={ws.id}
-                      ws={ws}
-                      isSelected={ws.id === selectedWorkspaceId}
-                      isWorking={isWorkspaceWorking && ws.id === selectedWorkspaceId}
-                      onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
-                    />
-                  ))}
-                </div>
-                <div className="border-t border-b1 p-1">
-                  <button
-                    onClick={() => { setWsDropdownOpen(false); onOpenSettings?.(); }}
-                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[12px] text-t3 transition-colors hover:bg-bg3 hover:text-t1"
-                  >
-                    <Settings className="h-3.5 w-3.5" />
-                    Manage workspaces
-                  </button>
-                </div>
+              <div className="absolute left-0 top-full z-50 mt-1 w-[240px] max-w-[calc(100vw-2rem)] rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                {renderWorkspaceList()}
               </div>
             )}
           </div>
@@ -399,42 +530,25 @@ export function LeftSidebar({
         <div className="px-2.5 pt-1.5 pb-1 text-[11px] font-medium uppercase tracking-wider text-t4">Recents</div>
         {conversations.map((conv) => {
           const isActive = conv.id === selectedId;
-          const isRenaming = renamingId === conv.id;
           return (
             <div key={conv.id} className="relative">
-              {isRenaming ? (
-                <div className="relative z-10 flex h-9 items-center rounded-lg bg-bg3 ring-1 ring-inset ring-as/50 px-2.5">
-                  <input
-                    autoFocus
-                    value={renameValue}
-                    onChange={(e) => setRenameValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") { onRenameConversation?.(conv.id, renameValue); setRenamingId(null); }
-                      if (e.key === "Escape") setRenamingId(null);
-                    }}
-                    onBlur={() => { setTimeout(() => { onRenameConversation?.(conv.id, renameValue); setRenamingId(null); }, 100); }}
-                    className="w-full bg-transparent text-[13px] font-medium text-t1 outline-none caret-as"
-                  />
-                </div>
-              ) : (
-                <button
-                  onClick={() => isMobile ? handleMobileSelect(conv.id) : onSelect(conv.id)}
-                  className={`group flex h-9 w-full items-center rounded-lg px-2.5 text-left transition-colors ${isActive ? "bg-bg3" : "hover:bg-bg3h"}`}
+              <button
+                onClick={() => isMobile ? handleMobileSelect(conv.id) : onSelect(conv.id)}
+                className={`group flex h-9 w-full items-center rounded-lg px-2.5 text-left transition-colors ${isActive ? "bg-bg3" : "hover:bg-bg3h"}`}
+              >
+                <span className={`flex-1 truncate text-[13px] ${isActive ? "font-medium text-t1" : "text-t2"}`}>{conv.title}</span>
+                <span
+                  onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === `m-${conv.id}` ? null : `m-${conv.id}`); }}
+                  className={`shrink-0 ml-1 flex h-6 w-6 items-center justify-center rounded-md text-t4 transition-all ${menuOpenId === `m-${conv.id}` ? "opacity-100 bg-bg3h" : "opacity-0 group-hover:opacity-100 hover:bg-bg3h hover:text-t2"}`}
                 >
-                  <span className={`flex-1 truncate text-[13px] ${isActive ? "font-medium text-t1" : "text-t2"}`}>{conv.title}</span>
-                  <span
-                    onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === `m-${conv.id}` ? null : `m-${conv.id}`); }}
-                    className={`shrink-0 ml-1 flex h-6 w-6 items-center justify-center rounded-md text-t4 transition-all ${menuOpenId === `m-${conv.id}` ? "opacity-100 bg-bg3h" : "opacity-0 group-hover:opacity-100 hover:bg-bg3h hover:text-t2"}`}
-                  >
-                    <Ellipsis className="h-4 w-4" />
-                  </span>
-                </button>
-              )}
+                  <Ellipsis className="h-4 w-4" />
+                </span>
+              </button>
               <ConversationMenu
                 open={menuOpenId === `m-${conv.id}`}
                 onClose={() => setMenuOpenId(null)}
                 onDelete={() => onDeleteConversation(conv.id)}
-                onRename={() => { setRenamingId(conv.id); setRenameValue(conv.title); }}
+                onRename={() => setConvRenaming(conv)}
               />
             </div>
           );
@@ -445,6 +559,25 @@ export function LeftSidebar({
 
   return (
     <>
+    {/* Rename modals — single instance via portal, shared across mobile + desktop sidebars */}
+    {wsRenamingWs && (
+      <RenameModal
+        title="Rename workspace"
+        description="Choose a new name for this workspace."
+        initialValue={wsRenamingWs.name}
+        onCommit={(newName) => { onRenameWorkspace?.(wsRenamingWs.id, newName); setWsRenamingWs(null); }}
+        onCancel={() => setWsRenamingWs(null)}
+      />
+    )}
+    {convRenaming && (
+      <RenameModal
+        title="Rename chat"
+        description="Choose a new name for this conversation."
+        initialValue={convRenaming.title}
+        onCommit={(newTitle) => { onRenameConversation?.(convRenaming.id, newTitle); setConvRenaming(null); }}
+        onCancel={() => setConvRenaming(null)}
+      />
+    )}
     {/* Mobile drawer */}
     <div className={`fixed inset-0 z-50 transition-opacity duration-300 md:hidden ${mobileOpen ? "opacity-100" : "pointer-events-none opacity-0"}`}>
       <div className="absolute inset-0 bg-overlay-light backdrop-blur-[2px]" onClick={onCloseMobile} />
@@ -504,7 +637,7 @@ export function LeftSidebar({
 
       {/* Workspace selector (collapsed = icon, expanded = full) */}
       {selectedWorkspace && collapsed && (
-        <div className="shrink-0 px-2 pb-2 flex justify-center border-b border-b1 mb-1" ref={wsDropdownRef}>
+        <div className="shrink-0 px-2 pb-2 flex justify-center border-b border-b1 mb-1" data-ws-dropdown>
           <div className="relative">
             <Tooltip text={selectedWorkspace.name}>
               <button
@@ -522,34 +655,15 @@ export function LeftSidebar({
               </button>
             </Tooltip>
             {wsDropdownOpen && (
-              <div className="absolute left-full top-0 z-50 ml-2 w-[380px] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
-                <div className="grid grid-cols-2 gap-2 p-2">
-                  {workspaces.map((ws) => (
-                    <WorkspacePreviewCard
-                      key={ws.id}
-                      ws={ws}
-                      isSelected={ws.id === selectedWorkspaceId}
-                      isWorking={isWorkspaceWorking && ws.id === selectedWorkspaceId}
-                      onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
-                    />
-                  ))}
-                </div>
-                <div className="border-t border-b1 p-1">
-                  <button
-                    onClick={() => { setWsDropdownOpen(false); onOpenSettings?.(); }}
-                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[12px] text-t3 transition-colors hover:bg-bg3 hover:text-t1"
-                  >
-                    <Settings className="h-3.5 w-3.5" />
-                    Manage workspaces
-                  </button>
-                </div>
+              <div className="absolute left-full top-0 z-50 ml-2 w-[240px] rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                {renderWorkspaceList()}
               </div>
             )}
           </div>
         </div>
       )}
       {selectedWorkspace && !collapsed && (
-        <div className="shrink-0 px-3 pb-2 border-b border-b1 mb-1" ref={wsDropdownRef}>
+        <div className="shrink-0 px-3 pb-2 border-b border-b1 mb-1" data-ws-dropdown>
           <div className="relative">
             <button
               onClick={() => { setWsDropdownOpen(!wsDropdownOpen); setWsMenuOpenId(null); }}
@@ -565,27 +679,8 @@ export function LeftSidebar({
               <ChevronDown className="h-3 w-3 shrink-0 text-t4" />
             </button>
             {wsDropdownOpen && (
-              <div className="absolute left-0 top-full z-50 mt-1 w-[380px] max-w-[calc(100vw-2rem)] overflow-hidden rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
-                <div className="grid grid-cols-2 gap-2 p-2">
-                  {workspaces.map((ws) => (
-                    <WorkspacePreviewCard
-                      key={ws.id}
-                      ws={ws}
-                      isSelected={ws.id === selectedWorkspaceId}
-                      isWorking={isWorkspaceWorking && ws.id === selectedWorkspaceId}
-                      onClick={() => { onSelectWorkspace?.(ws.id); setWsDropdownOpen(false); }}
-                    />
-                  ))}
-                </div>
-                <div className="border-t border-b1 p-1">
-                  <button
-                    onClick={() => { setWsDropdownOpen(false); onOpenSettings?.(); }}
-                    className="flex w-full items-center gap-2 rounded-md px-2.5 py-2 text-[12px] text-t3 transition-colors hover:bg-bg3 hover:text-t1"
-                  >
-                    <Settings className="h-3.5 w-3.5" />
-                    Manage workspaces
-                  </button>
-                </div>
+              <div className="absolute left-0 top-full z-50 mt-1 w-[240px] max-w-[calc(100vw-2rem)] rounded-lg border border-b1 bg-bg2 shadow-[var(--sc)]">
+                {renderWorkspaceList()}
               </div>
             )}
           </div>
@@ -699,51 +794,34 @@ export function LeftSidebar({
         </div>
         {conversations.map((conv) => {
           const isActive = conv.id === selectedId;
-          const isRenaming = renamingId === conv.id;
 
           return (
             <div key={conv.id} className="relative">
-              {isRenaming ? (
-                <div className="relative z-10 flex h-9 items-center rounded-lg bg-bg3 ring-1 ring-inset ring-as/50 px-2.5">
-                  <input
-                    autoFocus
-                    value={renameValue}
-                    onChange={(e) => setRenameValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") { onRenameConversation?.(conv.id, renameValue); setRenamingId(null); }
-                      if (e.key === "Escape") setRenamingId(null);
-                    }}
-                    onBlur={() => { setTimeout(() => { onRenameConversation?.(conv.id, renameValue); setRenamingId(null); }, 100); }}
-                    className="w-full bg-transparent text-[13px] font-medium text-t1 outline-none caret-as"
-                  />
-                </div>
-              ) : (
-                <button
-                  onClick={() => onSelect(conv.id)}
-                  className={`group flex h-9 w-full items-center rounded-lg px-2.5 text-left transition-colors ${
-                    isActive ? "bg-bg3" : "hover:bg-bg3h"
+              <button
+                onClick={() => onSelect(conv.id)}
+                className={`group flex h-9 w-full items-center rounded-lg px-2.5 text-left transition-colors ${
+                  isActive ? "bg-bg3" : "hover:bg-bg3h"
+                }`}
+              >
+                <span className={`flex-1 truncate text-[13px] ${isActive ? "font-medium text-t1" : "text-t2"}`}>
+                  {conv.title}
+                </span>
+                <span
+                  onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === conv.id ? null : conv.id); }}
+                  className={`shrink-0 ml-1 flex h-6 w-6 items-center justify-center rounded-md text-t4 transition-all ${
+                    menuOpenId === conv.id
+                      ? "opacity-100 bg-bg3h"
+                      : "opacity-0 group-hover:opacity-100 hover:bg-bg3h hover:text-t2"
                   }`}
                 >
-                  <span className={`flex-1 truncate text-[13px] ${isActive ? "font-medium text-t1" : "text-t2"}`}>
-                    {conv.title}
-                  </span>
-                  <span
-                    onClick={(e) => { e.stopPropagation(); setMenuOpenId(menuOpenId === conv.id ? null : conv.id); }}
-                    className={`shrink-0 ml-1 flex h-6 w-6 items-center justify-center rounded-md text-t4 transition-all ${
-                      menuOpenId === conv.id
-                        ? "opacity-100 bg-bg3h"
-                        : "opacity-0 group-hover:opacity-100 hover:bg-bg3h hover:text-t2"
-                    }`}
-                  >
-                    <Ellipsis className="h-4 w-4" />
-                  </span>
-                </button>
-              )}
+                  <Ellipsis className="h-4 w-4" />
+                </span>
+              </button>
               <ConversationMenu
                 open={menuOpenId === conv.id}
                 onClose={() => setMenuOpenId(null)}
                 onDelete={() => onDeleteConversation(conv.id)}
-                onRename={() => { setRenamingId(conv.id); setRenameValue(conv.title); }}
+                onRename={() => setConvRenaming(conv)}
               />
             </div>
           );

@@ -172,6 +172,7 @@ export default function Home() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [sidebarView, setSidebarView] = useState<"chat" | "artifacts" | "uploads">("chat");
   const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(mockWorkspaces[0].id);
+  const [workspaces, setWorkspaces] = useState(mockWorkspaces);
 
   // ── ChatArea remount key & auto-play ──
   const [chatKey, setChatKey] = useState(0);
@@ -861,9 +862,14 @@ export default function Home() {
               trialDaysLeft={trialDaysLeft}
               mobileOpen={mobileSidebarOpen}
               onCloseMobile={() => setMobileSidebarOpen(false)}
-              workspaces={mockWorkspaces}
+              workspaces={workspaces}
               selectedWorkspaceId={selectedWorkspaceId}
               onSelectWorkspace={setSelectedWorkspaceId}
+              onRenameWorkspace={(id, name) => {
+                if (!name.trim()) return;
+                setWorkspaces((prev) => prev.map((w) => w.id === id ? { ...w, name: name.trim() } : w));
+              }}
+              onManageWorkspaces={() => { setSettingsSection("workspaces"); setSettingsOpen(true); }}
             />
             {sidebarView === "artifacts" ? (
               <ArtifactsPage />
@@ -1076,6 +1082,16 @@ export default function Home() {
             connectedServices={connectedServices}
             onSignOut={(id) => setConnectedServices((prev) => prev.filter((s) => s.id !== id))}
             onSignOutAll={() => setConnectedServices([])}
+            workspaces={workspaces}
+            onRenameWorkspace={(id, name) => {
+              if (!name.trim()) return;
+              setWorkspaces((prev) => prev.map((w) => w.id === id ? { ...w, name: name.trim() } : w));
+            }}
+            onCreateWorkspace={({ name, isDevice }) => {
+              const id = `ws-${Math.random().toString(36).slice(2, 8)}`;
+              setWorkspaces((prev) => [...prev, { id, name, status: "active" as const, isDevice }]);
+              setSelectedWorkspaceId(id);
+            }}
           />
           <CardGallery
             open={cardGalleryOpen}
